@@ -8,7 +8,7 @@
 (evil-escape-mode t)
 
 (require 'evil-leader)
-(evil-leader/set-leader ";")
+(evil-leader/set-leader "SPC")
 (global-evil-leader-mode)
 
 (require 'evil)
@@ -18,40 +18,51 @@
 (setq evil-visual-state-cursor '(box "#9FFF4C"))
 (setq evil-replace-state-cursor '(box "#FF7C4C"))
 (setq evil-operator-state-cursor '(hollow "#528FFF"))
+(evil-mode t)
 
 
 ;; Evil states unbinds
-(define-key evil-normal-state-map (kbd "J") nil)
 (define-key evil-motion-state-map (kbd "SPC") nil)
+(define-key evil-normal-state-map (kbd "J") nil)
 
 
 ;; Leader key sequence
 (evil-leader/set-key
-	evil-leader/leader 'helm-M-x
-	"bb" 'helm-mini
-	"bf" 'helm-for-files
-	"bg" 'helm-occur
-	"gg" 'magit
-	"gs" 'magit-stage-file
-	"gc" 'magit-commit
-	"gp" 'magit-push
-	"pp" 'helm-projectile
-	"pf" 'helm-projectile-find-file
-	"pg" 'helm-projectile-grep
-	"ws" 'split-window-below
-	"wv" 'split-window)
+  "bb" 'helm-mini
+  "bg" 'helm-occur
+  "bs" (lambda () (interactive) (switch-to-buffer "*scratch*"))
+  "ff" 'helm-find-files
+  "fg" 'helm-for-files
+  "fq" 'evil-quit
+  "fs" (lambda () (interactive) (delete-trailing-whitespace) (save-buffer))
+  "gb" 'magit-checkout
+  "gc" 'magit-commit
+  "gg" 'magit
+  "gi" 'magit-init
+  "gm" 'magit-merge
+  "gp" 'magit-push
+  "gs" 'magit-stage
+  "gu" 'magit-unstage
+  "pf" 'helm-projectile-find-file
+  "pg" 'helm-projectile-grep
+  "pp" 'helm-projectile
+  "wh" 'windmove-left
+  "wj" 'windmove-down
+  "wk" 'windmove-up
+  "wl" 'windmove-right
+  "wn" 'next-buffer
+  "wp" 'previous-buffer
+  "ws" 'split-window-below
+  "wv" 'split-window-right)
 
 
 ;; Normal state bindings
-(define-key evil-normal-state-map (kbd "C-p") 'evil-prev-buffer)
-(define-key evil-normal-state-map (kbd "C-n") 'evil-next-buffer)
-(define-key evil-normal-state-map (kbd "C-h") 'windmove-left)
-(define-key evil-normal-state-map (kbd "C-j") 'windmove-down)
-(define-key evil-normal-state-map (kbd "C-k") 'windmove-up)
-(define-key evil-normal-state-map (kbd "C-l") 'windmove-right)
+(define-key evil-normal-state-map (kbd "%") (lambda () (interactive) (evil-jump-item) (evil-visual-char) (evil-jump-item)))
+(define-key evil-normal-state-map (kbd "SPC SPC") 'helm-M-x)
 
 
 ;; Motion state bindings
+(define-key evil-motion-state-map (kbd "SPC SPC") 'evil-escape)
 (define-key evil-motion-state-map (kbd "H") 'evil-first-non-blank)
 (define-key evil-motion-state-map (kbd "J") 'evil-forward-paragraph)
 (define-key evil-motion-state-map (kbd "K") 'evil-backward-paragraph)
@@ -59,14 +70,16 @@
 
 
 ;; Insert state bindings
+(define-key evil-insert-state-map (kbd "<backtab>") 'tab-to-tab-stop)
 (define-key evil-insert-state-map (kbd "S-SPC") 'company-complete)
 
 
-;; Special map bindings
+;; Specific map bindings
 (require 'company)
 (with-eval-after-load 'company
-  (define-key company-active-map (kbd "<tab>") #'company-select-next)
-  (define-key company-active-map (kbd "<backtab>") #'company-select-previous))
+  (define-key company-active-map (kbd "SPC SPC") (lambda () (interactive) (company-abort)))
+  (define-key company-active-map (kbd "<tab>") 'company-select-next)
+  (define-key company-active-map (kbd "<backtab>") 'company-select-previous))
 
 (require 'helm)
 (with-eval-after-load 'helm

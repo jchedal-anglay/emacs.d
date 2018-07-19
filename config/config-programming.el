@@ -1,16 +1,26 @@
+;; Syntax checker
+(require 'flycheck)
+(custom-set-faces
+ '(flycheck-info ((t (:underline (:style line :color "#80FF80")))))
+ '(flycheck-warning ((t (:underline (:style line :color "#FF9933")))))
+ '(flycheck-error ((t (:underline (:style line :color "#FF5C33"))))))
+(global-flycheck-mode t)
+
+
 ;; General programming settings
+(require 'smartparens-config)
 (add-hook 'prog-mode-hook (lambda()
 							(setq tab-width 4)
-							(linum-mode)
+							(smartparens-mode)
 							(rainbow-delimiters-mode)))
 
 
 ;; Python settings
-(setq-default python-shell-interpreter "python3.7")
+(setq-default python-shell-interpreter "python3.6")
 (setq-default python-indent 4)
 (add-hook 'python-mode-hook (lambda()
-								(setq flycheck-python-pylint-executable "python3.7")
-								(setq flycheck-python-pycompile-executable "python3.7")))
+							  (setq flycheck-python-pylint-executable "python3.6")
+							  (setq flycheck-python-pycompile-executable "python3.6")))
 
 
 ;; C settings
@@ -20,9 +30,14 @@
 						 (setq indent-tabs-mode t)))
 
 
-;; Syntax checker
-(require 'flycheck)
-(global-flycheck-mode t)
+;; Auto indentation
+(require 'aggressive-indent)
+(global-aggressive-indent-mode 1)
+(add-to-list
+ 'aggressive-indent-dont-indent-if
+ '(and (derived-mode-p 'c-mode)
+       (null (string-match "\\([;{}]\\|\\b\\(if\\|for\\|while\\)\\b\\)"
+                           (thing-at-point 'line)))))
 
 
 ;; Auto-completion
