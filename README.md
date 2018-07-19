@@ -6,7 +6,7 @@
 - Inconsolata
 
 ## Getting started
-Simply clone the repository into your home directory.
+Simply clone the repository as ~/.emacs.d
 
 ## Bindings
 The leader key in that configuration is the spacebar (`SPC`), we will refer to it as `<leader>` from now on.
@@ -27,7 +27,7 @@ The leader key in that configuration is the spacebar (`SPC`), we will refer to i
 `<leader>bg`: Use `grep` on the current buffer
 ### Files -> `f`
 `<leader>ff`: Stands for `find-files`, navigate through your files and directories  
-`<leader>fg`: Find a file or directory using locate  
+`<leader>fg`: Find a file or directory using locate, not great on MacOS  
 `<leader>fq`: Quit the current buffer, similar to vim's `:q`  
 `<leader>fs`: Save the current buffer, similar to vim's `:w`  
 `<leader>fx`: Save and quit the current buffer, similar to vim's `:wq`
