@@ -8,19 +8,17 @@
 
 
 ;; General programming settings
-(require 'smartparens-config)
 (add-hook 'prog-mode-hook (lambda()
 							(setq tab-width 4)
-							(smartparens-mode)
 							(rainbow-delimiters-mode)))
 
 
 ;; Python settings
-(setq-default python-shell-interpreter "python3.6")
+(setq-default python-shell-interpreter "python3.7")
 (setq-default python-indent 4)
 (add-hook 'python-mode-hook (lambda()
-							  (setq flycheck-python-pylint-executable "python3.6")
-							  (setq flycheck-python-pycompile-executable "python3.6")))
+							  (setq flycheck-python-pylint-executable "python3.7")
+							  (setq flycheck-python-pycompile-executable "python3.7")))
 
 
 ;; C settings

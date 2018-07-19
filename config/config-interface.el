@@ -34,16 +34,16 @@
 
 
 ;; Text appearance
-(set-frame-font "Inconsolata 16" nil t)
+(set-frame-font "Inconsolata-12" nil t)
 (require 'atom-one-dark-theme)
 (load-theme 'atom-one-dark t)
 (custom-set-faces
- '(font-lock-doc-face ((t (:inherit 'font-lock-comment-face))))
+ '(font-lock-doc-face ((t (:inherit 'font-lock-comment-face :slant italic))))
  '(font-lock-variable-name-face ((t (:foreground "#D6BDDB")))))
 
 
 ;; Line numbers
-(setq-default linum-format " %3d ")
+(setq-default linum-format " %d ")
 (add-hook 'prog-mode-hook (lambda ()
 							(linum-mode)
 							(set-face-underline 'linum nil)))
@@ -56,6 +56,13 @@
 						(bookmarks . 5)
 						(projects . 5)))
 (dashboard-setup-startup-hook)
+
+
+;; Syntax highlighting
+(font-lock-add-keywords 'prog-mode '(("\\(TODO\\|FIXME\\|BUG\\):" 1 'font-lock-function-name-face t)))
+(font-lock-add-keywords 'python-mode '(("\\<\\([^A-Z][\\w_]+\\)(" 1 'font-lock-function-name-face t)))
+(font-lock-add-keywords 'python-mode '(("\\<\\([A-Z][\\w_]+\\)(" 1 'font-lock-type-face t)))
+(font-lock-add-keywords 'python-mode '(("`\\(.+\\)[`']" 1 'font-lock-builtin-face)))
 
 
 ;; Fringes
@@ -113,6 +120,8 @@
 (setq require-final-newline t)
 (setq ring-bell-function 'ignore)
 (blink-cursor-mode -1)
+(show-paren-mode t)
+(elcord-mode)
 
 
 (provide 'config-interface)
