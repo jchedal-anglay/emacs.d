@@ -2,7 +2,7 @@
 
 
 ## Requirements
-- Emacs **GUI**
+- Emacs **GUI**, preferably 26+
 - Inconsolata
 
 ## Getting started
