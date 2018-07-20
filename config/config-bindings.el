@@ -8,7 +8,7 @@
 (evil-escape-mode t)
 
 (require 'evil-leader)
-(evil-leader/set-leader "ù")
+(evil-leader/set-leader "SPC")
 (global-evil-leader-mode)
 
 (require 'evil)
@@ -28,31 +28,31 @@
 
 ;; Leader key sequence
 (evil-leader/set-key
-	evil-leader/leader 'helm-M-x
-	"bb" 'helm-mini
-	"bf" 'helm-for-files
-	"bg" 'helm-occur
-	"gg" 'magit
-	"gs" 'magit-stage-file
-	"gc" 'magit-commit
-	"gp" 'magit-push
-	"pp" 'helm-projectile
-	"pf" 'helm-projectile-find-file
-	"pg" 'helm-projectile-grep
-	"ws" 'split-window-below
-	"wv" 'split-window)
+  "b" 'helm-mini
+  "f" 'helm-find-files
+  "g" 'magit
+  "h" 'windmove-left
+  "j" 'windmove-down
+  "k" 'windmove-up
+  "l" 'windmove-right
+  "p" 'helm-projectile
+  "q" 'evil-quit
+  "w" 'save-buffer
+  "x" 'evil-save-and-close
+  "/" 'helm-occur
+  "?" (lambda ()
+		(interactive)
+		(if (projectile-project-p)
+			(helm-projectile-grep)
+		  (helm-locate))))
 
 
 ;; Normal state bindings
-(define-key evil-normal-state-map (kbd "C-p") 'evil-prev-buffer)
-(define-key evil-normal-state-map (kbd "C-n") 'evil-next-buffer)
-(define-key evil-normal-state-map (kbd "C-h") 'windmove-left)
-(define-key evil-normal-state-map (kbd "C-j") 'windmove-down)
-(define-key evil-normal-state-map (kbd "C-k") 'windmove-up)
-(define-key evil-normal-state-map (kbd "C-l") 'windmove-right)
+(define-key evil-normal-state-map (kbd "SPC SPC") 'helm-M-x)
 
 
 ;; Motion state bindings
+(define-key evil-motion-state-map (kbd "SPC SPC") 'evil-escape)
 (define-key evil-motion-state-map (kbd "H") 'evil-first-non-blank)
 (define-key evil-motion-state-map (kbd "J") 'evil-forward-paragraph)
 (define-key evil-motion-state-map (kbd "K") 'evil-backward-paragraph)
@@ -60,17 +60,17 @@
 
 
 ;; Insert state bindings
-(define-key evil-insert-state-map (kbd "RET") 'newline-and-indent)
-(define-key evil-insert-state-map (kbd "<tab>") 'indent-for-tab-command)
+(define-key evil-insert-state-map (kbd "S-SPC") 'company-complete-common)
 (define-key evil-insert-state-map (kbd "<backtab>") 'tab-to-tab-stop)
-(define-key evil-insert-state-map (kbd "S-SPC") 'company-complete)
 
 
 ;; Special map bindings
 (require 'company)
 (with-eval-after-load 'company
-  (define-key company-active-map (kbd "<tab>") #'company-select-next)
-  (define-key company-active-map (kbd "<backtab>") #'company-select-previous))
+  (define-key company-active-map (kbd "SPC SPC") (lambda () (interactive) (company-abort) (evil-escape)))
+  (define-key company-active-map (kbd "S-SPC") 'company-abort)
+  (define-key company-active-map (kbd "<tab>") 'company-select-next)
+  (define-key company-active-map (kbd "<backtab>") 'company-select-previous))
 
 (require 'helm)
 (with-eval-after-load 'helm
