@@ -8,8 +8,10 @@
 
 
 ;; General programming settings
+(require 'smartparens-config)
 (add-hook 'prog-mode-hook (lambda()
 							(setq tab-width 4)
+							(smartparens-mode)
 							(rainbow-delimiters-mode)))
 
 
