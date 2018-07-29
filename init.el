@@ -6,6 +6,7 @@
 (package-refresh-contents)
 (package-install 'aggressive-indent)
 (package-install 'atom-one-dark-theme)
+(package-install 'cider)
 (package-install 'company)
 (package-install 'company-c-headers)
 (package-install 'company-jedi)

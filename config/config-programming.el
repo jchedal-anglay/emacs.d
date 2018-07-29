@@ -16,11 +16,11 @@
 
 
 ;; Python settings
-(setq-default python-shell-interpreter "python3.7")
+(setq-default python-shell-interpreter "python3")
 (setq-default python-indent 4)
 (add-hook 'python-mode-hook (lambda()
-							  (setq flycheck-python-pylint-executable "python3.7")
-							  (setq flycheck-python-pycompile-executable "python3.7")))
+							  (setq flycheck-python-pylint-executable "python3")
+							  (setq flycheck-python-pycompile-executable "python3")))
 
 
 ;; C settings
@@ -33,11 +33,6 @@
 ;; Auto indentation
 (require 'aggressive-indent)
 (global-aggressive-indent-mode 1)
-(add-to-list
- 'aggressive-indent-dont-indent-if
- '(and (derived-mode-p 'c-mode)
-       (null (string-match "\\([;{}]\\|\\b\\(if\\|for\\|while\\)\\b\\)"
-                           (thing-at-point 'line)))))
 
 
 ;; Auto-completion

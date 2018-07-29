@@ -2,8 +2,8 @@
 (setq-default evil-want-integration nil)
 
 (require 'evil-escape)
-(setq evil-escape-key-sequence "  ")
-(setq evil-escape-delay .5)
+(setq evil-escape-key-sequence "jk")
+(setq evil-escape-delay .05)
 (setq evil-escape-unordered-key-sequence t)
 (evil-escape-mode t)
 
@@ -21,6 +21,10 @@
 (evil-mode t)
 
 
+;; Global bindings
+(define-key global-map (kbd "M-x") 'helm-M-x)
+
+
 ;; Evil states unbinds
 (define-key evil-normal-state-map (kbd "J") nil)
 (define-key evil-motion-state-map (kbd "SPC") nil)
@@ -28,6 +32,7 @@
 
 ;; Leader key sequence
 (evil-leader/set-key
+  "SPC" 'helm-M-x
   "b" 'helm-mini
   "f" 'helm-find-files
   "g" 'magit
@@ -44,30 +49,26 @@
 		(interactive)
 		(if (projectile-project-p)
 			(helm-projectile-grep)
-		  (helm-locate))))
-
-
-;; Normal state bindings
-(define-key evil-normal-state-map (kbd "SPC SPC") 'helm-M-x)
+		  (helm-for-files))))
 
 
 ;; Motion state bindings
-(define-key evil-motion-state-map (kbd "SPC SPC") 'evil-escape)
 (define-key evil-motion-state-map (kbd "H") 'evil-first-non-blank)
-(define-key evil-motion-state-map (kbd "J") 'evil-forward-paragraph)
-(define-key evil-motion-state-map (kbd "K") 'evil-backward-paragraph)
+(define-key evil-motion-state-map (kbd "J") 'evil-forward-section-begin)
+(define-key evil-motion-state-map (kbd "K") 'evil-backward-section-begin)
 (define-key evil-motion-state-map (kbd "L") 'evil-end-of-visual-line)
 
 
 ;; Insert state bindings
-(define-key evil-insert-state-map (kbd "S-SPC") 'company-complete-common)
+(define-key evil-insert-state-map (kbd "S-SPC") 'company-complete)
 (define-key evil-insert-state-map (kbd "<backtab>") 'tab-to-tab-stop)
 
 
 ;; Special map bindings
 (require 'company)
 (with-eval-after-load 'company
-  (define-key company-active-map (kbd "SPC SPC") (lambda () (interactive) (company-abort) (evil-escape)))
+  (define-key company-active-map (kbd "jk") (lambda () (interactive) (company-abort) (evil-escape)))
+  (define-key company-active-map (kbd "kj") (lambda () (interactive) (company-abort) (evil-escape)))
   (define-key company-active-map (kbd "S-SPC") 'company-abort)
   (define-key company-active-map (kbd "<tab>") 'company-select-next)
   (define-key company-active-map (kbd "<backtab>") 'company-select-previous))
@@ -79,6 +80,7 @@
 
 (require 'magit)
 (with-eval-after-load 'magit
+  (define-key magit-mode-map (kbd "J") 'evil-forward-paragraph)
   (define-key magit-mode-map (kbd "K") 'evil-backward-paragraph))
 
 (provide 'config-bindings)
