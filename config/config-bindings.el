@@ -52,7 +52,12 @@
 		  (helm-for-files))))
 
 
+;; Normal state bindings
+(define-key evil-normal-state-map (kbd "SPC SPC") 'helm-M-x)
+
+
 ;; Motion state bindings
+(define-key evil-motion-state-map (kbd "SPC SPC") 'evil-escape)
 (define-key evil-motion-state-map (kbd "H") 'evil-first-non-blank)
 (define-key evil-motion-state-map (kbd "J") 'evil-forward-section-begin)
 (define-key evil-motion-state-map (kbd "K") 'evil-backward-section-begin)
