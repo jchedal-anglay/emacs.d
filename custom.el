@@ -6,7 +6,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (cider keyfreq smartparens rainbow-delimiters projectile magit helm-projectile helm flycheck evil-magit evil-leader evil-escape evil elcord dashboard company-jedi company-c-headers company atom-one-dark-theme aggressive-indent))))
+    (xah-fly-keys cider keyfreq smartparens rainbow-delimiters projectile magit helm-projectile helm flycheck evil-magit evil-leader evil-escape evil elcord dashboard company-jedi company-c-headers company atom-one-dark-theme aggressive-indent))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

@@ -1,79 +1,97 @@
-;; Evil related settings
-(setq-default evil-want-integration nil)
+;; Xah-fly-keys settings
+(require 'xah-fly-keys)
+(xah-fly-keys-set-layout "qwerty")
 
-(require 'evil-escape)
-(setq evil-escape-key-sequence "jk")
-(setq evil-escape-delay .05)
-(setq evil-escape-unordered-key-sequence t)
-(evil-escape-mode t)
+(defun xfk-insert-mode ()
+  (define-key xah-fly-key-map (kbd "<f2>") 'xah-fly-command-mode-activate))
 
-(require 'evil-leader)
-(evil-leader/set-leader "SPC")
-(global-evil-leader-mode)
+(defun xfk-command-mode ()
+  (define-key xah-fly-key-map (kbd "<f2>") 'xah-fly-insert-mode-activate))
 
-(require 'evil)
-(setq evil-move-cursor-back nil)
-(setq evil-normal-state-cursor '(box "#528FFF"))
-(setq evil-insert-state-cursor '(box "#FFFFFF"))
-(setq evil-visual-state-cursor '(box "#9FFF4C"))
-(setq evil-replace-state-cursor '(box "#FF7C4C"))
-(setq evil-operator-state-cursor '(hollow "#528FFF"))
-(evil-mode t)
+(defun xfk-hl-on ()
+  (global-hl-line-mode 1))
 
+(defun xfk-hl-off ()
+  (global-hl-line-mode 0))
 
-;; Global bindings
-(define-key global-map (kbd "M-x") 'helm-M-x)
+(add-hook 'xah-fly-insert-mode-activate-hook 'xfk-insert-mode 'xfk-hl-on)
+(add-hook 'xah-fly-command-mode-activate-hook 'xfk-command-mode 'xfk-hl-off)
 
+(defun xfk-quit ()
+  "Kills the buffer and window"
+  (interactive)
+  (condition-case nil
+	  (delete-window)
+	(error
+	 (if (and (boundp 'server-buffer-clients)
+			  (fboundp 'server-edit)
+			  (fboundp 'server-buffer-done)
+			  server-buffer-clients)
+		 (server-edit)
+	   (condition-case nil
+		   (delete-frame)
+		 (error
+		  (save-buffers-kill-emacs)))))))
 
-;; Evil states unbinds
-(define-key evil-normal-state-map (kbd "J") nil)
-(define-key evil-motion-state-map (kbd "SPC") nil)
+(xah-fly--define-keys
+ (define-prefix-command 'xah-fly-leader-key-map)
+ '(("1" . nil)
+   ("2" . nil)
+   ("3" . nil)
+   ("4" . nil)
+   ("5" . nil)
+   ("6" . nil)
+   ("7" . nil)
+   ("8" . nil)
+   ("9" . nil)
+   ("0" . nil)
+   ("SPC" . helm-mini)
+   ("a" . nil) ; a
+   ("x" . nil) ; b
+   ("j" . nil) ; c
+   ("e" . nil) ; d
+   ("." . nil) ; e
+   ("u" . helm-find-files) ; f
+   ("i" . magit) ; g
+   ("d" . nil) ; h
+   ("c" . nil) ; i
+   ("h" . nil) ; j
+   ("t" . nil) ; k
+   ("n" . nil) ; l
+   ("m" . nil) ; m
+   ("b" . nil) ; n
+   ("r" . nil) ; o
+   ("l" . helm-projectile) ; p
+   ("'" . xfk-quit) ; q
+   ("p" . nil) ; r
+   ("o" . nil) ; s
+   ("y" . nil) ; t
+   ("g" . nil) ; u
+   ("k" . nil) ; v
+   ("," . save-buffer) ; w
+   ("q" . (lambda () (interactive) (save-buffer) (xfk-quit))) ; x
+   ("f" . nil) ; y
+   (";" . nil) ; z
+   ("s" . nil) ; ;
+   ("v" . nil) ; .
+   ("w" . nil) ; ,
+   ("-" . nil) ; '
+   ("z" . nil) ; /
+   ("]" . nil) ; =
+   ("/" . nil) ; [
+   ("=" . nil) ; ]
+   ))
 
+(xah-fly-keys 1)
 
-;; Leader key sequence
-(evil-leader/set-key
-  "SPC" 'helm-M-x
-  "b" 'helm-mini
-  "f" 'helm-find-files
-  "g" 'magit
-  "h" 'windmove-left
-  "j" 'windmove-down
-  "k" 'windmove-up
-  "l" 'windmove-right
-  "p" 'helm-projectile
-  "q" 'evil-quit
-  "w" 'save-buffer
-  "x" 'evil-save-and-close
-  "/" 'helm-occur
-  "?" (lambda ()
-		(interactive)
-		(if (projectile-project-p)
-			(helm-projectile-grep)
-		  (helm-for-files))))
-
-
-;; Normal state bindings
-(define-key evil-normal-state-map (kbd "SPC SPC") 'helm-M-x)
-
-
-;; Motion state bindings
-(define-key evil-motion-state-map (kbd "SPC SPC") 'evil-escape)
-(define-key evil-motion-state-map (kbd "H") 'evil-first-non-blank)
-(define-key evil-motion-state-map (kbd "J") 'evil-forward-section-begin)
-(define-key evil-motion-state-map (kbd "K") 'evil-backward-section-begin)
-(define-key evil-motion-state-map (kbd "L") 'evil-end-of-visual-line)
-
-
-;; Insert state bindings
-(define-key evil-insert-state-map (kbd "S-SPC") 'company-complete)
-(define-key evil-insert-state-map (kbd "<backtab>") 'tab-to-tab-stop)
+(global-set-key (kbd "S-SPC") (lambda () (interactive) (when xah-fly-insert-state-q (company-complete))))
+(global-set-key (kbd "<backtab>") 'tab-to-tab-stop)
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 
 ;; Special map bindings
 (require 'company)
 (with-eval-after-load 'company
-  (define-key company-active-map (kbd "jk") (lambda () (interactive) (company-abort) (evil-escape)))
-  (define-key company-active-map (kbd "kj") (lambda () (interactive) (company-abort) (evil-escape)))
   (define-key company-active-map (kbd "S-SPC") 'company-abort)
   (define-key company-active-map (kbd "<tab>") 'company-select-next)
   (define-key company-active-map (kbd "<backtab>") 'company-select-previous))
@@ -85,7 +103,9 @@
 
 (require 'magit)
 (with-eval-after-load 'magit
-  (define-key magit-mode-map (kbd "J") 'evil-forward-paragraph)
-  (define-key magit-mode-map (kbd "K") 'evil-backward-paragraph))
+  (define-key magit-mode-map (kbd "j") 'backward-char)
+  (define-key magit-mode-map (kbd "k") 'previous-line)
+  (define-key magit-mode-map (kbd "i") 'next-line)
+  (define-key magit-mode-map (kbd "l") 'forward-char))
 
 (provide 'config-bindings)
