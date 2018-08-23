@@ -1,37 +1,30 @@
-;; Xah-fly-keys settings
 (require 'xah-fly-keys)
 (xah-fly-keys-set-layout "qwerty")
 
-(defun xfk-insert-mode ()
-  (define-key xah-fly-key-map (kbd "<f2>") 'xah-fly-command-mode-activate))
-
-(defun xfk-command-mode ()
-  (define-key xah-fly-key-map (kbd "<f2>") 'xah-fly-insert-mode-activate))
-
-(defun xfk-hl-on ()
-  (global-hl-line-mode 1))
-
-(defun xfk-hl-off ()
-  (global-hl-line-mode 0))
-
-(add-hook 'xah-fly-insert-mode-activate-hook 'xfk-insert-mode 'xfk-hl-on)
-(add-hook 'xah-fly-command-mode-activate-hook 'xfk-command-mode 'xfk-hl-off)
-
-(defun xfk-quit ()
-  "Kills the buffer and window"
+(defun my-bindkey-xfk-insert-mode ()
+  "Define keys for `xah-fly-insert-mode-activate-hook'."
   (interactive)
-  (condition-case nil
-	  (delete-window)
-	(error
-	 (if (and (boundp 'server-buffer-clients)
-			  (fboundp 'server-edit)
-			  (fboundp 'server-buffer-done)
-			  server-buffer-clients)
-		 (server-edit)
-	   (condition-case nil
-		   (delete-frame)
-		 (error
-		  (save-buffers-kill-emacs)))))))
+  (define-key xah-fly-key-map (kbd "<f2>") 'xah-fly-command-mode-activate)
+  )
+
+(defun my-bindkey-xfk-command-mode ()
+  "Define keys for `xah-fly-command-mode-activate-hook'."
+  (interactive)
+  (define-key xah-fly-key-map (kbd "q") 'keyboard-escape-quit)
+  (define-key xah-fly-key-map (kbd "<f2>") 'xah-fly-insert-mode-activate)
+  )
+
+(add-hook 'xah-fly-insert-mode-activate-hook 'my-bindkey-xfk-insert-mode)
+(add-hook 'xah-fly-command-mode-activate-hook 'my-bindkey-xfk-command-mode)
+
+(defun smart-quit (&optional flag)
+  "Kill the buffer and window, if FLAG is t, save the current buffer"
+  (interactive)
+  (when flag
+	(save-buffer))
+  (if (one-window-p)
+	  (save-buffers-kill-emacs)
+	(delete-window)))
 
 (xah-fly--define-keys
  (define-prefix-command 'xah-fly-leader-key-map)
@@ -62,14 +55,14 @@
    ("b" . nil) ; n
    ("r" . nil) ; o
    ("l" . helm-projectile) ; p
-   ("'" . xfk-quit) ; q
-   ("p" . nil) ; r
+   ("'" . smart-quit) ; q
+   ("p" . query-replace-regexp) ; r
    ("o" . nil) ; s
    ("y" . nil) ; t
    ("g" . nil) ; u
    ("k" . nil) ; v
    ("," . save-buffer) ; w
-   ("q" . (lambda () (interactive) (save-buffer) (xfk-quit))) ; x
+   ("q" . (lambda () (interactive) (smart-quit t))) ; x
    ("f" . nil) ; y
    (";" . nil) ; z
    ("s" . nil) ; ;
@@ -87,7 +80,6 @@
 (global-set-key (kbd "S-SPC") (lambda () (interactive) (when xah-fly-insert-state-q (company-complete))))
 (global-set-key (kbd "<backtab>") 'tab-to-tab-stop)
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-
 
 ;; Special map bindings
 (require 'company)

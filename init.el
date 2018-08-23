@@ -25,6 +25,7 @@
 (package-install 'projectile)
 (package-install 'rainbow-delimiters)
 (package-install 'smartparens)
+(package-install 'xah-fly-keys)
 
 
 ;; Initialize load path
