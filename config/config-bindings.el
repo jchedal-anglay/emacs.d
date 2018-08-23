@@ -54,9 +54,9 @@
    ("m" . nil) ; m
    ("b" . nil) ; n
    ("r" . nil) ; o
-   ("l" . helm-projectile) ; p
+   ("l" . projectile-keymap) ; p
    ("'" . smart-quit) ; q
-   ("p" . query-replace-regexp) ; r
+   ("p" . helm-for-files) ; r
    ("o" . nil) ; s
    ("y" . nil) ; t
    ("g" . nil) ; u
@@ -75,7 +75,10 @@
    ("=" . nil) ; ]
    ))
 
-(xah-fly-keys 1)
+(define-prefix-command 'projectile-keymap)
+(define-key my-nice-keymap (kbd "p") nil)
+
+  (xah-fly-keys 1)
 
 (global-set-key (kbd "S-SPC") (lambda () (interactive) (when xah-fly-insert-state-q (company-complete))))
 (global-set-key (kbd "<backtab>") 'tab-to-tab-stop)
