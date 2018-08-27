@@ -1,5 +1,5 @@
-;; Xah-fly-keys settings
 (require 'xah-fly-keys)
+<<<<<<< HEAD
 
 (xah-fly-keys-set-layout "qwerty")
 
@@ -18,12 +18,35 @@
 
 (defun smart-quit (&optional flag)
   "Kill the buffer and window, if FLAG is t, save the current buffer."
+=======
+(xah-fly-keys-set-layout "qwerty")
+
+(defun my-bindkey-xfk-insert-mode ()
+  "Define keys for `xah-fly-insert-mode-activate-hook'."
+  (interactive)
+  (define-key xah-fly-key-map (kbd "<f2>") 'xah-fly-command-mode-activate)
+  )
+
+(defun my-bindkey-xfk-command-mode ()
+  "Define keys for `xah-fly-command-mode-activate-hook'."
+  (interactive)
+  (define-key xah-fly-key-map (kbd "q") 'keyboard-escape-quit)
+  (define-key xah-fly-key-map (kbd "<f2>") 'xah-fly-insert-mode-activate)
+  )
+
+(add-hook 'xah-fly-insert-mode-activate-hook 'my-bindkey-xfk-insert-mode)
+(add-hook 'xah-fly-command-mode-activate-hook 'my-bindkey-xfk-command-mode)
+
+(defun smart-quit (&optional flag)
+  "Kill the buffer and window, if FLAG is t, save the current buffer"
+>>>>>>> 21573c66c32ca5776f4009c46e77620e08c48113
   (interactive)
   (when flag
 	(save-buffer))
   (if (one-window-p)
 	  (save-buffers-kill-emacs)
 	(delete-window)))
+<<<<<<< HEAD
 
 (xah-fly--define-keys
  (define-prefix-command 'projectile-keymap)
@@ -31,6 +54,8 @@
    ("l" . helm-projectile) ; p
    ("p" . helm-projectile-grep) ; r
    ))
+=======
+>>>>>>> 21573c66c32ca5776f4009c46e77620e08c48113
 
 (xah-fly--define-keys
  (define-prefix-command 'xah-fly-leader-key-map)
@@ -61,7 +86,11 @@
    ("r" . nil) ; o
    ("l" . projectile-keymap) ; p
    ("'" . smart-quit) ; q
+<<<<<<< HEAD
    ("p" . helm-grep) ; r
+=======
+   ("p" . helm-for-files) ; r
+>>>>>>> 21573c66c32ca5776f4009c46e77620e08c48113
    ("o" . nil) ; s
    ("y" . nil) ; t
    ("g" . nil) ; u
@@ -80,12 +109,14 @@
    ("=" . nil) ; ]
    ))
 
-(xah-fly-keys 1)
+(define-prefix-command 'projectile-keymap)
+(define-key my-nice-keymap (kbd "p") nil)
+
+  (xah-fly-keys 1)
 
 (global-set-key (kbd "S-SPC") (lambda () (interactive) (when xah-fly-insert-state-q (company-complete))))
 (global-set-key (kbd "<backtab>") 'tab-to-tab-stop)
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-
 
 ;; Special map bindings
 (require 'company)
