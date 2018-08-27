@@ -3,6 +3,9 @@
 (toggle-scroll-bar -1)
 (tool-bar-mode -1)
 
+;; Golden ratio
+(require 'golden-ratio)
+(golden-ratio-mode 1)
 
 ;; Columns/Lines
 (line-number-mode t)
@@ -35,8 +38,7 @@
 
 ;; Text appearance
 (set-frame-font "Inconsolata-12" nil t)
-(require 'atom-one-dark-theme)
-(load-theme 'atom-one-dark t)
+(load-theme 'tango-dark t)
 (custom-set-faces
  '(font-lock-doc-face ((t (:inherit 'font-lock-comment-face :slant italic))))
  '(font-lock-variable-name-face ((t (:foreground "#D6BDDB")))))

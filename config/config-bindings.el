@@ -1,37 +1,36 @@
 ;; Xah-fly-keys settings
 (require 'xah-fly-keys)
+
 (xah-fly-keys-set-layout "qwerty")
 
-(defun xfk-insert-mode ()
-  (define-key xah-fly-key-map (kbd "<f2>") 'xah-fly-command-mode-activate))
-
-(defun xfk-command-mode ()
-  (define-key xah-fly-key-map (kbd "<f2>") 'xah-fly-insert-mode-activate))
-
-(defun xfk-hl-on ()
-  (global-hl-line-mode 1))
-
-(defun xfk-hl-off ()
-  (global-hl-line-mode 0))
-
-(add-hook 'xah-fly-insert-mode-activate-hook 'xfk-insert-mode 'xfk-hl-on)
-(add-hook 'xah-fly-command-mode-activate-hook 'xfk-command-mode 'xfk-hl-off)
-
-(defun xfk-quit ()
-  "Kills the buffer and window"
+(defun bindkey-insert-mode ()
+  "Define keys for `xah-fly-insert-mode-activate-hook'."
   (interactive)
-  (condition-case nil
-	  (delete-window)
-	(error
-	 (if (and (boundp 'server-buffer-clients)
-			  (fboundp 'server-edit)
-			  (fboundp 'server-buffer-done)
-			  server-buffer-clients)
-		 (server-edit)
-	   (condition-case nil
-		   (delete-frame)
-		 (error
-		  (save-buffers-kill-emacs)))))))
+  (define-key xah-fly-key-map (kbd "<escape>") 'xah-fly-command-mode-activate))
+
+(defun bindkey-command-mode ()
+  "Define keys for `xah-fly-command-mode-activate-hook'."
+  (interactive)
+  (define-key xah-fly-key-map (kbd "q") 'keyboard-escape-quit))
+
+(add-hook 'xah-fly-insert-mode-activate-hook 'bindkey-insert-mode)
+(add-hook 'xah-fly-command-mode-activate-hook 'bindkey-command-mode)
+
+(defun smart-quit (&optional flag)
+  "Kill the buffer and window, if FLAG is t, save the current buffer."
+  (interactive)
+  (when flag
+	(save-buffer))
+  (if (one-window-p)
+	  (save-buffers-kill-emacs)
+	(delete-window)))
+
+(xah-fly--define-keys
+ (define-prefix-command 'projectile-keymap)
+ '(("u" . helm-projectile-find-file) ; f
+   ("l" . helm-projectile) ; p
+   ("p" . helm-projectile-grep) ; r
+   ))
 
 (xah-fly--define-keys
  (define-prefix-command 'xah-fly-leader-key-map)
@@ -45,9 +44,8 @@
    ("8" . nil)
    ("9" . nil)
    ("0" . nil)
-   ("SPC" . helm-mini)
    ("a" . nil) ; a
-   ("x" . nil) ; b
+   ("x" . helm-mini) ; b
    ("j" . nil) ; c
    ("e" . nil) ; d
    ("." . nil) ; e
@@ -61,15 +59,15 @@
    ("m" . nil) ; m
    ("b" . nil) ; n
    ("r" . nil) ; o
-   ("l" . helm-projectile) ; p
-   ("'" . xfk-quit) ; q
-   ("p" . nil) ; r
+   ("l" . projectile-keymap) ; p
+   ("'" . smart-quit) ; q
+   ("p" . helm-grep) ; r
    ("o" . nil) ; s
    ("y" . nil) ; t
    ("g" . nil) ; u
    ("k" . nil) ; v
    ("," . save-buffer) ; w
-   ("q" . (lambda () (interactive) (save-buffer) (xfk-quit))) ; x
+   ("q" . (lambda () (interactive) (smart-quit t))) ; x
    ("f" . nil) ; y
    (";" . nil) ; z
    ("s" . nil) ; ;
@@ -103,6 +101,8 @@
 
 (require 'magit)
 (with-eval-after-load 'magit
+  (define-key magit-mode-map (kbd "c") 'magit-commit)
+  (define-key magit-mode-map (kbd "p") 'magit-push)
   (define-key magit-mode-map (kbd "j") 'backward-char)
   (define-key magit-mode-map (kbd "k") 'previous-line)
   (define-key magit-mode-map (kbd "i") 'next-line)
