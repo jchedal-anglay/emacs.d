@@ -1,4 +1,3 @@
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -6,7 +5,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (xah-fly-keys cider keyfreq smartparens rainbow-delimiters projectile magit helm-projectile helm flycheck evil-magit evil-leader evil-escape evil elcord dashboard company-jedi company-c-headers company atom-one-dark-theme aggressive-indent))))
+    (keyfreq xah-fly-keys multiple-cursors helm-projectile helm golden-ratio flycheck dashboard company-jedi company-c-headers company atom-one-dark-theme))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -26,5 +25,4 @@
  '(flycheck-error ((t (:underline (:style line :color "#FF5C33")))))
  '(flycheck-info ((t (:underline (:style line :color "#80FF80")))))
  '(flycheck-warning ((t (:underline (:style line :color "#FF9933")))))
- '(font-lock-doc-face ((t (:inherit (quote font-lock-comment-face) :slant italic))))
  '(font-lock-variable-name-face ((t (:foreground "#D6BDDB")))))
