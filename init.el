@@ -4,6 +4,7 @@
 (package-initialize)
 
 (package-refresh-contents)
+(package-install 'aggressive-indent)
 (package-install 'atom-one-dark-theme)
 (package-install 'cider)
 (package-install 'company)
@@ -15,6 +16,8 @@
 (package-install 'helm)
 (package-install 'helm-projectile)
 (package-install 'multiple-cursors)
+(package-install 'rainbow-delimiters)
+(package-install 'smartparens)
 (package-install 'xah-fly-keys)
 
 ;; Initialize load path
@@ -184,6 +187,18 @@
 (show-paren-mode t)
 (blink-cursor-mode -1)
 (delete-selection-mode t)
+
+;; Aggressive Indent
+(require 'aggressive-indent)
+(global-aggressive-indent-mode 1)
+
+;; Smartparens
+(require 'smartparens)
+(smartparens-mode 1)
+
+;; Rainbow Delimiters
+(require 'rainbow-delimiters)
+(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 
 ;; Atom One Dark
 (require 'atom-one-dark-theme)
