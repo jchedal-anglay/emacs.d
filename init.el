@@ -16,17 +16,14 @@
 (package-install 'helm)
 (package-install 'helm-projectile)
 (package-install 'multiple-cursors)
+(package-install 'magit)
 (package-install 'rainbow-delimiters)
 (package-install 'smartparens)
 (package-install 'xah-fly-keys)
-
-;; Initialize load path
-(defvar config-dir
-  (expand-file-name "config" user-emacs-directory))
-(add-to-list 'load-path config-dir)
+(package-install 'yasnippet-snippets)
 
 (setq custom-file
-	  (expand-file-name "custom.el" user-emacs-directory))
+      (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file)
 
 ;; Bindings
@@ -38,6 +35,7 @@
   "Define keys for `xah-fly-insert-mode-activate-hook'."
   (interactive)
   (setq cursor-type 'box)
+  (hl-line-mode 1)
   (blink-cursor-mode -1)
   (define-key xah-fly-key-map (kbd "n") 'self-insert-command)
   (define-key xah-fly-key-map (kbd "t") 'self-insert-command)
@@ -46,6 +44,7 @@
 (defun bindkey-command-mode ()
   "Define keys for `xah-fly-command-mode-activate-hook'."
   (interactive)
+  (hl-line-mode 0)
   (define-key xah-fly-key-map (kbd "n") 'isearch-forward-regexp)
   (define-key xah-fly-key-map (kbd "q") 'keyboard-escape-quit)
   (define-key xah-fly-key-map (kbd "t") 'rectangle-mark-mode))
@@ -53,29 +52,35 @@
 (add-hook 'xah-fly-insert-mode-activate-hook 'bindkey-insert-mode)
 (add-hook 'xah-fly-command-mode-activate-hook 'bindkey-command-mode)
 
+(defun smart-save ()
+  "Save the buffer and remove trailing whitespaces."
+  (interactive)
+  (delete-trailing-whitespace)
+  (save-buffer))
+
 (defun smart-quit (&optional flag)
   "Kill the buffer and window, if FLAG is t, save the current buffer."
   (interactive)
   (when flag
-	(save-buffer))
+    (smart-save))
   (if (one-window-p)
-	  (kill-emacs)
-	(delete-window)))
-
-;; Multiple cursors
-(require 'multiple-cursors)
+      (kill-emacs)
+    (delete-window)))
 
 (xah-fly--define-keys
  (define-prefix-command 'projectile-key-map)
- '(
+ '(("u" . helm-projectile-find-file) ; f
    ("i" . helm-projectile) ; g
    ("b" . helm-projectile-grep) ; n
    ))
 
+;; Multiple cursors
+(require 'multiple-cursors)
+(setq mc/always-run-for-all 1)
 (xah-fly--define-keys
  (define-prefix-command 'multiple-cursor-key-map)
  '(
-
+   ("y" . mc/edit-lines)
    ))
 
 (xah-fly--define-keys
@@ -96,13 +101,13 @@
    ("e" . smart-quit) ; d
    ("u" . helm-find-files) ; f
    ("i" . projectile-key-map) ; g
-   ("d" . nil) ; h
+   ("d" . magit-status) ; h
    ("h" . windmove-left) ; j
    ("t" . windmove-down) ; k
    ("n" . windmove-right) ; l
    (";" . nil) ; z
    ("q" . (lambda () (interactive) (smart-quit 1))) ; x
-   ("j" . save-buffer) ; c
+   ("j" . smart-save) ; c
    ("k" . nil) ; v
    ("x" . helm-mini) ; b
    ("b" . helm-occur) ; n
@@ -150,8 +155,6 @@
 
 ;; No prompt on exit
 (setq confirm-kill-emacs nil)
-(when (not (version< emacs-version "26.0"))
-  (setq confirm-kill-processes nil))
 
 ;; UTF-8 settings
 (setq locale-coding-system 'utf-8)
@@ -166,15 +169,15 @@
 ;; Line numbers
 (setq-default linum-format " %d ")
 (add-hook 'prog-mode-hook (lambda ()
-							(linum-mode)
-							(set-face-underline 'linum nil)))
+			    (linum-mode)
+			    (set-face-underline 'linum nil)))
 
 ;; Welcome screen
 (require 'dashboard)
 (setq dashboard-startup-banner 'logo)
 (setq dashboard-items '((recents  . 5)
-						(bookmarks . 5)
-						(projects . 5)))
+			(bookmarks . 5)
+			(projects . 5)))
 (dashboard-setup-startup-hook)
 
 ;; Miscellaneous settings
@@ -193,8 +196,8 @@
 (global-aggressive-indent-mode 1)
 
 ;; Smartparens
-(require 'smartparens)
-(smartparens-mode 1)
+(require 'smartparens-config)
+(add-hook 'prog-mode-hook #'smartparens-mode)
 
 ;; Rainbow Delimiters
 (require 'rainbow-delimiters)
@@ -210,22 +213,22 @@
 (require 'flycheck)
 (define-fringe-bitmap 'flycheck-fringe-bitmap-ball
   (vector #b00000000
-		  #b00000000
-		  #b00000000
-		  #b00000000
-		  #b00000000
-		  #b00111000
-		  #b01111100
-		  #b11111110
-		  #b11111110
-		  #b11111110
-		  #b01111100
-		  #b00111000
-		  #b00000000
-		  #b00000000
-		  #b00000000
-		  #b00000000
-		  #b00000000))
+	  #b00000000
+	  #b00000000
+	  #b00000000
+	  #b00000000
+	  #b00111000
+	  #b01111100
+	  #b11111110
+	  #b11111110
+	  #b11111110
+	  #b01111100
+	  #b00111000
+	  #b00000000
+	  #b00000000
+	  #b00000000
+	  #b00000000
+	  #b00000000))
 (flycheck-define-error-level 'info
   :severity 100
   :compilation-level 2
@@ -259,7 +262,8 @@
   (define-key helm-map (kbd "<tab>") 'helm-next-line)
   (define-key helm-map (kbd "<backtab>") 'helm-previous-line))
 (setq helm-boring-file-regexp-list
-	  '("\\.$" "\\.git*." "\\.o" "\\.a$" "\\.pyc$" "\\.pyo$" "/Library/?" "/Applications/?"))
+      '("\\.$" "\\.git*." "\\.o" "\\.a$" "\\.pyc$" "\\.pyo$" "/Library/?" "/Applications/?"))
+(setq helm-display-header-line nil)
 (helm-mode t)
 
 ;; Projectile
@@ -291,3 +295,16 @@
  '(company-scrollbar-fg ((t (:background "#30343C"))))
  '(company-scrollbar-bg ((t (:background "#30343C"))))
  '(company-template-field ((t (:foreground "#282C34" :background "#C678DD")))))
+
+;; Magit
+(require 'magit)
+(with-eval-after-load 'magit
+  (define-key magit-mode-map (kbd "c") 'magit-commit)
+  (define-key magit-mode-map (kbd "p") 'magit-push))
+
+;; Yasnippet
+(require 'yasnippet)
+(add-hook 'prog-mode-hook 'yas-minor-mode)
+(define-key yas-minor-mode-map (kbd "TAB") nil)
+(define-key yas-minor-mode-map (kbd "<tab>") nil)
+(define-key yas-minor-mode-map (kbd "C-SPC") 'yas-expand)
