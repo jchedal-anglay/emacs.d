@@ -1,4 +1,4 @@
-;; Initialize MELPA repository
+;; MELPA repository
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
 (package-initialize)
@@ -79,8 +79,7 @@
 (setq mc/always-run-for-all 1)
 (xah-fly--define-keys
  (define-prefix-command 'multiple-cursor-key-map)
- '(
-   ("y" . mc/edit-lines)
+ '(("y" . mc/edit-lines) ; t
    ))
 
 (xah-fly--define-keys
@@ -169,15 +168,15 @@
 ;; Line numbers
 (setq-default linum-format " %d ")
 (add-hook 'prog-mode-hook (lambda ()
-			    (linum-mode)
-			    (set-face-underline 'linum nil)))
+							(linum-mode)
+							(set-face-underline 'linum nil)))
 
 ;; Welcome screen
 (require 'dashboard)
 (setq dashboard-startup-banner 'logo)
 (setq dashboard-items '((recents  . 5)
-			(bookmarks . 5)
-			(projects . 5)))
+						(bookmarks . 5)
+						(projects . 5)))
 (dashboard-setup-startup-hook)
 
 ;; Miscellaneous settings
@@ -213,22 +212,22 @@
 (require 'flycheck)
 (define-fringe-bitmap 'flycheck-fringe-bitmap-ball
   (vector #b00000000
-	  #b00000000
-	  #b00000000
-	  #b00000000
-	  #b00000000
-	  #b00111000
-	  #b01111100
-	  #b11111110
-	  #b11111110
-	  #b11111110
-	  #b01111100
-	  #b00111000
-	  #b00000000
-	  #b00000000
-	  #b00000000
-	  #b00000000
-	  #b00000000))
+		  #b00000000
+		  #b00000000
+		  #b00000000
+		  #b00000000
+		  #b00111000
+		  #b01111100
+		  #b11111110
+		  #b11111110
+		  #b11111110
+		  #b01111100
+		  #b00111000
+		  #b00000000
+		  #b00000000
+		  #b00000000
+		  #b00000000
+		  #b00000000))
 (flycheck-define-error-level 'info
   :severity 100
   :compilation-level 2
@@ -254,6 +253,17 @@
  '(flycheck-info ((t (:underline (:style line :color "#80FF80")))))
  '(flycheck-warning ((t (:underline (:style line :color "#FF9933")))))
  '(flycheck-error ((t (:underline (:style line :color "#FF5C33"))))))
+(flycheck-define-checker python-mypy ""
+						 :command ("mypy"
+								   "--ignore-missing-imports" "--fast-parser"
+								   "--python-version" "3.6" "--hide-error-context"
+								   source-original)
+						 :error-patterns
+						 ((error line-start (file-name) ":" line ": error:" (message) line-end))
+						 :modes python-mode)
+(add-to-list 'flycheck-checkers 'python-mypy t)
+(flycheck-add-next-checker 'python-pylint 'python-mypy t)
+(setq flycheck-check-syntax-automatically '(mode-enabled save))
 (global-flycheck-mode t)
 
 ;; Helm
@@ -308,3 +318,20 @@
 (define-key yas-minor-mode-map (kbd "TAB") nil)
 (define-key yas-minor-mode-map (kbd "<tab>") nil)
 (define-key yas-minor-mode-map (kbd "C-SPC") 'yas-expand)
+
+;; General programming settings
+(add-hook 'prog-mode-hook (lambda()
+							(setq tab-width 4)))
+
+;; C settings
+(setq-default c-default-style "linux")
+(setq-default c-basic-offset 4)
+(add-hook 'c-mode-hook (lambda()
+						 (setq indent-tabs-mode t)))
+
+;; Python settings
+(setq-default python-shell-interpreter "python3")
+(setq-default python-indent 4)
+(add-hook 'python-mode-hook (lambda()
+							  (setq flycheck-python-pylint-executable "python3")
+							  (setq flycheck-python-pycompile-executable "python3")))
