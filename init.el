@@ -28,7 +28,7 @@
 
 ;; Bindings
 (require 'xah-fly-keys)
-(xah-fly-keys-set-layout "qwerty")
+;;(xah-fly-keys-set-layout "qwerty")
 (setq xah-fly-use-control-key nil)
 
 (defun bindkey-insert-mode ()
@@ -37,17 +37,19 @@
   (setq cursor-type 'box)
   (hl-line-mode 1)
   (blink-cursor-mode -1)
-  (define-key xah-fly-key-map (kbd "n") 'self-insert-command)
-  (define-key xah-fly-key-map (kbd "t") 'self-insert-command)
+  (define-key xah-fly-key-map (kbd "e") 'self-insert-command)
+  (define-key xah-fly-key-map (kbd "b") 'self-insert-command)
+  (define-key xah-fly-key-map (kbd "y") 'self-insert-command)
   (define-key xah-fly-key-map (kbd "<escape>") 'xah-fly-command-mode-activate))
 
 (defun bindkey-command-mode ()
   "Define keys for `xah-fly-command-mode-activate-hook'."
   (interactive)
   (hl-line-mode 0)
-  (define-key xah-fly-key-map (kbd "n") 'isearch-forward-regexp)
-  (define-key xah-fly-key-map (kbd "q") 'keyboard-escape-quit)
-  (define-key xah-fly-key-map (kbd "t") 'rectangle-mark-mode))
+  (define-key xah-fly-key-map (kbd "e") 'delete-backward-char)
+  (define-key xah-fly-key-map (kbd "b") 'isearch-forward-regexp)
+  (define-key xah-fly-key-map (kbd "'") 'keyboard-escape-quit)
+  (define-key xah-fly-key-map (kbd "y") 'rectangle-mark-mode))
 
 (add-hook 'xah-fly-insert-mode-activate-hook 'bindkey-insert-mode)
 (add-hook 'xah-fly-command-mode-activate-hook 'bindkey-command-mode)
@@ -68,6 +70,13 @@
     (delete-window)))
 
 (xah-fly--define-keys
+ (define-prefix-command 'alternative-map)
+ '(("u" . helm-for-files)
+   ("i" . magit-status)
+   ("b" . helm-occur)
+   ))
+
+(xah-fly--define-keys
  (define-prefix-command 'projectile-key-map)
  '(("u" . helm-projectile-find-file) ; f
    ("i" . helm-projectile) ; g
@@ -80,11 +89,13 @@
 (xah-fly--define-keys
  (define-prefix-command 'multiple-cursor-key-map)
  '(("y" . mc/edit-lines) ; t
+   ("b" . mc/mark-all-like-this)
    ))
 
 (xah-fly--define-keys
  (define-prefix-command 'xah-fly-leader-key-map)
- '(("SPC" . nil)
+ '(("SPC" . alternative-map)
+   ("5" . kill-line)
    ("'" . nil) ; q
    ("," . nil) ; w
    ("." . nil) ; e
@@ -92,40 +103,35 @@
    ("y" . multiple-cursor-key-map) ; t
    ("f" . nil) ; y
    ("g" . nil) ; u
-   ("c" . windmove-up) ; i
+   ("c" . nil) ; i
    ("r" . nil) ; o
    ("l" . nil) ; p
    ("a" . nil) ; a
    ("o" . nil) ; s
-   ("e" . smart-quit) ; d
-   ("u" . helm-find-files) ; f
+   ("e" . nil) ; d
+   ("u" . nil) ; f
    ("i" . projectile-key-map) ; g
-   ("d" . magit-status) ; h
-   ("h" . windmove-left) ; j
-   ("t" . windmove-down) ; k
-   ("n" . windmove-right) ; l
+   ("d" . beginning-of-buffer) ; h
+   ("h" . beginning-of-line) ; j
+   ("t" . nil) ; k
+   ("n" . end-of-line) ; l
+   ("s" . end-of-buffer) ; ;
    (";" . nil) ; z
-   ("q" . (lambda () (interactive) (smart-quit 1))) ; x
+   ("q" . smart-quit) ; x
    ("j" . smart-save) ; c
-   ("k" . nil) ; v
+   ("k" . helm-find-files) ; v
    ("x" . helm-mini) ; b
-   ("b" . helm-occur) ; n
+   ("b" . xah-search-current-word) ; n
    ("m" . nil) ; m
-   ("s" . nil) ; ;
-   ("-" . nil) ; '
    ("w" . nil) ; ,
    ("v" . nil) ; .
    ("z" . nil) ; /
-   ("/" . nil) ; [
-   ("=" . nil) ; ]
-   ("[" . nil) ; -
-   ("]" . nil) ; =
    ))
 
 (xah-fly-keys 1)
 
-(global-set-key (kbd "C-f") 'isearch-repeat-backward)
-(global-set-key (kbd "C-j") 'isearch-repeat-forward)
+(global-set-key (kbd "C-u") 'isearch-repeat-backward)
+(global-set-key (kbd "C-h") 'isearch-repeat-forward)
 (global-set-key (kbd "S-SPC") (lambda () (interactive) (when xah-fly-insert-state-q (company-complete))))
 (global-set-key (kbd "<backtab>") 'tab-to-tab-stop)
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -257,6 +263,7 @@
 						 :command ("mypy"
 								   "--ignore-missing-imports" "--fast-parser"
 								   "--python-version" "3.6" "--hide-error-context"
+								   "--no-strict-optional"
 								   source-original)
 						 :error-patterns
 						 ((error line-start (file-name) ":" line ": error:" (message) line-end))
