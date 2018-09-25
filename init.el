@@ -6,7 +6,6 @@
 (package-refresh-contents)
 (package-install 'aggressive-indent)
 (package-install 'atom-one-dark-theme)
-(package-install 'cider)
 (package-install 'company)
 (package-install 'company-c-headers)
 (package-install 'company-jedi)
@@ -28,7 +27,6 @@
 
 ;; Bindings
 (require 'xah-fly-keys)
-;;(xah-fly-keys-set-layout "qwerty")
 (setq xah-fly-use-control-key nil)
 
 (defun bindkey-insert-mode ()
@@ -78,18 +76,10 @@
 
 (xah-fly--define-keys
  (define-prefix-command 'projectile-key-map)
- '(("u" . helm-projectile-find-file) ; f
+ '(("y" . mc/mark-all-like-this)
+   ("u" . helm-projectile-find-file) ; f
    ("i" . helm-projectile) ; g
    ("b" . helm-projectile-grep) ; n
-   ))
-
-;; Multiple cursors
-(require 'multiple-cursors)
-(setq mc/always-run-for-all 1)
-(xah-fly--define-keys
- (define-prefix-command 'multiple-cursor-key-map)
- '(("y" . mc/edit-lines) ; t
-   ("b" . mc/mark-all-like-this)
    ))
 
 (xah-fly--define-keys
@@ -100,7 +90,7 @@
    ("," . nil) ; w
    ("." . nil) ; e
    ("p" . nil) ; r
-   ("y" . multiple-cursor-key-map) ; t
+   ("y" . mc/edit-lines) ; t
    ("f" . nil) ; y
    ("g" . nil) ; u
    ("c" . nil) ; i
