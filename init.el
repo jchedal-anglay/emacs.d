@@ -3,6 +3,7 @@
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
 (package-initialize)
 
+;; Package settings
 (package-refresh-contents)
 (package-install 'aggressive-indent)
 (package-install 'atom-one-dark-theme)
@@ -10,20 +11,29 @@
 (package-install 'company-c-headers)
 (package-install 'company-jedi)
 (package-install 'dashboard)
+(package-install 'elcord)
+(package-install 'exec-path-from-shell)
 (package-install 'flycheck)
 (package-install 'golden-ratio)
 (package-install 'helm)
 (package-install 'helm-projectile)
-(package-install 'multiple-cursors)
 (package-install 'magit)
+(package-install 'merlin)
+(package-install 'multiple-cursors)
 (package-install 'rainbow-delimiters)
 (package-install 'smartparens)
+(package-install 'tuareg)
 (package-install 'xah-fly-keys)
 (package-install 'yasnippet-snippets)
 
+;; Variables setings
 (setq custom-file
       (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file)
+
+;; MacOS settings
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize))
 
 ;; Bindings
 (require 'xah-fly-keys)
@@ -150,6 +160,10 @@
 
 ;; No prompt on exit
 (setq confirm-kill-emacs nil)
+
+;; Discord AW wode
+(require 'elcord)
+(elcord-mode)
 
 ;; UTF-8 settings
 (setq locale-coding-system 'utf-8)
@@ -332,3 +346,10 @@
 (add-hook 'python-mode-hook (lambda()
 							  (setq flycheck-python-pylint-executable "python3")
 							  (setq flycheck-python-pycompile-executable "python3")))
+
+;; Ocaml settings
+(require 'tuareg)
+(require 'merlin)
+(add-hook 'tuareg-mode-hook 'merlin-mode)
+(setq tuareg-match-patterns-aligned t)
+(setq tuareg-indent-align-with-first-arg t)
