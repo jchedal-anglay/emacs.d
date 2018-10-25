@@ -75,6 +75,7 @@
   (defun bindkey-insert-mode ()
 	"Define keys for `xah-fly-insert-mode-activate-hook'."
 	(interactive)
+	(define-key xah-fly-key-map (kbd ";") 'self-insert-command)
 	(define-key xah-fly-key-map (kbd "'") 'self-insert-command)
 	(define-key xah-fly-key-map (kbd "e") 'self-insert-command)
 	(define-key xah-fly-key-map (kbd "y") 'self-insert-command)
@@ -82,7 +83,8 @@
   (defun bindkey-command-mode ()
 	"Define keys for `xah-fly-command-mode-activate-hook'."
 	(interactive)
-	(define-key xah-fly-key-map (kbd "'") 'keyboard-escape-quit)
+	(define-key xah-fly-key-map (kbd ";") 'keyboard-escape-quit)
+	(define-key xah-fly-key-map (kbd "'") 'xah-comment-dwim)
 	(define-key xah-fly-key-map (kbd "e") 'delete-backward-char)
 	(define-key xah-fly-key-map (kbd "y") 'rectangle-mark-mode))
 
@@ -299,13 +301,10 @@
    '(company-template-field ((t (:foreground "#282C34" :background "#C678DD"))))))
 
 ;; Magit
-(use-package magit
-  :init
-  (with-eval-after-load 'magit
-	(define-key magit-mode-map (kbd "c") 'magit-commit)
-	(define-key magit-mode-map (kbd "p") 'magit-push)))
+(use-package magit)
 
 ;; Yasnippet
+(use-package yasnippet-snippets)
 (use-package yasnippet
   :config
   (add-hook 'prog-mode-hook 'yas-minor-mode)
