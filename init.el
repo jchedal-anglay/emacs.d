@@ -75,50 +75,33 @@
   (defun bindkey-insert-mode ()
 	"Define keys for `xah-fly-insert-mode-activate-hook'."
 	(interactive)
-	(define-key xah-fly-key-map (kbd ";") 'self-insert-command)
-	(define-key xah-fly-key-map (kbd "'") 'self-insert-command)
-	(define-key xah-fly-key-map (kbd "e") 'self-insert-command)
-	(define-key xah-fly-key-map (kbd "y") 'self-insert-command)
 	(define-key xah-fly-key-map (kbd "<escape>") 'xah-fly-command-mode-activate))
   (defun bindkey-command-mode ()
 	"Define keys for `xah-fly-command-mode-activate-hook'."
 	(interactive)
 	(define-key xah-fly-key-map (kbd ";") 'keyboard-escape-quit)
 	(define-key xah-fly-key-map (kbd "'") 'xah-comment-dwim)
-	(define-key xah-fly-key-map (kbd "e") 'delete-backward-char)
-	(define-key xah-fly-key-map (kbd "y") 'rectangle-mark-mode))
+	(define-key xah-fly-key-map (kbd ",") 'xah-backward-kill-word)
+	(define-key xah-fly-key-map (kbd ".") (lambda () "Kill word at point." (interactive)
+											(let ((bounds (bounds-of-thing-at-point 'word)))
+											  (if bounds
+												  (kill-region (car bounds) (cdr bounds))
+												nil))))
+	(define-key xah-fly-key-map (kbd "b") 'helm-occur))
 
   (add-hook 'xah-fly-insert-mode-activate-hook 'bindkey-insert-mode)
   (add-hook 'xah-fly-command-mode-activate-hook 'bindkey-command-mode)
   :config
-  (defun smart-save ()
-	"Save the buffer and remove trailing whitespaces."
-	(interactive)
-	(delete-trailing-whitespace)
-	(save-buffer))
-  (defun smart-quit ()
-	"Kill the buffer and window, if FLAG is t, save the current buffer."
-	(interactive)
-	(if (one-window-p)
-		(kill-emacs)
-	  (delete-window)))
-
-  (xah-fly--define-keys
-   (define-prefix-command 'projectile-key-map)
-   '(
-
-	 ))
-
   (xah-fly--define-keys
    (define-prefix-command 'xah-fly-leader-key-map)
    '(("SPC" . helm-mini)
 	 ("'" . nil) ; q
-	 ("," . mc/mark-previous-like-this-word) ; w
-	 ("." . mc/mark-next-like-this-word) ; e
-	 ("p" . mc/mark-all-words-like-this) ; r
-	 ("y" . mc/edit-lines) ; t
+	 ("," . nil) ; w
+	 ("." . nil) ; e
+	 ("p" . helm-projectile) ; r
+	 ("y" . nil) ; t
 	 ("f" . nil) ; y
-	 ("g" . nil) ; u
+	 ("g" . magit-status) ; u
 	 ("c" . windmove-up) ; i
 	 ("r" . nil) ; o
 	 ("l" . nil) ; p
@@ -126,30 +109,32 @@
 	 ("o" . nil) ; s
 	 ("e" . nil) ; d
 	 ("u" . nil) ; f
-	 ("i" . projectile-key-map) ; g
-	 ("d" . nil) ; h
-	 ("h" . windmove-left) ; j
-	 ("t" . windmove-down) ; k
-	 ("n" . windmove-right) ; l
+	 ("i" . nil) ; g
+	 ("d" . windmove-left) ; h
+	 ("h" . windmove-down) ; j
+	 ("t" . windmove-right) ; k
+	 ("n" . nil) ; l
 	 ("s" . nil) ; ;
 	 (";" . nil) ; z
-	 ("q" . smart-quit) ; x
-	 ("j" . smart-save) ; c
+	 ("q" . (lambda () (interactive) (if (one-window-p) (kill-emacs) (delete-window)))) ; c
+	 ("j" . (lambda () (interactive) (delete-trailing-whitespace) (save-buffer))) ; x
 	 ("k" . helm-find-files) ; v
 	 ("x" . nil) ; b
-	 ("b" . helm-occur) ; n
-	 ("m" . nil) ; m
-	 ("w" . nil) ; ,
-	 ("v" . nil) ; .
+	 ("b" . nil) ; n
+	 ("m" . previous-buffer) ; m
+	 ("w" . split-window-right) ; ,
+	 ("v" . next-buffer) ; .
 	 ("z" . nil) ; /
 	 ))
-
   (xah-fly-keys 1))
 
-;; Windows split management
-(use-package golden-ratio
+
+;; Zoom
+(use-package zoom
   :config
-  (golden-ratio-mode 1))
+  (zoom-mode)
+  (setq zoom-size '(0.618 . 0.618)))
+
 
 ;; Welcome screen
 (use-package dashboard
@@ -179,13 +164,6 @@
 (use-package rainbow-delimiters
   :config
   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
-
-;; Multiple-cursors
-(use-package multiple-cursors
-  :bind
-  (:map mc/keymap ("<return>" . nil))
-  :config
-  (setq mc/always-run-for-all t))
 
 ;; Atom One Dark
 (use-package atom-one-dark-theme
@@ -312,7 +290,6 @@
   (define-key yas-minor-mode-map (kbd "<tab>") nil)
   (define-key yas-minor-mode-map (kbd "C-SPC") 'yas-expand))
 
-
 ;; Bindings
 (global-set-key (kbd "S-SPC") (lambda () (interactive) (when xah-fly-insert-state-q (company-complete))))
 (global-set-key (kbd "<backtab>") 'tab-to-tab-stop)
@@ -340,6 +317,3 @@
   :config
   (setq tuareg-match-patterns-aligned t)
   (setq tuareg-indent-align-with-first-arg t))
-
-;; Clojure settings
-(use-package cider)
