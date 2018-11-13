@@ -53,7 +53,9 @@
 ;; Line numbers
 (setq-default linum-format " %d ")
 (add-hook 'prog-mode-hook (lambda ()
-							(linum-mode)
+							(if (version<= "26.0.50" emacs-version)
+								(global-display-line-numbers-mode)
+							  (linum-mode))
 							(set-face-underline 'linum nil)))
 
 ;; Miscellaneous settings
@@ -63,6 +65,7 @@
 (setq read-file-name-completion-ignore-case t)
 (setq require-final-newline t)
 (setq ring-bell-function 'ignore)
+(global-subword-mode 1)
 (show-paren-mode t)
 (blink-cursor-mode -1)
 (delete-selection-mode t)
@@ -71,7 +74,6 @@
 (use-package xah-fly-keys
   :init
   (setq xah-fly-use-control-key nil)
-
   (defun bindkey-insert-mode ()
 	"Define keys for `xah-fly-insert-mode-activate-hook'."
 	(interactive)
@@ -87,8 +89,9 @@
 											  (if bounds
 												  (kill-region (car bounds) (cdr bounds))
 												nil))))
+	(define-key xah-fly-key-map (kbd "e") 'delete-backward-char)
+	(define-key xah-fly-key-map (kbd "x") 'xah-shrink-whitespaces)
 	(define-key xah-fly-key-map (kbd "b") 'helm-occur))
-
   (add-hook 'xah-fly-insert-mode-activate-hook 'bindkey-insert-mode)
   (add-hook 'xah-fly-command-mode-activate-hook 'bindkey-command-mode)
   :config
@@ -98,29 +101,29 @@
 	 ("'" . nil) ; q
 	 ("," . nil) ; w
 	 ("." . nil) ; e
-	 ("p" . helm-projectile) ; r
-	 ("y" . nil) ; t
+	 ("p" . nil) ; r
+	 ("y" . er/expand-region) ; t
 	 ("f" . nil) ; y
-	 ("g" . magit-status) ; u
-	 ("c" . windmove-up) ; i
+	 ("g" . nil) ; u
+	 ("c" . nil) ; i
 	 ("r" . nil) ; o
 	 ("l" . nil) ; p
 	 ("a" . nil) ; a
 	 ("o" . nil) ; s
-	 ("e" . nil) ; d
-	 ("u" . nil) ; f
+	 ("e" . delete-char) ; d
+	 ("u" . avy-goto-char-2) ; f
 	 ("i" . nil) ; g
-	 ("d" . windmove-left) ; h
-	 ("h" . windmove-down) ; j
-	 ("t" . windmove-right) ; k
+	 ("d" . nil) ; h
+	 ("h" . nil) ; j
+	 ("t" . nil) ; k
 	 ("n" . nil) ; l
 	 ("s" . nil) ; ;
 	 (";" . nil) ; z
-	 ("q" . (lambda () (interactive) (if (one-window-p) (kill-emacs) (delete-window)))) ; c
-	 ("j" . (lambda () (interactive) (delete-trailing-whitespace) (save-buffer))) ; x
+	 ("q" . (lambda () (interactive) (if (one-window-p) (kill-emacs) (delete-window)))) ; x
+	 ("j" . (lambda () (interactive) (delete-trailing-whitespace) (save-buffer))) ; c
 	 ("k" . helm-find-files) ; v
 	 ("x" . nil) ; b
-	 ("b" . nil) ; n
+	 ("b" . (lambda () (interactive) (if (projectile-project-p) (helm-projectile-grep) (helm-for-files)))) ; n
 	 ("m" . previous-buffer) ; m
 	 ("w" . split-window-right) ; ,
 	 ("v" . next-buffer) ; .
@@ -128,15 +131,11 @@
 	 ))
   (xah-fly-keys 1))
 
-
-;; Zoom
 (use-package zoom
   :config
   (zoom-mode)
-  (setq zoom-size '(0.618 . 0.618)))
+  (setq zoom-size '(0.666 . 0.666)))
 
-
-;; Welcome screen
 (use-package dashboard
   :config
   (setq dashboard-startup-banner 'logo)
@@ -145,34 +144,36 @@
 						  (projects . 5)))
   (dashboard-setup-startup-hook))
 
-;; Elcord
 (use-package elcord
   :config
   (elcord-mode))
 
-;; Aggressive Indent
 (use-package aggressive-indent
   :config
   (global-aggressive-indent-mode 1))
+
+(use-package expand-region)
 
 (use-package smartparens
   :config
   (require 'smartparens-config)
   (smartparens-global-mode 1))
 
-;; Rainbow Delimiters
 (use-package rainbow-delimiters
   :config
-  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 
-;; Atom One Dark
+(use-package avy
+  :config
+  (setq avy-background t)
+  (setq avy-keys '(?a ?o ?e ?u ?h ?t ?n ?s)))
+
 (use-package atom-one-dark-theme
   :config
   (load-theme 'atom-one-dark t)
   (custom-set-faces
    '(font-lock-variable-name-face ((t (:foreground "#D6BDDB"))))))
 
-;; Flycheck
 (use-package flycheck
   :config
   (define-fringe-bitmap 'flycheck-fringe-bitmap-ball
@@ -220,9 +221,8 @@
    '(flycheck-error ((t (:underline (:style line :color "#FF5C33"))))))
   (flycheck-define-checker python-mypy ""
 						   :command ("mypy"
-									 "--ignore-missing-imports" "--fast-parser"
-									 "--python-version" "3.6" "--hide-error-context"
-									 "--no-strict-optional"
+									 "--ignore-missing-imports" "--python-version" "3.7"
+									 "--hide-error-context" "--no-strict-optional"
 									 source-original)
 						   :error-patterns
 						   ((error line-start (file-name) ":" line ": error:" (message) line-end))
@@ -232,7 +232,6 @@
   (setq flycheck-check-syntax-automatically '(mode-enabled save))
   (global-flycheck-mode t))
 
-;; Helm
 (use-package helm
   :init
   (with-eval-after-load 'helm
@@ -244,13 +243,11 @@
   (setq helm-display-header-line nil)
   (helm-mode t))
 
-;; Projectile
 (use-package helm-projectile
   :config
   (projectile-mode t)
   (helm-projectile-on))
 
-;; Company
 (use-package company-c-headers)
 (use-package company-jedi)
 
@@ -278,10 +275,8 @@
    '(company-scrollbar-bg ((t (:background "#30343C"))))
    '(company-template-field ((t (:foreground "#282C34" :background "#C678DD"))))))
 
-;; Magit
 (use-package magit)
 
-;; Yasnippet
 (use-package yasnippet-snippets)
 (use-package yasnippet
   :config
@@ -300,7 +295,9 @@
 ;; C settings
 (setq-default c-default-style "linux")
 (setq-default c-basic-offset 4)
-(add-hook 'c-mode-hook (lambda() (setq indent-tabs-mode t)))
+(add-hook 'c-mode-hook (lambda()
+						 (setq indent-tabs-mode t)
+						 (global-aggressive-indent-mode -1)))
 
 ;; Python settings
 (setq-default python-shell-interpreter "python3")
