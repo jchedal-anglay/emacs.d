@@ -17,8 +17,9 @@
 	(exec-path-from-shell-initialize)))
 
 ;; Variables settings
-(setq custom-file
-      (expand-file-name "custom.el" user-emacs-directory))
+(defconst custom-file (expand-file-name "custom.el" user-emacs-directory))
+(when (not (file-exists-p custom-file))
+  (write-region "" nil custom-file))
 (load custom-file)
 
 ;; Appearance
@@ -53,10 +54,10 @@
 ;; Line numbers
 (setq-default linum-format " %d ")
 (add-hook 'prog-mode-hook (lambda ()
-							(if (version<= "26.0.50" emacs-version)
-								(global-display-line-numbers-mode)
-							  (linum-mode))
-							(set-face-underline 'linum nil)))
+			    (if (version<= "26.0.50" emacs-version)
+				(global-display-line-numbers-mode)
+			      (linum-mode))
+			    (set-face-underline 'linum nil)))
 
 ;; Miscellaneous settings
 (setq auto-save-default nil)
@@ -73,80 +74,35 @@
 ;; Xah-fly-keys settings
 (use-package xah-fly-keys
   :init
-  (setq xah-fly-use-control-key nil)
   (defun bindkey-insert-mode ()
-	"Define keys for `xah-fly-insert-mode-activate-hook'."
-	(interactive)
-	(define-key xah-fly-key-map (kbd "<escape>") 'xah-fly-command-mode-activate))
+    (interactive)
+    (define-key xah-fly-key-map (kbd "S-SPC") 'company-complete)
+    (define-key xah-fly-key-map (kbd "<backtab>") 'tab-to-tab-stop))
   (defun bindkey-command-mode ()
-	"Define keys for `xah-fly-command-mode-activate-hook'."
-	(interactive)
-	(define-key xah-fly-key-map (kbd ";") 'keyboard-escape-quit)
-	(define-key xah-fly-key-map (kbd "'") 'xah-comment-dwim)
-	(define-key xah-fly-key-map (kbd ",") 'xah-backward-kill-word)
-	(define-key xah-fly-key-map (kbd ".") (lambda () "Kill word at point." (interactive)
-											(let ((bounds (bounds-of-thing-at-point 'word)))
-											  (if bounds
-												  (kill-region (car bounds) (cdr bounds))
-												nil))))
-	(define-key xah-fly-key-map (kbd "e") 'delete-backward-char)
-	(define-key xah-fly-key-map (kbd "x") 'xah-shrink-whitespaces)
-	(define-key xah-fly-key-map (kbd "b") 'helm-occur))
+    (interactive)
+    (define-key xah-fly-key-map (kbd ";") 'keyboard-escape-quit)
+    (define-key xah-fly-key-map (kbd "'") 'xah-comment-dwim)
+    (define-key xah-fly-key-map (kbd "b") 'helm-occur))
   (add-hook 'xah-fly-insert-mode-activate-hook 'bindkey-insert-mode)
   (add-hook 'xah-fly-command-mode-activate-hook 'bindkey-command-mode)
   :config
   (xah-fly--define-keys
    (define-prefix-command 'xah-fly-leader-key-map)
    '(("SPC" . helm-mini)
-	 ("'" . nil) ; q
-	 ("," . nil) ; w
-	 ("." . nil) ; e
-	 ("p" . nil) ; r
-	 ("y" . er/expand-region) ; t
-	 ("f" . nil) ; y
-	 ("g" . nil) ; u
-	 ("c" . nil) ; i
-	 ("r" . nil) ; o
-	 ("l" . nil) ; p
-	 ("a" . nil) ; a
-	 ("o" . nil) ; s
-	 ("e" . delete-char) ; d
-	 ("u" . avy-goto-char-2) ; f
-	 ("i" . nil) ; g
-	 ("d" . nil) ; h
-	 ("h" . nil) ; j
-	 ("t" . nil) ; k
-	 ("n" . nil) ; l
-	 ("s" . nil) ; ;
-	 (";" . nil) ; z
-	 ("q" . (lambda () (interactive) (if (one-window-p) (kill-emacs) (delete-window)))) ; x
-	 ("j" . (lambda () (interactive) (delete-trailing-whitespace) (save-buffer))) ; c
-	 ("k" . helm-find-files) ; v
-	 ("x" . nil) ; b
-	 ("b" . (lambda () (interactive) (if (projectile-project-p) (helm-projectile-grep) (helm-for-files)))) ; n
-	 ("m" . previous-buffer) ; m
-	 ("w" . split-window-right) ; ,
-	 ("v" . next-buffer) ; .
-	 ("z" . nil) ; /
-	 ))
+     ("y" . er/expand-region) ; t
+     ("q" . (lambda () (interactive) (if (one-window-p) (kill-emacs) (delete-window)))) ; x
+     ("j" . (lambda () (interactive) (delete-trailing-whitespace) (save-buffer))) ; c
+     ("k" . helm-find-files) ; v
+     ))
+  (global-set-key (kbd "<escape>") 'xah-fly-command-mode-activate)
+  (setq xah-fly-use-control-key nil)
+  (setq xah-fly-use-meta-key nil)
   (xah-fly-keys 1))
-
-(use-package zoom
-  :config
-  (zoom-mode)
-  (setq zoom-size '(0.666 . 0.666)))
 
 (use-package dashboard
   :config
   (setq dashboard-startup-banner 'logo)
-  (setq dashboard-items '((recents  . 5)
-						  (bookmarks . 5)
-						  (projects . 5)))
   (dashboard-setup-startup-hook))
-
-(use-package elcord
-  :config
-  (elcord-mode))
 
 (use-package aggressive-indent
   :config
@@ -159,14 +115,7 @@
   (require 'smartparens-config)
   (smartparens-global-mode 1))
 
-(use-package rainbow-delimiters
-  :config
-  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
-
-(use-package avy
-  :config
-  (setq avy-background t)
-  (setq avy-keys '(?a ?o ?e ?u ?h ?t ?n ?s)))
+(use-package rainbow-delimiters)
 
 (use-package atom-one-dark-theme
   :config
@@ -177,56 +126,56 @@
 (use-package flycheck
   :config
   (define-fringe-bitmap 'flycheck-fringe-bitmap-ball
-	(vector #b00000000
-			#b00000000
-			#b00000000
-			#b00000000
-			#b00000000
-			#b00111000
-			#b01111100
-			#b11111110
-			#b11111110
-			#b11111110
-			#b01111100
-			#b00111000
-			#b00000000
-			#b00000000
-			#b00000000
-			#b00000000
-			#b00000000))
+    (vector #b00000000
+	    #b00000000
+	    #b00000000
+	    #b00000000
+	    #b00000000
+	    #b00111000
+	    #b01111100
+	    #b11111110
+	    #b11111110
+	    #b11111110
+	    #b01111100
+	    #b00111000
+	    #b00000000
+	    #b00000000
+	    #b00000000
+	    #b00000000
+	    #b00000000))
   (flycheck-define-error-level 'info
-	:severity 100
-	:compilation-level 2
-	:overlay-category 'flycheck-info-overlay
-	:fringe-bitmap 'flycheck-fringe-bitmap-ball
-	:fringe-face 'flycheck-fringe-info
-	:info-list-face 'flycheck-error-list-info)
+    :severity 100
+    :compilation-level 2
+    :overlay-category 'flycheck-info-overlay
+    :fringe-bitmap 'flycheck-fringe-bitmap-ball
+    :fringe-face 'flycheck-fringe-info
+    :info-list-face 'flycheck-error-list-info)
   (flycheck-define-error-level 'warning
-	:severity 100
-	:compilation-level 2
-	:overlay-category 'flycheck-warning-overlay
-	:fringe-bitmap 'flycheck-fringe-bitmap-ball
-	:fringe-face 'flycheck-fringe-warning
-	:warning-list-face 'flycheck-error-list-warning)
+    :severity 100
+    :compilation-level 2
+    :overlay-category 'flycheck-warning-overlay
+    :fringe-bitmap 'flycheck-fringe-bitmap-ball
+    :fringe-face 'flycheck-fringe-warning
+    :warning-list-face 'flycheck-error-list-warning)
   (flycheck-define-error-level 'error
-	:severity 100
-	:compilation-level 2
-	:overlay-category 'flycheck-error-overlay
-	:fringe-bitmap 'flycheck-fringe-bitmap-ball
-	:fringe-face 'flycheck-fringe-error
-	:error-list-face 'flycheck-error-list-error)
+    :severity 100
+    :compilation-level 2
+    :overlay-category 'flycheck-error-overlay
+    :fringe-bitmap 'flycheck-fringe-bitmap-ball
+    :fringe-face 'flycheck-fringe-error
+    :error-list-face 'flycheck-error-list-error)
   (custom-set-faces
    '(flycheck-info ((t (:underline (:style line :color "#80FF80")))))
    '(flycheck-warning ((t (:underline (:style line :color "#FF9933")))))
    '(flycheck-error ((t (:underline (:style line :color "#FF5C33"))))))
   (flycheck-define-checker python-mypy ""
-						   :command ("mypy"
-									 "--ignore-missing-imports" "--python-version" "3.7"
-									 "--hide-error-context" "--no-strict-optional"
-									 source-original)
-						   :error-patterns
-						   ((error line-start (file-name) ":" line ": error:" (message) line-end))
-						   :modes python-mode)
+			   :command ("mypy"
+				     "--ignore-missing-imports" "--python-version" "3.7"
+				     "--hide-error-context" "--no-strict-optional"
+				     source-original)
+			   :error-patterns
+			   ((error line-start (file-name) ":" line ": error:" (message) line-end))
+			   :modes python-mode)
   (add-to-list 'flycheck-checkers 'python-mypy t)
   (flycheck-add-next-checker 'python-pylint 'python-mypy t)
   (setq flycheck-check-syntax-automatically '(mode-enabled save))
@@ -235,11 +184,11 @@
 (use-package helm
   :init
   (with-eval-after-load 'helm
-	(define-key helm-map (kbd "<tab>") 'helm-next-line)
-	(define-key helm-map (kbd "<backtab>") 'helm-previous-line))
+    (define-key helm-map (kbd "TAB") 'helm-next-line)
+    (define-key helm-map (kbd "<backtab>") 'helm-previous-line))
   :config
   (setq helm-boring-file-regexp-list
-		'("\\.$" "\\.git*." "\\.o" "\\.a$" "\\.pyc$" "\\.pyo$" "/Library/?" "/Applications/?"))
+	'("\\.$" "\\.git*." "\\.o" "\\.a$" "\\.pyc$" "\\.pyo$" "/Library/?" "/Applications/?"))
   (setq helm-display-header-line nil)
   (helm-mode t))
 
@@ -248,19 +197,14 @@
   (projectile-mode t)
   (helm-projectile-on))
 
-(use-package company-c-headers)
-(use-package company-jedi)
-
 (use-package company
   :init
   (with-eval-after-load 'company
-	(define-key company-active-map (kbd "S-SPC") 'company-abort)
-	(define-key company-active-map (kbd "<tab>") 'company-select-next)
-	(define-key company-active-map (kbd "<backtab>") 'company-select-previous))
+    (define-key company-active-map (kbd "S-SPC") 'company-abort)
+    (define-key company-active-map (kbd "TAB") 'company-select-next)
+    (define-key company-active-map (kbd "<backtab>") 'company-select-previous))
   :config
   (setq company-idle-delay 120)
-  (add-to-list 'company-backends 'company-jedi)
-  (add-to-list 'company-backends 'company-c-headers)
   (global-company-mode t)
   (custom-set-faces
    '(company-tooltip ((t (:foreground "#ABB2BF" :background "#30343C"))))
@@ -275,42 +219,41 @@
    '(company-scrollbar-bg ((t (:background "#30343C"))))
    '(company-template-field ((t (:foreground "#282C34" :background "#C678DD"))))))
 
+(use-package company-c-headers
+  :config
+  (add-to-list 'company-backends 'company-c-headers))
+
+(use-package company-jedi
+  :config
+  (add-to-list 'company-backends 'company-jedi))
+
 (use-package magit)
 
-(use-package yasnippet-snippets)
-(use-package yasnippet
-  :config
-  (add-hook 'prog-mode-hook 'yas-minor-mode)
-  (define-key yas-minor-mode-map (kbd "TAB") nil)
-  (define-key yas-minor-mode-map (kbd "<tab>") nil)
-  (define-key yas-minor-mode-map (kbd "C-SPC") 'yas-expand))
-
-;; Bindings
-(global-set-key (kbd "S-SPC") (lambda () (interactive) (when xah-fly-insert-state-q (company-complete))))
-(global-set-key (kbd "<backtab>") 'tab-to-tab-stop)
-
-;; General programming settings
-(add-hook 'prog-mode-hook (lambda() (setq tab-width 4)))
-
-;; C settings
-(setq-default c-default-style "linux")
-(setq-default c-basic-offset 4)
-(add-hook 'c-mode-hook (lambda()
-						 (setq indent-tabs-mode t)
-						 (global-aggressive-indent-mode -1)))
-
-;; Python settings
-(setq-default python-shell-interpreter "python3")
-(setq-default python-indent 4)
-(add-hook 'python-mode-hook (lambda()
-							  (setq flycheck-python-pylint-executable "python3")
-							  (setq flycheck-python-pycompile-executable "python3")))
-
-;; Ocaml settings
-(use-package merlin)
-(use-package tuareg
+(use-package prog-mode
+  :ensure nil
   :init
-  (add-hook 'tuareg-mode-hook 'merlin-mode)
+  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+
+(use-package cc-mode
+  :ensure nil
+  :init
+  (add-hook 'c-mode-hook (lambda ()
+			   (setq indent-tabs-mode t)
+			   (global-aggressive-indent-mode -1)))
+  :config
+  (setq-default c-default-style "linux")
+  (setq-default c-basic-offset 4))
+(use-package python
+  :ensure nil
+  :init
+  (add-hook 'python-mode-hook (lambda ()
+				(setq flycheck-python-pylint-executable "python3.7")
+				(setq flycheck-python-pycompile-executable "python3.7")))
+  :config
+  (setq-default python-shell-interpreter "python3")
+  (setq-default python-indent 4))
+
+(use-package tuareg
   :config
   (setq tuareg-match-patterns-aligned t)
   (setq tuareg-indent-align-with-first-arg t))
