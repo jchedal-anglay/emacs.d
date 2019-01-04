@@ -45,21 +45,6 @@
 (defconst custom-file "/dev/zero")
 #+end_src
 
-* Functions
-
-#+begin_src emacs-lisp
-  (defun insert-map ()
-    (interactive)
-    (define-key xah-fly-key-map (kbd "S-SPC") 'company-complete)
-    (define-key xah-fly-key-map (kbd "<backtab>") 'tab-to-tab-stop))
-
-  (defun command-map ()
-    (interactive)
-    (define-key xah-fly-key-map (kbd ";") 'keyboard-escape-quit)
-    (define-key xah-fly-key-map (kbd "'") 'xah-comment-dwim)
-    (define-key xah-fly-key-map (kbd "b") 'helm-occur))
-#+end_src
-
 * GUI
 
 #+begin_src emacs-lisp
@@ -75,14 +60,16 @@
 (setq-default transient-mark-mode t
               visual-line-mode t
               truncate-lines nil
-              column-number-mode t
-              linum-format " %d ")
+              column-number-mode t)
 
-(add-hook 'prog-mode-hook (lambda ()
-			    (if (version<= "26.0.50" emacs-version)
-				(global-display-line-numbers-mode)
-			      (linum-mode))
-			    (set-face-underline 'linum nil)))
+(global-hl-line-mode 1)
+
+(use-package linum
+  :hook (prog-mode . linum-mode)
+  :custom
+  (linum-format " %d ")
+  :config
+  (set-face-underline 'linum nil))
 #+end_src
 
 ** Status bar
@@ -90,6 +77,20 @@
 #+begin_src emacs-lisp
 (line-number-mode t)
 (column-number-mode t)
+
+(use-package doom-modeline
+  :hook (after-init . doom-modeline-init)
+  :custom
+  (doom-modeline-python-executable "python3.7")
+  (doom-modeline-icon t)
+  (doom-modeline-major-mode-icon t)
+  :config
+  (doom-modeline-def-segment xah-fly-keys ()
+    "The current xah-fly-keys state."
+    (when (boundp 'xah-fly-insert-state-q)
+      (if xah-fly-insert-state-q
+          (propertize " <I> " 'face (if (doom-modeline--active) 'doom-modeline-evil-insert-state))
+        (propertize " <C> " 'face (if (doom-modeline--active) 'doom-modeline-evil-normal-state))))))
 #+end_src
 
 ** Cursor
@@ -102,13 +103,12 @@
 ** Parentheses
 
 #+begin_src emacs-lisp
-(use-package smartparens
-  :config
-  (require 'smartparens-config)
-  (smartparens-global-mode 1))
-
 (use-package rainbow-delimiters
-  :hook prog-mode)
+  :hook (prog-mode . rainbow-delimiters-mode))
+
+(use-package smartparens
+  :config (require 'smartparens-config)
+  :hook (prog-mode . smartparens-mode))
 
 (show-paren-mode t)
 #+end_src
@@ -132,7 +132,7 @@
 ** Scratch buffer
 
 #+begin_src emacs-lisp
-(setq-default initial-major-mode 'python-mode
+(setq-default initial-major-mode 'fundamental-mode
 	      initial-scratch-message nil)
 #+end_src
 
@@ -150,13 +150,13 @@
 (global-subword-mode 1)
 (delete-selection-mode t)
 (setq-default require-final-newline t)
+(add-hook 'before-save-hook #'delete-trailing-whitespace)
 #+end_src
 
 * Selection
 
 #+begin_src emacs-lisp
 (use-package expand-region)
-(delete-selection-mode t)
 #+end_src
 
 * Welcome screen
@@ -173,28 +173,26 @@
 ** Font
 
 #+begin_src emacs-lisp
-(set-frame-font "Inconsolata-12" nil t)
+(set-frame-font (if (memq window-system '(mac ns)) "Menlo-16" "FiraCode-12") nil t)
 #+end_src
 
 ** Theme
 
 #+begin_src emacs-lisp
-(use-package atom-one-dark-theme
+(use-package doom-themes
+  :custom-face
+  (helm-ff-directory ((t (:foreground "#5CEFFF"))))
   :config
-  (load-theme 'atom-one-dark t))
+  (doom-themes-org-config)
+  (load-theme 'doom-vibrant t))
 #+end_src
 
 * System
-** GNU
-
-# test
-
 ** MacOS
 
 #+begin_src emacs-lisp
 (use-package exec-path-from-shell
   :if (memq window-system '(mac ns))
-  :ensure t
   :config
   (exec-path-from-shell-initialize))
 #+end_src
@@ -205,6 +203,22 @@
 (use-package magit)
 #+end_src
 
+* Helm
+
+#+begin_src emacs-lisp
+(use-package helm
+  :bind
+  (:map helm-map
+   ("<escape>" . keyboard-escape-quit)
+   ("<tab>" . helm-next-line)
+   ("<backtab>" . helm-previous-line))
+  :custom
+  (helm-boring-file-regexp-list '("\\.$" "\\.git*." "\\.o" "\\.a$" "\\.pyc$" "\\.pyo$" "/Library/?" "/Applications/?"))
+  (helm-display-header-line nil)
+  :config
+  (helm-mode t))
+
+#+end_src
 * Project Managing
 
 #+begin_src emacs-lisp
@@ -213,48 +227,35 @@
   (projectile-mode t))
 
 (use-package helm-projectile
-  :after helm
+  :after (projectile helm)
   :config
   (projectile-mode t))
 #+end_src
 
-* Helm
+* Translations
 
 #+begin_src emacs-lisp
-(use-package helm
-  :bind
-  (:map helm-map
-        ("ESC" . keyboard-escape-quit)
-        ("<escape>" . keyboard-escape-quit)
-	("TAB" . 'helm-next-line)
-	("<tab>" . 'helm-next-line)
-	("<backtab>" . 'helm-previous-line))
-  :init
-  :custom
-  (helm-boring-file-regexp-list '("\\.$" "\\.git*." "\\.o" "\\.a$" "\\.pyc$" "\\.pyo$" "/Library/?" "/Applications/?"))
-  (helm-display-header-line nil)
-  :config
-  (helm-mode t))
+(define-key key-translation-map (kbd "TAB") (kbd "<tab>"))
+(define-key key-translation-map (kbd "S-TAB") (kbd "<backtab>"))
+(define-key key-translation-map (kbd "ESC") (kbd "<escape>"))
 #+end_src
 
 * Bindings
 
 #+begin_src emacs-lisp
 (use-package xah-fly-keys
-  :hook
-  ((xah-fly-insert-mode-activate-hook . insert-map)
-   (xah-fly-command-mode-activate-hook . command-map))
-  :bind (("ESC" . xah-fly-command-mode-activate)
-	 ("<escape>" . xah-fly-command-mode-activate))
-  :config
-  (xah-fly--define-keys
-   (define-prefix-command 'xah-fly-leader-key-map)
-   '(("SPC" . helm-mini)
-     ("y" . er/expand-region) ; t
-     ("q" . (lambda () (interactive) (if (one-window-p) (kill-emacs) (delete-window)))) ; x
-     ("j" . (lambda () (interactive) (delete-trailing-whitespace) (save-buffer))) ; c
-     ("k" . helm-find-files) ; v
-     ))
+  :demand
+  :bind
+  (("<escape>" . xah-fly-command-mode-activate)
+   :map xah-fly-leader-key-map
+   ("SPC" . helm-mini)
+   ("j" . save-buffer)
+   ("k" . helm-find-files)
+   ("m" . previous-buffer)
+   ("q" . kill-buffer-and-window)
+   ("v" . next-buffer)
+   ("w" . split-window-right)
+   ("y" . er/expand-region))
   :custom
   (xah-fly-use-control-key nil)
   (xah-fly-use-meta-key nil)
@@ -266,24 +267,25 @@
 
 #+begin_src emacs-lisp
 (use-package company
+  :demand
   :bind
-  (:map company-active-map
-	("S-SPC" . company-abort)
-	("TAB" . company-select-next)
-	("<tab>" . company-select-next)
-	("<backtab>" . company-select-previous))
+  (("S-SPC" . company-complete)
+   :map company-active-map
+   ("S-SPC" . company-abort)
+   ("<tab>" . company-select-next)
+   ("<backtab>" . company-select-previous))
   :custom-face
-   (company-tooltip ((t (:foreground "#ABB2BF" :background "#30343C"))))
-   (company-tooltip-annotation ((t (:foreground "#ABB2BF" :background "#30343C"))))
-   (company-tooltip-selection ((t (:foreground "#ABB2BF" :background "#393F49"))))
-   (company-tooltip-mouse ((t (:background "#30343C"))))
-   (company-tooltip-common ((t (:foreground "#ABB2BF" :background "#30343C"))))
-   (company-tooltip-common-selection ((t (:foreground "#ABB2BF" :background "#393F49"))))
-   (company-preview ((t (:background "#30343C"))))
-   (company-preview-common ((t (:foreground "#ABB2BF" :background "#30343C"))))
-   (company-scrollbar-fg ((t (:background "#30343C"))))
-   (company-scrollbar-bg ((t (:background "#30343C"))))
-   (company-template-field ((t (:foreground "#282C34" :background "#C678DD"))))
+  (company-tooltip ((t (:foreground "#ABB2BF" :background "#30343C"))))
+  (company-tooltip-annotation ((t (:foreground "#ABB2BF" :background "#30343C"))))
+  (company-tooltip-selection ((t (:foreground "#ABB2BF" :background "#393F49"))))
+  (company-tooltip-mouse ((t (:background "#30343C"))))
+  (company-tooltip-common ((t (:foreground "#ABB2BF" :background "#30343C"))))
+  (company-tooltip-common-selection ((t (:foreground "#ABB2BF" :background "#393F49"))))
+  (company-preview ((t (:background "#30343C"))))
+  (company-preview-common ((t (:foreground "#ABB2BF" :background "#30343C"))))
+  (company-scrollbar-fg ((t (:background "#30343C"))))
+  (company-scrollbar-bg ((t (:background "#30343C"))))
+  (company-template-field ((t (:foreground "#282C34" :background "#C678DD"))))
   :custom
   (company-idle-delay 120)
   :config
@@ -367,26 +369,16 @@
   :after (flycheck)
   :ensure nil
   :custom
-  (flycheck-python-pylint-executable "python3.7")
-  (flycheck-python-pycompile-executable "python3.7")
   (python-indent 4)
-  :interpreter
-  ("python3.7" . python-mode)
-  :config
-  (flycheck-define-checker
-      python-mypy ""
-      :command ("mypy"
-                "--ignore-missing-imports" "--python-version" "3.7"
-                "--hide-error-context" "--no-strict-optional"
-                source-original)
-      :error-patterns
-      ((error line-start (file-name) ":" line ": error:" (message) line-end))
-      :modes python-mode)
-  (add-to-list 'flycheck-checkers 'python-mypy t)
-  (flycheck-add-next-checker 'python-pylint 'python-mypy t))
+  (python-shell-interpreter "ipython3")
+  (python-shell-interpreter-args "--simple-prompt -i")
+  (flycheck-python-pylint-executable "python3.7")
+  (flycheck-python-pycompile-executable "python3.7"))
 
 (use-package company-jedi
   :after company
+  :hook (python-mode . jedi-setup)
+  :demand
   :config
   (add-to-list 'company-backends 'company-jedi))
 #+end_src
@@ -395,12 +387,16 @@
 
 #+begin_src emacs-lisp
 (use-package tuareg
+  :mode ("\\.mly\\'" . tuareg-menhir-mode)
   :custom
   (tuareg-match-patterns-aligned t)
   (tuareg-indent-align-with-first-arg t))
 
 (use-package merlin
-  :hook tuareg-mode)
+  :hook (tuareg-mode . merlin-mode)
+  :config
+  (when (file-exists-p "~/.emacs.d/opam-user-setup.el")
+   (require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")))
 #+end_src
 
 * C
@@ -432,7 +428,7 @@
 
 #+begin_src emacs-lisp
 (use-package elcord
-  :disabled t
-  :init
+  :demand t
+  :config
   (elcord-mode))
 #+end_src
