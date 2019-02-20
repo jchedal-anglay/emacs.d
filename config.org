@@ -1,4 +1,5 @@
-#+TITLE: Literate emacs configuration
+#+TITLE: Literate Emacs Configuration
+#+AUTHOR: Julien Chedal-Anglay
 * Personal Informations
 
 #+BEGIN_SRC emacs-lisp
@@ -30,6 +31,7 @@
 #+BEGIN_SRC emacs-lisp
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+(add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
 (package-initialize)
 
 (unless (package-installed-p 'use-package)
@@ -52,6 +54,7 @@
 #+BEGIN_SRC emacs-lisp
 (use-package exec-path-from-shell
   :if (memq window-system '(mac ns))
+  :demand
   :config
   (exec-path-from-shell-initialize))
 #+END_SRC
@@ -59,17 +62,17 @@
 * GUI
 
 #+BEGIN_SRC emacs-lisp
-(when (window-system)
-  (menu-bar-mode -1)
-  (toggle-scroll-bar -1)
-  (tool-bar-mode -1))
+(when (display-graphic-p)
+  (menu-bar-mode 0)
+  (toggle-scroll-bar 0)
+  (tool-bar-mode 0))
 #+END_SRC
 
 * Appearance
 ** Font
 
 #+BEGIN_SRC emacs-lisp
-(set-frame-font (if (memq window-system '(mac ns)) "Menlo-16" "FiraCode-12") nil t)
+(set-frame-font (if (memq window-system '(mac ns)) "Menlo-14" "FiraCode-12") nil t)
 #+END_SRC
 
 ** Theme
@@ -88,11 +91,51 @@
 (column-number-mode t)
 
 (use-package doom-modeline
-  :hook (after-init . doom-modeline-init)
+  :if (display-graphic-p)
   :custom
-  (doom-modeline-python-executable "python3.7")
+  (doom-modeline-python-executable "python3")
   (doom-modeline-icon t)
-  (doom-modeline-major-mode-icon t))
+  (doom-modeline-major-mode-icon t)
+  (doom-modeline-version t)
+  :config
+  (doom-modeline-mode))
+#+END_SRC
+
+* Functions
+** Dependencies
+
+#+BEGIN_SRC emacs-lisp
+(use-package popwin)
+#+END_SRC
+
+** Definitions
+
+#+BEGIN_SRC emacs-lisp
+(defun ign/split-window-right ()
+  (interactive)
+  (split-window-right)
+  (balance-windows))
+
+(defun ign/kill-and-balance-window ()
+  (interactive)
+  (if (= (length (get-buffer-window-list (current-buffer))) 1)
+     (kill-buffer-and-window)
+    (delete-window))
+  (balance-windows))
+
+(defun ign/popwin-ansi-term (name)
+  (popwin:display-buffer-1
+   (or (get-buffer name)
+       (save-window-excursion
+         (ansi-term "zsh" name)))
+   :default-config-keywords '(:height 15 :position :bottom :noselect nil :stick t)))
+
+(defun ign/term-toggle ()
+  (interactive)
+  (if (get-buffer "*term*")
+     (progn (switch-to-buffer "*term*")
+            (kill-buffer-and-window))
+    (ign/popwin-ansi-term "term")))
 #+END_SRC
 
 * Interface
@@ -101,19 +144,12 @@
 #+BEGIN_SRC emacs-lisp
 (use-package dashboard
   :custom
+  (dashboard-banner-logo-title
+        (format "[Emacs ready in %.2f seconds with %d garbage collections.]"
+                (float-time (time-subtract after-init-time before-init-time)) gcs-done))
   (dashboard-startup-banner 'logo)
   :config
   (dashboard-setup-startup-hook))
-#+END_SRC
-
-** Scratch buffer
-
-#+BEGIN_SRC emacs-lisp
-(setq-default initial-major-mode 'python-mode
-	      initial-scratch-message "\
-# This buffer is for notes you don't want to save, and for Ruby code.
-# If you want to create a file, visit that file with C-x C-f,
-# then enter the text in that file's own buffer.")
 #+END_SRC
 
 ** Lines
@@ -122,7 +158,8 @@
 (setq-default transient-mark-mode t
               visual-line-mode t)
 
-(global-hl-line-mode 1)
+(when (display-graphic-p)
+  (global-hl-line-mode 1))
 
 (use-package linum
   :hook (prog-mode . linum-mode)
@@ -159,49 +196,31 @@
 * Completion Frontend
 
 #+BEGIN_SRC emacs-lisp
-(use-package ivy :demand
+(use-package ivy
+  :bind
+  ("C-x b" . ivy-switch-buffer)
+  (:map ivy-minibuffer-map
+   ("<return>" . ivy-alt-done))
   :custom
   (ivy-use-virtual-buffers t)
-  (ivy-count-format "%d/%d "))
-#+END_SRC
+  (ivy-count-format "%d/%d ")
+  (ivy-height 20)
+  (ivy-display-style 'fancy)
+  (ivy-format-function 'ivy-format-function-line)
+  (ivy-re-builders-alist
+      '((t . ivy--regex-plus)))
+  (ivy-initial-inputs-alist nil))
 
-* Functions
+(use-package counsel
+  :bind
+  (("M-x" . counsel-M-x)
+   ("C-x C-f" . counsel-find-file)
+   ("C-h v" . counsel-describe-variable)
+   ("C-h f" . counsel-describe-function)))
 
-#+BEGIN_SRC emacs-lisp
-(defun ign/split-window-right ()
-  (interactive)
-  (split-window-right)
-  (balance-windows))
-
-(defun ign/kill-and-balance-window ()
-  (interactive)
-  (if (= (length (get-buffer-window-list (current-buffer))) 1)
-     (kill-buffer-and-window)
-    (delete-window))
-  (balance-windows))
-
-(defun ign/popwin-ansi-term (name)
-  (popwin:display-buffer-1
-   (or (get-buffer name)
-       (save-window-excursion
-         (ansi-term "zsh" name)))
-   :default-config-keywords '(:height 20 :position :bottom :noselect nil :stick t)))
-
-(defun ign/term-toggle ()
-  (interactive)
-  (if (get-buffer "*term*")
-     (progn (switch-to-buffer "*term*")
-            (kill-buffer-and-window))
-    (ign/popwin-ansi-term "term")))
-#+END_SRC
-
-* Buffers
-** IBuffer
-
-#+BEGIN_SRC emacs-lisp
-(use-package ibuffer
-  :ensure nil
-  :bind ("C-x b" . ibuffer))
+(use-package swiper
+  :bind
+  ("C-s" . swiper))
 #+END_SRC
 
 * Org
@@ -210,7 +229,19 @@
 (use-package org
   :ensure nil
   :custom
-  (org-src-fontify-natively t))
+  (org-src-fontify-natively t)
+  (org-hide-emphasis-markers t)
+  (org-babel-python-command "ipython3 -i --simple-prompt")
+  :config
+  (use-package ob-ipython)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((python . t)
+     (ipython . t)
+     (ocaml . t))))
+
+(use-package org-bullets
+  :hook (org-mode . org-bullets-mode))
 #+END_SRC
 
 * Programming
@@ -225,6 +256,8 @@
 
 (use-package smartparens
   :hook (prog-mode . smartparens-mode)
+  :custom
+  (sp-escape-quotes-after-insert nil)
   :config
   (require 'smartparens-config))
 
@@ -235,31 +268,25 @@
 
 #+BEGIN_SRC emacs-lisp
 (use-package magit
-  :bind ("C-c g" . magit-status)
-  :custom
-  (magit-completing-read-function 'ivy-completing-read))
+  :bind
+  ("C-c g" . magit-status))
 
 (use-package gitignore-mode
   :mode ("\\.gitignore\\'" . gitignore-mode))
 #+END_SRC
 
-** Projectile
-
-#+BEGIN_SRC emacs-lisp
-(use-package projectile
-  :demand
-  :bind
-  (:map projectile-mode-map
-   ("C-c p" . projectile-command-map))
-  :config
-  (projectile-mode t))
-#+END_SRC
-
-** Company
+** Auto-Completion
 
 #+BEGIN_SRC emacs-lisp
 (use-package company
-  :demand
+  :bind
+  ("C-@" . company-complete)
+  ("C-SPC" . company-complete)
+  (:map company-active-map
+   ("M-n" . nil)
+   ("M-p" . nil)
+   ("C-n" . company-select-next)
+   ("C-p" . company-select-previous))
   :custom-face
   (company-tooltip ((t (:foreground "#ABB2BF" :background "#30343C"))))
   (company-tooltip-annotation ((t (:foreground "#ABB2BF" :background "#30343C"))))
@@ -273,9 +300,27 @@
   (company-scrollbar-bg ((t (:background "#30343C"))))
   (company-template-field ((t (:foreground "#282C34" :background "#C678DD"))))
   :custom
-  (company-idle-delay 120)
+  (company-require-match 'never)
+  (company-dabbrev-downcase nil)
+  (company-tooltip-align-annotations t)
+  (company-idle-delay 128)
+  (company-minimum-prefix-length 128)
   :config
   (global-company-mode t))
+
+(use-package company-quickhelp
+  :if (display-graphic-p)
+  :after company
+  (company-quickhelp-mode))
+#+END_SRC
+
+** Snippets
+
+#+BEGIN_SRC emacs-lisp
+(use-package yasnippet
+  :hook (prog-mode . yas-minor-mode)
+  :config
+  (use-package yasnippet-snippets))
 #+END_SRC
 
 ** Flycheck
@@ -334,42 +379,59 @@
 ** Python
 
 #+BEGIN_SRC emacs-lisp
+(use-package pip-requirements)
+
 (use-package python
-  :after (flycheck)
+  :after flycheck
   :ensure nil
+  :hook (python-mode . elpy-mode)
   :custom
   (python-indent 4)
-  (python-shell-interpreter "ipython3")
+  (python-shell-interpreter (if (memq window-system '(mac ns)) "ipython" "ipython3"))
   (python-shell-interpreter-args "--simple-prompt -i")
+  (gud-pdb-command-name "python3 -m pdb")
   (python-fill-docstring-style 'pep-257)
   (py-split-window-on-execute t)
-  (flycheck-python-pylint-executable "python3.7")
-  (flycheck-python-pycompile-executable "python3.7"))
+  (flycheck-python-pylint-executable "python3")
+  (flycheck-python-pycompile-executable "python3"))
 
-(use-package company-jedi
+(use-package elpy
   :after company
-  :hook (python-mode . jedi-setup)
-  :demand
+  :custom
+  (elpy-rpc-python-command "python3")
   :config
-  (add-to-list 'company-backends 'company-jedi))
+  (delete 'elpy-module-highlight-indentation elpy-modules)
+  (delete 'elpy-module-flymake elpy-modules)
+  (delete 'elpy-module-company elpy-modules)
+  (add-to-list 'company-backends 'elpy-company-backend)
+  (elpy-enable))
+#+END_SRC
 
-(use-package pip-requirements)
+*** Jupyter
+
+#+BEGIN_SRC emacs-lisp
+(use-package ein
+  :custom
+  (ein:completion-backend 'ein:use-company-jedi-backends)
+  (ein:use-auto-complete-superpack t))
 #+END_SRC
 
 ** OCaml
 
 #+BEGIN_SRC emacs-lisp
 (use-package tuareg
-  :mode ("\\.mly\\'" . tuareg-menhir-mode)
+  :after company
+  :mode ("\\.ml[ly]\\'" . tuareg-menhir-mode)
   :custom
   (tuareg-match-patterns-aligned t)
   (tuareg-indent-align-with-first-arg t))
 
 (use-package merlin
+  :if (file-exists-p "~/.emacs.d/opam-user-setup.el")
+  :after tuareg
   :hook (tuareg-mode . merlin-mode)
   :config
-  (when (file-exists-p "~/.emacs.d/opam-user-setup.el")
-   (require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")))
+  (require 'opam-user-setup "~/.emacs.d/opam-user-setup.el"))
 #+END_SRC
 
 ** C
@@ -379,7 +441,7 @@
   :ensure nil
   :hook
   (c-mode . (lambda () (setq indent-tabs-mode t)
-	      (global-aggressive-indent-mode -1)))
+                       (global-aggressive-indent-mode -1)))
   :custom
   (c-default-style "linux")
   (c-basic-offset 4))
@@ -393,51 +455,51 @@
 * Text Editing
 
 #+BEGIN_SRC emacs-lisp
-(use-package expand-region)
-
 (setq-default require-final-newline t)
 (global-subword-mode 1)
 (delete-selection-mode t)
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
+
+(defun ign/fill-or-unfill ()
+  (interactive)
+  (let ((fill-column
+         (if (eq last-command 'endless/fill-or-unfill)
+             (progn (setq this-command nil)
+                    (point-max))
+           fill-column)))
+    (call-interactively #'fill-paragraph)))
+
+(global-set-key [remap fill-paragraph] #'ign/fill-or-unfill)
+
+(use-package expand-region
+  :bind
+  ("C-=" . er/expand-region))
 #+END_SRC
 
 * Text Navigation
 
 #+BEGIN_SRC emacs-lisp
-(use-package popwin)
-
 (use-package avy
+  :bind
+  ("C-'" . avy-goto-char-2)
   :custom
-  (avy-keys '(?u ?h ?e ?t ?o ?n ?a ?s))
-  :bind
-  ("C-'" . 'avy-goto-char-2))
-
-(use-package ace-window
-  :custom
-  (aw-keys '(?u ?h ?e ?t ?o ?n ?a ?s))
-  :bind
-  ("C-x C-w" . 'ace-window))
-
-(use-package ace-jump-helm-line
-  :bind
-  (:map helm-map
-   ("C-'" . 'ace-jump-helm-line)))
+  (avy-keys '(?a ?o ?e ?u ?h ?t ?n ?s)))
 #+END_SRC
 
 * Bindings
 
 #+BEGIN_SRC emacs-lisp
-(define-key key-translation-map (kbd "C-t") (kbd "C-x"))
-(define-key key-translation-map (kbd "C-x") (kbd "C-t"))
+(keyboard-translate ?\C-t ?\C-x)
+(keyboard-translate ?\C-x ?\C-t)
+
+(define-key key-translation-map (kbd "S-C-i") (kbd "S-TAB"))
 (define-key key-translation-map (kbd "M-t") (kbd "M-x"))
-(define-key key-translation-map (kbd "M-x") (kbd "M-t"))
+(define-key comint-mode-map (kbd "C-l") #'comint-clear-buffer)
 
 (use-package bind-key)
-(bind-key* "C-x m" 'previous-buffer)
-(bind-key* "C-x v" 'next-buffer)
-(bind-key* "C-x w" 'ign/split-window-right)
 (bind-key* "C-x k" 'ign/kill-and-balance-window)
-(bind-key* "C-x t" 'ign/term-toggle)
+(bind-key* "C-c w" 'ign/split-window-right)
+(bind-key* "C-c t" 'ign/term-toggle)
 #+END_SRC
 
 ** Which-key
@@ -445,9 +507,11 @@
 #+BEGIN_SRC emacs-lisp
 (use-package which-key
   :demand
-  :bind ("C-h b" . which-key-show-top-level)
   :config
-  (which-key-mode))
+  (which-key-mode)
+  :bind
+  ("C-h m" . which-key-show-major-mode)
+  ("C-h b" . which-key-show-top-level))
 #+END_SRC
 
 * Community
@@ -461,7 +525,6 @@
 
 #+BEGIN_SRC emacs-lisp
 (use-package elcord
-  :demand
   :config
   (elcord-mode))
 #+END_SRC
