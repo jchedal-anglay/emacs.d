@@ -54,7 +54,7 @@
 #+BEGIN_SRC emacs-lisp
 (use-package exec-path-from-shell
   :if (memq window-system '(mac ns))
-  :demand
+  :demand t
   :config
   (exec-path-from-shell-initialize))
 #+END_SRC
@@ -72,7 +72,7 @@
 ** Font
 
 #+BEGIN_SRC emacs-lisp
-(set-frame-font (if (memq window-system '(mac ns)) "Menlo-14" "FiraCode-12") nil t)
+(set-frame-font (if (memq window-system '(mac ns)) "Menlo-14" "FiraCode-10") nil t)
 #+END_SRC
 
 ** Theme
@@ -106,36 +106,52 @@
 
 #+BEGIN_SRC emacs-lisp
 (use-package popwin)
+(use-package multi-term
+  :custom
+  (multi-term-program "/bin/zsh"))
 #+END_SRC
 
 ** Definitions
 
 #+BEGIN_SRC emacs-lisp
-(defun ign/split-window-right ()
+(defun ign:split-window-right ()
   (interactive)
   (split-window-right)
   (balance-windows))
 
-(defun ign/kill-and-balance-window ()
+(defun ign:split-window-below ()
   (interactive)
-  (if (= (length (get-buffer-window-list (current-buffer))) 1)
-     (kill-buffer-and-window)
-    (delete-window))
+  (split-window-below)
   (balance-windows))
 
-(defun ign/popwin-ansi-term (name)
+(defun ign:delete-window ()
+  (interactive)
+  (delete-window)
+  (balance-windows))
+
+(defun ign:popwin-term (name)
   (popwin:display-buffer-1
    (or (get-buffer name)
        (save-window-excursion
-         (ansi-term "zsh" name)))
-   :default-config-keywords '(:height 15 :position :bottom :noselect nil :stick t)))
+         (multi-term)))
+   :default-config-keywords '(:height 15 :position :bottom :noselect nil :stick t))
+   (rename-buffer name))
 
-(defun ign/term-toggle ()
+(defun ign:term-toggle ()
   (interactive)
   (if (get-buffer "*term*")
      (progn (switch-to-buffer "*term*")
             (kill-buffer-and-window))
-    (ign/popwin-ansi-term "term")))
+    (ign:popwin-term "*term*")))
+
+(defun ign:fill-or-unfill ()
+  (interactive)
+  (let ((fill-column
+         (if (eq last-command 'endless/fill-or-unfill)
+             (progn (setq this-command nil)
+                    (point-max))
+           fill-column)))
+    (call-interactively #'fill-paragraph)))
 #+END_SRC
 
 * Interface
@@ -156,10 +172,12 @@
 
 #+BEGIN_SRC emacs-lisp
 (setq-default transient-mark-mode t
-              visual-line-mode t)
+              visual-line-mode t
+              indent-tabs-mode nil
+              tab-width 4)
 
 (when (display-graphic-p)
-  (global-hl-line-mode 1))
+  (global-hl-line-mode t))
 
 (use-package linum
   :hook (prog-mode . linum-mode)
@@ -221,6 +239,12 @@
 (use-package swiper
   :bind
   ("C-s" . swiper))
+
+(use-package all-the-icons-ivy
+  :after ivy
+  :config
+  (setq-default all-the-icons-ivy-file-commands (append all-the-icons-ivy-file-commands '(counsel-projectile-find-file counsel-projectile-find-file-dwim)))
+  (all-the-icons-ivy-setup))
 #+END_SRC
 
 * Org
@@ -280,8 +304,7 @@
 #+BEGIN_SRC emacs-lisp
 (use-package company
   :bind
-  ("C-@" . company-complete)
-  ("C-SPC" . company-complete)
+  ("M-/" . company-complete)
   (:map company-active-map
    ("M-n" . nil)
    ("M-p" . nil)
@@ -323,7 +346,7 @@
   (use-package yasnippet-snippets))
 #+END_SRC
 
-** Flycheck
+** Checkers/Linters CC
 
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
@@ -376,6 +399,29 @@
   (global-flycheck-mode t))
 #+END_SRC
 
+** Project
+
+#+BEGIN_SRC emacs-lisp
+(use-package projectile
+  :demand t
+  :bind
+  (:map projectile-mode-map
+   ("C-c p" . projectile-command-map))
+  :custom
+  (projectile-project-search-path '("~/Projects/"))
+  (projectile-indexing-method 'hybrid)
+  (projectile-sort-order 'access-time)
+  (projectile-enable-caching t)
+  (projectile-require-project-root t)
+  (projectile-completion-system 'ivy)
+  :config
+  (projectile-mode t)
+  (counsel-projectile-mode))
+
+(use-package counsel-projectile
+  :after (counsel projectile))
+#+END_SRC
+
 ** Python
 
 #+BEGIN_SRC emacs-lisp
@@ -396,7 +442,9 @@
   (flycheck-python-pycompile-executable "python3"))
 
 (use-package elpy
+  :demand t
   :after company
+  :hook (before-save . elpy-black-fix-code)
   :custom
   (elpy-rpc-python-command "python3")
   :config
@@ -421,7 +469,7 @@
 #+BEGIN_SRC emacs-lisp
 (use-package tuareg
   :after company
-  :mode ("\\.ml[ly]\\'" . tuareg-menhir-mode)
+  :mode ("\\.mly\\'" . tuareg-menhir-mode)
   :custom
   (tuareg-match-patterns-aligned t)
   (tuareg-indent-align-with-first-arg t))
@@ -456,20 +504,12 @@
 
 #+BEGIN_SRC emacs-lisp
 (setq-default require-final-newline t)
-(global-subword-mode 1)
+(global-subword-mode t)
 (delete-selection-mode t)
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
 
-(defun ign/fill-or-unfill ()
-  (interactive)
-  (let ((fill-column
-         (if (eq last-command 'endless/fill-or-unfill)
-             (progn (setq this-command nil)
-                    (point-max))
-           fill-column)))
-    (call-interactively #'fill-paragraph)))
 
-(global-set-key [remap fill-paragraph] #'ign/fill-or-unfill)
+(global-set-key [remap fill-paragraph] #'ign:fill-or-unfill)
 
 (use-package expand-region
   :bind
@@ -492,21 +532,20 @@
 (keyboard-translate ?\C-t ?\C-x)
 (keyboard-translate ?\C-x ?\C-t)
 
-(define-key key-translation-map (kbd "S-C-i") (kbd "S-TAB"))
 (define-key key-translation-map (kbd "M-t") (kbd "M-x"))
 (define-key comint-mode-map (kbd "C-l") #'comint-clear-buffer)
 
 (use-package bind-key)
-(bind-key* "C-x k" 'ign/kill-and-balance-window)
-(bind-key* "C-c w" 'ign/split-window-right)
-(bind-key* "C-c t" 'ign/term-toggle)
+(bind-key* "C-x k" 'ign:delete-window)
+(bind-key* "C-c w" 'ign:split-window-right)
+(bind-key* "C-c t" 'ign:term-toggle)
 #+END_SRC
 
 ** Which-key
 
 #+BEGIN_SRC emacs-lisp
 (use-package which-key
-  :demand
+  :demand t
   :config
   (which-key-mode)
   :bind
