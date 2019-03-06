@@ -346,7 +346,7 @@
   (use-package yasnippet-snippets))
 #+END_SRC
 
-** Checkers/Linters CC
+** Checkers/Linters
 
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
@@ -487,12 +487,29 @@
 #+BEGIN_SRC emacs-lisp
 (use-package cc-mode
   :ensure nil
+  :preface
+  (define-auto-insert
+    (cons "\\.\\([Hh]\\|hh\\|hpp\\)\\'" "C/C++ header")
+    '(nil
+      (let* ((noext (substring buffer-file-name 0 (match-beginning 0)))
+             (nopath (file-name-nondirectory noext))
+             (ident (concat (upcase nopath) "_H")))
+        (concat "#ifndef " ident "\n"
+                "# define " ident  "\n\n"
+                "#endif\n"))))
+
   :hook
   (c-mode . (lambda () (setq indent-tabs-mode t)
                        (global-aggressive-indent-mode -1)))
   :custom
   (c-default-style "linux")
   (c-basic-offset 4))
+
+(use-package srefactor
+  :bind
+  (:map c-mode-base-map
+   ("C-c C-r" . srefactor-refactor-at-point))
+  :hook ((c-mode c++-mode) . semantic-mode))
 
 (use-package company-c-headers
   :demand t
@@ -538,6 +555,7 @@
 
 (use-package bind-key)
 (bind-key* "C-x k" 'ign:delete-window)
+(bind-key* "C-c i" 'auto-insert)
 (bind-key* "C-c w" 'ign:split-window-right)
 (bind-key* "C-c t" 'ign:term-toggle)
 #+END_SRC
