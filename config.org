@@ -254,8 +254,10 @@
   :ensure nil
   :custom
   (org-src-fontify-natively t)
+  (org-pretty-entities t)
   (org-hide-emphasis-markers t)
   (org-babel-python-command "ipython3 -i --simple-prompt")
+  (org-format-latex-options (plist-put org-format-latex-options :scale 1.6))
   :config
   (use-package ob-ipython)
   (org-babel-do-load-languages
@@ -266,7 +268,8 @@
 
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode))
-#+END_SRC
+
+(use-package px)
 
 * Programming
 
@@ -443,8 +446,13 @@
 
 (use-package elpy
   :demand t
+  :preface
+  (defun python-before-save-hook ()
+    (when (eq major-mode 'python-mode)
+      (elpy-black-fix-code)))
   :after company
-  :hook (before-save . elpy-black-fix-code)
+  :hook
+  (python-mode . (lambda () (add-hook 'before-save-hook 'python-before-save-hook)))
   :custom
   (elpy-rpc-python-command "python3")
   :config
