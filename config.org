@@ -252,10 +252,13 @@
 #+BEGIN_SRC emacs-lisp
 (use-package org
   :ensure nil
+  :hook (org-babel-after-execute . org-redisplay-inline-images)
   :custom
+  (org-image-actual-width 480)
   (org-src-fontify-natively t)
   (org-pretty-entities t)
   (org-hide-emphasis-markers t)
+  (org-startup-with-inline-images t)
   (org-babel-python-command "ipython3 -i --simple-prompt")
   (org-format-latex-options (plist-put org-format-latex-options :scale 1.6))
   :config
@@ -264,7 +267,9 @@
    'org-babel-load-languages
    '((python . t)
      (ipython . t)
-     (ocaml . t))))
+     (js . t)
+     (ocaml . t)
+     (gnuplot . t))))
 
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode))
@@ -525,6 +530,13 @@
   :after company
   :config
   (add-to-list 'company-backends 'company-c-headers))
+#+END_SRC
+
+** GNUplot
+
+#+BEGIN_SRC emacs-lisp
+(use-package gnuplot)
+(use-package gnuplot-mode)
 #+END_SRC
 
 * Text Editing
