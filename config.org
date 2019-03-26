@@ -31,7 +31,7 @@
 #+BEGIN_SRC emacs-lisp
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-(add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
+(add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
 (package-initialize)
 
 (unless (package-installed-p 'use-package)
@@ -139,10 +139,10 @@
 
 (defun ign:term-toggle ()
   (interactive)
-  (if (get-buffer "*term*")
-     (progn (switch-to-buffer "*term*")
-            (kill-buffer-and-window))
-    (ign:popwin-term "*term*")))
+  (cond
+   ((get-buffer-window "*term*") (progn (switch-to-buffer "*term*") (kill-buffer-and-window)))
+   ((get-buffer "*term*") (progn (kill-buffer "*term*") (ign:term-toggle)))
+   (t (ign:popwin-term "*term*"))))
 
 (defun ign:fill-or-unfill ()
   (interactive)
@@ -260,7 +260,7 @@
   (org-hide-emphasis-markers t)
   (org-startup-with-inline-images t)
   (org-babel-python-command "ipython3 -i --simple-prompt")
-  (org-format-latex-options (plist-put org-format-latex-options :scale 1.6))
+  (org-format-latex-options (plist-put org-format-latex-options :scale 1.4))
   :config
   (use-package ob-ipython)
   (org-babel-do-load-languages
