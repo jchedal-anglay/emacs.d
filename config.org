@@ -155,6 +155,19 @@
                     (point-max))
            fill-column)))
     (call-interactively #'fill-paragraph)))
+
+(defun ign:refresh-buffer ()
+  (interactive)
+  (revert-buffer :ignore-auto :noconfirm))
+
+(defun ign:sh-run-safe (command &rest args)
+  (if (executable-find command)
+      (shell-command (string-join (nconc (list command) args) " "))
+     (message (concat "'" command "' not found found; please install"))))
+
+(defun ign:apply-formatter (command &rest args)
+  (apply #'ign:sh-run-safe command (nconc args (list (buffer-file-name))))
+  (ign:refresh-buffer))
 #+END_SRC
 
 * Interface
@@ -460,15 +473,14 @@
     (when (eq major-mode 'python-mode)
       (elpy-black-fix-code)))
   :after company
-  :hook
-  (python-mode . (lambda () (add-hook 'before-save-hook 'python-before-save-hook)))
   :custom
   (elpy-rpc-python-command "python3")
   :config
   (delete 'elpy-module-highlight-indentation elpy-modules)
   (delete 'elpy-module-flymake elpy-modules)
   (delete 'elpy-module-company elpy-modules)
-  (add-to-list 'company-backends 'elpy-company-backend)
+  (add-to-list 'company-backends #'elpy-company-backend)
+  (add-hook 'before-save-hook #'python-before-save-hook)
   (elpy-enable))
 #+END_SRC
 
@@ -485,11 +497,18 @@
 
 #+BEGIN_SRC emacs-lisp
 (use-package tuareg
+  :demand t
   :after company
+  :preface
+  (defun ocaml-before-save-hook ()
+    (when (eq major-mode 'tuareg-mode)
+      (ign:apply-formatter "ocamlformat" "-i")))
   :mode ("\\.mly\\'" . tuareg-menhir-mode)
   :custom
   (tuareg-match-patterns-aligned t)
-  (tuareg-indent-align-with-first-arg t))
+  (tuareg-indent-align-with-first-arg t)
+  :config
+  (add-hook 'before-save-hook #'ocaml-before-save-hook))
 
 (use-package merlin
   :if (file-exists-p "~/.emacs.d/opam-user-setup.el")
