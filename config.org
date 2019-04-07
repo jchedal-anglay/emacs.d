@@ -75,7 +75,7 @@
 ** Font
 
 #+BEGIN_SRC emacs-lisp
-(set-frame-font (if (memq window-system '(mac ns)) "Menlo-14" "FiraCode-10") nil t)
+(set-frame-font (if (memq window-system '(mac ns)) "Menlo-14" "SourceCodePro-10") nil t)
 #+END_SRC
 
 ** Theme
@@ -102,6 +102,13 @@
   (doom-modeline-version t)
   :config
   (doom-modeline-mode))
+#+END_SRC
+
+** Cursor
+
+#+BEGIN_SRC emacs-lisp
+(setq-default cursor-type 'hbar)
+(setq-default cursor-in-non-selected-windows nil)
 #+END_SRC
 
 * Functions
@@ -164,10 +171,6 @@
   (if (executable-find command)
       (shell-command (string-join (nconc (list command) args) " "))
      (message (concat "'" command "' not found found; please install"))))
-
-(defun ign:apply-formatter (command &rest args)
-  (apply #'ign:sh-run-safe command (nconc args (list (buffer-file-name))))
-  (ign:refresh-buffer))
 #+END_SRC
 
 * Interface
@@ -194,13 +197,6 @@
 
 (when (display-graphic-p)
   (global-hl-line-mode t))
-
-(use-package linum
-  :hook (prog-mode . linum-mode)
-  :custom
-  (linum-format " %d ")
-  :config
-  (set-face-underline 'linum nil))
 #+END_SRC
 
 ** Scrolling
@@ -254,7 +250,7 @@
 
 (use-package swiper
   :bind
-  ("C-s" . swiper))
+  ("C-M-s" . swiper))
 
 (use-package all-the-icons-ivy
   :after ivy
@@ -357,6 +353,7 @@
   (global-company-mode t))
 
 (use-package company-quickhelp
+  :demand t
   :if (display-graphic-p)
   :after company
   (company-quickhelp-mode))
@@ -451,11 +448,14 @@
 
 #+BEGIN_SRC emacs-lisp
 (use-package pip-requirements)
+(use-package sphinx-doc)
 
 (use-package python
   :after flycheck
   :ensure nil
-  :hook (python-mode . elpy-mode)
+  :hook
+  (python-mode . elpy-mode)
+  (python-mode . sphinx-doc-mode)
   :custom
   (python-indent 4)
   (python-shell-interpreter (if (memq window-system '(mac ns)) "ipython" "ipython3"))
@@ -499,21 +499,16 @@
 (use-package tuareg
   :demand t
   :after company
-  :preface
-  (defun ocaml-before-save-hook ()
-    (when (eq major-mode 'tuareg-mode)
-      (ign:apply-formatter "ocamlformat" "-i")))
   :mode ("\\.mly\\'" . tuareg-menhir-mode)
   :custom
   (tuareg-match-patterns-aligned t)
-  (tuareg-indent-align-with-first-arg t)
-  :config
-  (add-hook 'before-save-hook #'ocaml-before-save-hook))
+  (tuareg-indent-align-with-first-arg t))
 
 (use-package merlin
   :if (file-exists-p "~/.emacs.d/opam-user-setup.el")
   :after tuareg
-  :hook (tuareg-mode . merlin-mode)
+  :hook
+  (tuareg-mode . merlin-mode)
   :config
   (require 'opam-user-setup "~/.emacs.d/opam-user-setup.el"))
 #+END_SRC
@@ -585,6 +580,14 @@
   ("C-'" . avy-goto-char-2)
   :custom
   (avy-keys '(?a ?o ?e ?u ?h ?t ?n ?s)))
+
+(use-package phi-search
+  :bind
+  ("C-r" . phi-search-backward)
+  ("C-s" . phi-search)
+  :config
+  (set-face-attribute 'phi-search-selection-face nil
+                      :background "orange"))
 #+END_SRC
 
 * Bindings
