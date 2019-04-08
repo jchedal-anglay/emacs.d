@@ -157,7 +157,7 @@
 (defun ign:fill-or-unfill ()
   (interactive)
   (let ((fill-column
-         (if (eq last-command 'endless/fill-or-unfill)
+         (if (eq last-command ign:fill-or-unfill)
              (progn (setq this-command nil)
                     (point-max))
            fill-column)))
@@ -264,7 +264,8 @@
 #+BEGIN_SRC emacs-lisp
 (use-package org
   :ensure nil
-  :hook (org-babel-after-execute . org-redisplay-inline-images)
+  :hook
+  (org-babel-after-execute . org-redisplay-inline-images)
   :custom
   (org-image-actual-width 480)
   (org-src-fontify-natively t)
@@ -284,7 +285,8 @@
      (gnuplot . t))))
 
 (use-package org-bullets
-  :hook (org-mode . org-bullets-mode))
+  :hook
+  (org-mode . org-bullets-mode))
 
 (use-package px)
 #+END_SRC
@@ -297,10 +299,12 @@
   (global-aggressive-indent-mode 1))
 
 (use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode))
+  :hook
+  (prog-mode . rainbow-delimiters-mode))
 
 (use-package smartparens
-  :hook (prog-mode . smartparens-mode)
+  :hook
+  (prog-mode . smartparens-mode)
   :custom
   (sp-escape-quotes-after-insert nil)
   :config
@@ -339,12 +343,13 @@
 (use-package lsp-ui
   :demand t
   :after lsp-mode
+  :hook
+  (lsp-mode-hook . lsp-ui-mode)
   :custom
   (lsp-ui-doc-t)
   (lsp-ui-imenu t)
   (lsp-ui-peek t)
-  (lsp-ui-sideline nil)
-)
+  (lsp-ui-sideline nil))
 
 (use-package dap-mode
   :after lsp-mode
@@ -543,8 +548,9 @@
   ("C-r" . phi-search-backward)
   ("C-s" . phi-search)
   :config
-  (set-face-attribute 'phi-search-selection-face nil
-                      :background "orange"))
+  (advice-add 'phi-search :after #'recenter-top-bottom)
+  (advice-add 'phi-search-backward :after #'recenter-top-bottom)
+  (set-face-attribute 'phi-search-selection-face nil :background "yellow"))
 #+END_SRC
 
 * Bindings
