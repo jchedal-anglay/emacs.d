@@ -405,6 +405,7 @@
   (flycheck-error ((t (:underline (:style line :color "#FF5C33")))))
   :custom
   (flycheck-check-syntax-automatically '(mode-enabled save))
+  :config
   (global-flycheck-mode t))
 #+END_SRC
 
