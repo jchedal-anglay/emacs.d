@@ -320,6 +320,39 @@
   :mode ("\\.gitignore\\'" . gitignore-mode))
 #+END_SRC
 
+** LSP
+
+#+BEGIN_SRC emacs-lisp
+(use-package lsp-mode
+  :bind
+  (:map lsp-mode-map
+   ("C-c C-e" . lsp-rename)
+   ("C-c C-f" . lsp-format-buffer))
+  :custom
+  (lsp-prefer-flymake nil)
+  (lsp-auto-guess-root t)
+  (lsp-before-save-edits t)
+  (lsp-enable-indentation t)
+  :config
+  (require 'lsp-clients))
+
+(use-package lsp-ui
+  :demand t
+  :after lsp-mode
+  :custom
+  (lsp-ui-doc-t)
+  (lsp-ui-imenu t)
+  (lsp-ui-peek t)
+  (lsp-ui-sideline nil)
+)
+
+(use-package dap-mode
+  :after lsp-mode
+  :config
+  (require 'dap-python)
+  (require 'dap-lldb))
+#+END_SRC
+
 ** Auto-Completion
 
 #+BEGIN_SRC emacs-lisp
@@ -352,20 +385,14 @@
   :config
   (global-company-mode t))
 
-(use-package company-quickhelp
-  :demand t
-  :if (display-graphic-p)
-  :after company
-  (company-quickhelp-mode))
-#+END_SRC
-
-** Snippets
-
-#+BEGIN_SRC emacs-lisp
-(use-package yasnippet
-  :hook (prog-mode . yas-minor-mode)
+(use-package company-lsp
+  :after (company lsp-mode)
+  :custom
+  (company-lsp-async t)
+  (company-lsp-enable-snippets nil)
+  (company-lsp-enable-recompletion t)
   :config
-  (use-package yasnippet-snippets))
+  (add-to-list 'company-backends #'company-lsp))
 #+END_SRC
 
 ** Checkers/Linters
@@ -378,46 +405,6 @@
   (flycheck-error ((t (:underline (:style line :color "#FF5C33")))))
   :custom
   (flycheck-check-syntax-automatically '(mode-enabled save))
-  :config
-  (define-fringe-bitmap 'flycheck-fringe-bitmap-ball
-    (vector #b00000000
-	    #b00000000
-	    #b00000000
-	    #b00000000
-	    #b00000000
-	    #b00111000
-	    #b01111100
-	    #b11111110
-	    #b11111110
-	    #b11111110
-	    #b01111100
-	    #b00111000
-	    #b00000000
-	    #b00000000
-	    #b00000000
-	    #b00000000
-	    #b00000000))
-  (flycheck-define-error-level 'info
-    :severity 100
-    :compilation-level 2
-    :overlay-category 'flycheck-info-overlay
-    :fringe-bitmap 'flycheck-fringe-bitmap-ball
-    :fringe-face 'flycheck-fringe-info
-    :info-list-face 'flycheck-error-list-info)
-  (flycheck-define-error-level 'warning
-    :severity 100
-    :compilation-level 2
-    :overlay-category 'flycheck-warning-overlay
-    :fringe-bitmap 'flycheck-fringe-bitmap-ball
-    :fringe-face 'flycheck-fringe-warning
-    :warning-list-face 'flycheck-error-list-warning)
-  (flycheck-define-error-level 'error
-    :severity 100
-    :compilation-level 2
-    :overlay-category 'flycheck-error-overlay
-    :fringe-bitmap 'flycheck-fringe-bitmap-ball
-    :fringe-face 'flycheck-fringe-error
-    :error-list-face 'flycheck-error-list-error)
   (global-flycheck-mode t))
 #+END_SRC
 
@@ -451,37 +438,22 @@
 (use-package sphinx-doc)
 
 (use-package python
-  :after flycheck
   :ensure nil
+  :after (flycheck lsp-mode dap-mode)
   :hook
-  (python-mode . elpy-mode)
+  (python-mode . lsp)
   (python-mode . sphinx-doc-mode)
   :custom
   (python-indent 4)
   (python-shell-interpreter (if (memq window-system '(mac ns)) "ipython" "ipython3"))
   (python-shell-interpreter-args "--simple-prompt -i")
-  (gud-pdb-command-name "python3 -m pdb")
   (python-fill-docstring-style 'pep-257)
   (py-split-window-on-execute t)
   (flycheck-python-pylint-executable "python3")
-  (flycheck-python-pycompile-executable "python3"))
-
-(use-package elpy
-  :demand t
-  :preface
-  (defun python-before-save-hook ()
-    (when (eq major-mode 'python-mode)
-      (elpy-black-fix-code)))
-  :after company
-  :custom
-  (elpy-rpc-python-command "python3")
-  :config
-  (delete 'elpy-module-highlight-indentation elpy-modules)
-  (delete 'elpy-module-flymake elpy-modules)
-  (delete 'elpy-module-company elpy-modules)
-  (add-to-list 'company-backends #'elpy-company-backend)
-  (add-hook 'before-save-hook #'python-before-save-hook)
-  (elpy-enable))
+  (flycheck-python-pycompile-executable "python3")
+  (flycheck-python-flake8-executable "python3")
+  (flycheck-python-mypy-executable "python3")
+  (dap-python-executable "python3"))
 #+END_SRC
 
 *** Jupyter
@@ -518,29 +490,13 @@
 #+BEGIN_SRC emacs-lisp
 (use-package cc-mode
   :ensure nil
-  :preface
-  (define-auto-insert
-    (cons "\\.\\([Hh]\\|hh\\|hpp\\)\\'" "C/C++ header")
-    '(nil
-      (let* ((noext (substring buffer-file-name 0 (match-beginning 0)))
-             (nopath (file-name-nondirectory noext))
-             (ident (concat (upcase nopath) "_H")))
-        (concat "#ifndef " ident "\n"
-                "# define " ident  "\n\n"
-                "#endif\n"))))
-
   :hook
+  (c-mode . lsp)
   (c-mode . (lambda () (setq indent-tabs-mode t)
                        (global-aggressive-indent-mode -1)))
   :custom
   (c-default-style "linux")
   (c-basic-offset 4))
-
-(use-package srefactor
-  :bind
-  (:map c-mode-base-map
-   ("C-c C-r" . srefactor-refactor-at-point))
-  :hook ((c-mode c++-mode) . semantic-mode))
 
 (use-package company-c-headers
   :demand t
