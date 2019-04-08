@@ -257,6 +257,12 @@
   :config
   (setq-default all-the-icons-ivy-file-commands (append all-the-icons-ivy-file-commands '(counsel-projectile-find-file counsel-projectile-find-file-dwim)))
   (all-the-icons-ivy-setup))
+
+(use-package ivy-xref
+  :demand t
+  :after ivy
+  :custom
+  (xref-show-xrefs-function #'ivy-xref-show-xrefs))
 #+END_SRC
 
 * Org
@@ -328,15 +334,25 @@
 
 #+BEGIN_SRC emacs-lisp
 (use-package lsp-mode
+  :demand t
+  :hook
+  (python-mode . lsp)
+  (c-mode . lsp)
   :bind
   (:map lsp-mode-map
-   ("C-c C-e" . lsp-rename)
-   ("C-c C-f" . lsp-format-buffer))
+   ("C-c C-j" . lsp-ui-imenu)
+   ("C-c d" . lsp-find-definition)
+   ("C-c e" . lsp-rename)
+   ("C-c f" . lsp-format-buffer)
+   ("C-c l" . lsp-ui-flycheck-list)
+   ("C-c r" . lsp-ui-peek-find-references)
+   ("C-c t" . lsp-find-type-definition))
   :custom
   (lsp-prefer-flymake nil)
   (lsp-auto-guess-root t)
   (lsp-before-save-edits t)
   (lsp-enable-indentation t)
+  (lsp-auto-configure t)
   :config
   (require 'lsp-clients))
 
@@ -344,15 +360,19 @@
   :demand t
   :after lsp-mode
   :hook
-  (lsp-mode-hook . lsp-ui-mode)
+  (lsp-mode . lsp-ui-mode)
   :custom
-  (lsp-ui-doc-t)
+  (lsp-ui-doc t)
   (lsp-ui-imenu t)
   (lsp-ui-peek t)
-  (lsp-ui-sideline nil))
+  (lsp-ui-sideline nil)
+  (lsp-ui-flycheck-live-reporting nil))
 
 (use-package dap-mode
   :after lsp-mode
+  :hook lsp-mode
+  :custom
+  (dap-python-executable "python3")
   :config
   (require 'dap-python)
   (require 'dap-lldb))
@@ -409,6 +429,10 @@
   (flycheck-warning ((t (:underline (:style line :color "#FF9933")))))
   (flycheck-error ((t (:underline (:style line :color "#FF5C33")))))
   :custom
+  (flycheck-python-pylint-executable "python3")
+  (flycheck-python-pycompile-executable "python3")
+  (flycheck-python-flake8-executable "python3")
+  (flycheck-python-mypy-executable "python3")
   (flycheck-check-syntax-automatically '(mode-enabled save))
   :config
   (global-flycheck-mode t))
@@ -441,25 +465,19 @@
 
 #+BEGIN_SRC emacs-lisp
 (use-package pip-requirements)
-(use-package sphinx-doc)
+(use-package sphinx-doc
+  :hook
+  (python-mode . sphinx-doc-mode))
 
 (use-package python
   :ensure nil
   :after (flycheck lsp-mode dap-mode)
-  :hook
-  (python-mode . lsp)
-  (python-mode . sphinx-doc-mode)
   :custom
   (python-indent 4)
   (python-shell-interpreter (if (memq window-system '(mac ns)) "ipython" "ipython3"))
   (python-shell-interpreter-args "--simple-prompt -i")
   (python-fill-docstring-style 'pep-257)
-  (py-split-window-on-execute t)
-  (flycheck-python-pylint-executable "python3")
-  (flycheck-python-pycompile-executable "python3")
-  (flycheck-python-flake8-executable "python3")
-  (flycheck-python-mypy-executable "python3")
-  (dap-python-executable "python3"))
+  (py-split-window-on-execute t))
 #+END_SRC
 
 *** Jupyter
@@ -497,7 +515,6 @@
 (use-package cc-mode
   :ensure nil
   :hook
-  (c-mode . lsp)
   (c-mode . (lambda () (setq indent-tabs-mode t)
                        (global-aggressive-indent-mode -1)))
   :custom
@@ -526,7 +543,6 @@
 (delete-selection-mode t)
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
 
-
 (global-set-key [remap fill-paragraph] #'ign:fill-or-unfill)
 
 (use-package expand-region
@@ -548,9 +564,12 @@
   ("C-r" . phi-search-backward)
   ("C-s" . phi-search)
   :config
-  (advice-add 'phi-search :after #'recenter-top-bottom)
-  (advice-add 'phi-search-backward :after #'recenter-top-bottom)
-  (set-face-attribute 'phi-search-selection-face nil :background "yellow"))
+  (advice-add 'phi-search :after #'phi-search-recenter)
+  (advice-add 'phi-search-backward :after #'phi-search-recenter)
+  (advice-add 'phi-search-again-or-next :after #'phi-search-recenter)
+  (advice-add 'phi-search-again-or-previous :after #'phi-search-recenter)
+  (advice-add 'phi-search-complete :after #'phi-search-recenter)
+  (set-face-attribute 'phi-search-selection-face nil :background "orange"))
 #+END_SRC
 
 * Bindings
@@ -563,10 +582,9 @@
 (define-key comint-mode-map (kbd "C-l") #'comint-clear-buffer)
 
 (use-package bind-key)
-(bind-key* "C-x k" 'ign:delete-window)
-(bind-key* "C-c i" 'auto-insert)
-(bind-key* "C-c w" 'ign:split-window-right)
-(bind-key* "C-c t" 'ign:term-toggle)
+(bind-key* "C-x k" 'delete-window)
+(bind-key* "C-x w" 'split-window-right)
+(bind-key* "C-x t" 'ign:term-toggle)
 #+END_SRC
 
 ** Which-key
