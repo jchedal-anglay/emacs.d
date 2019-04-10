@@ -157,7 +157,7 @@
 (defun ign:fill-or-unfill ()
   (interactive)
   (let ((fill-column
-         (if (eq last-command ign:fill-or-unfill)
+         (if (eq last-command 'ign:fill-or-unfill)
              (progn (setq this-command nil)
                     (point-max))
            fill-column)))
@@ -348,25 +348,14 @@
    ("C-c r" . lsp-ui-peek-find-references)
    ("C-c t" . lsp-find-type-definition))
   :custom
-  (lsp-prefer-flymake nil)
   (lsp-auto-guess-root t)
   (lsp-before-save-edits t)
   (lsp-enable-indentation t)
-  (lsp-auto-configure t)
+  (lsp-auto-configure nil)
   :config
   (require 'lsp-clients))
 
-(use-package lsp-ui
-  :demand t
-  :after lsp-mode
-  :hook
-  (lsp-mode . lsp-ui-mode)
-  :custom
-  (lsp-ui-doc t)
-  (lsp-ui-imenu t)
-  (lsp-ui-peek t)
-  (lsp-ui-sideline nil)
-  (lsp-ui-flycheck-live-reporting nil))
+(use-package lsp-ui)
 
 (use-package dap-mode
   :after lsp-mode
