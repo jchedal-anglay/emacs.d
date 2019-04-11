@@ -450,6 +450,8 @@
 (use-package elpy
   :demand t
   :after company
+  :hook
+  (python-mode . elpy-mode)
   :custom
   (elpy-rpc-python-command ign:python-executable)
   :config
