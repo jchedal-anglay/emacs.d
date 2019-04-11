@@ -1,5 +1,3 @@
-#+TITLE: Literate Emacs Configuration
-#+AUTHOR: Julien Chedal-Anglay
 * Personal Informations
 
 #+BEGIN_SRC emacs-lisp
@@ -46,8 +44,8 @@
 
 #+BEGIN_SRC emacs-lisp
 (defconst custom-file "/dev/zero")
-(defconst ign:python "python3")
-(defconst ign:ipython "ipython3")
+(defconst ign:python-executable "python3")
+(defconst ign:ipython-executable "ipython3")
 #+END_SRC
 
 * System
@@ -84,6 +82,7 @@
 
 #+BEGIN_SRC emacs-lisp
 (use-package doom-themes
+  :if (display-graphic-p)
   :config
   (doom-themes-org-config)
   (load-theme 'doom-vibrant t))
@@ -98,7 +97,7 @@
 (use-package doom-modeline
   :if (display-graphic-p)
   :custom
-  (doom-modeline-python-executable ign:python)
+  (doom-modeline-python-executable ign:python-executable)
   (doom-modeline-icon t)
   (doom-modeline-major-mode-icon t)
   (doom-modeline-version t)
@@ -173,6 +172,10 @@
   (if (executable-find command)
       (shell-command (string-join (nconc (list command) args) " "))
      (message (concat "'" command "' not found found; please install"))))
+
+(defun ign:reload ()
+  (interactive)
+  (load-file (concat user-emacs-directory "init.el")))
 #+END_SRC
 
 * Interface
@@ -332,42 +335,23 @@
   :mode ("\\.gitignore\\'" . gitignore-mode))
 #+END_SRC
 
-** LSP
+** TRAMP
 
 #+BEGIN_SRC emacs-lisp
-(use-package lsp-mode
-  :demand t
-  :hook
-  (python-mode . lsp)
-  (c-mode . lsp)
-  :bind
-  (:map lsp-mode-map
-   ("M-/" . company-lsp)
-   ("C-c C-j" . lsp-ui-imenu)
-   ("C-c d" . lsp-find-definition)
-   ("C-c e" . lsp-rename)
-   ("C-c f" . lsp-format-buffer)
-   ("C-c l" . lsp-ui-flycheck-list)
-   ("C-c r" . lsp-ui-peek-find-references)
-   ("C-c t" . lsp-find-type-definition))
-  :custom
-  (lsp-auto-guess-root t)
-  (lsp-before-save-edits t)
-  (lsp-enable-indentation t)
-  (lsp-auto-configure nil)
+(use-package tramp
+  :ensure nil
   :config
-  (require 'lsp-clients))
-
-(use-package lsp-ui)
-
-(use-package dap-mode
-  :after lsp-mode
-  :hook lsp-mode
-  :custom
-  (dap-python-executable ign:python)
-  :config
-  (require 'dap-python)
-  (require 'dap-lldb))
+  (add-to-list 'tramp-methods
+    '("gssh"
+      (tramp-login-program "gcloud compute ssh")
+      (tramp-login-args (("%h")))
+      (tramp-async-args (("-q")))
+      (tramp-remote-shell "/bin/sh")
+      (tramp-remote-shell-args ("-c"))
+      (tramp-gw-args (("-o" "GlobalKnownHostsFile=/dev/null")
+                      ("-o" "UserKnownHostsFile=/dev/null")
+                      ("-o" "StrictHostKeyChecking=no")))
+      (tramp-default-port 22))))
 #+END_SRC
 
 ** Auto-Completion
@@ -382,17 +366,17 @@
    ("C-n" . company-select-next)
    ("C-p" . company-select-previous))
   :custom-face
-  (company-tooltip ((t (:foreground "#ABB2BF" :background "#30343C"))))
-  (company-tooltip-annotation ((t (:foreground "#ABB2BF" :background "#30343C"))))
-  (company-tooltip-selection ((t (:foreground "#ABB2BF" :background "#393F49"))))
-  (company-tooltip-mouse ((t (:background "#30343C"))))
-  (company-tooltip-common ((t (:foreground "#ABB2BF" :background "#30343C"))))
-  (company-tooltip-common-selection ((t (:foreground "#ABB2BF" :background "#393F49"))))
-  (company-preview ((t (:background "#30343C"))))
-  (company-preview-common ((t (:foreground "#ABB2BF" :background "#30343C"))))
-  (company-scrollbar-fg ((t (:background "#30343C"))))
-  (company-scrollbar-bg ((t (:background "#30343C"))))
-  (company-template-field ((t (:foreground "#282C34" :background "#C678DD"))))
+  (company-tooltip ((t (:foreground "#abb2bf" :background "#30343c"))))
+  (company-tooltip-annotation ((t (:foreground "#abb2bf" :background "#30343c"))))
+  (company-tooltip-selection ((t (:foreground "#abb2bf" :background "#393f49"))))
+  (company-tooltip-mouse ((t (:background "#30343c"))))
+  (company-tooltip-common ((t (:foreground "#abb2bf" :background "#30343c"))))
+  (company-tooltip-common-selection ((t (:foreground "#abb2bf" :background "#393f49"))))
+  (company-preview ((t (:background "#30343c"))))
+  (company-preview-common ((t (:foreground "#abb2bf" :background "#30343c"))))
+  (company-scrollbar-fg ((t (:background "#30343c"))))
+  (company-scrollbar-bg ((t (:background "#30343c"))))
+  (company-template-field ((t (:foreground "#282c34" :background "#c678dd"))))
   :custom
   (company-require-match 'never)
   (company-dabbrev-downcase nil)
@@ -401,15 +385,6 @@
   (company-minimum-prefix-length 128)
   :config
   (global-company-mode t))
-
-(use-package company-lsp
-  :after (company lsp-mode)
-  :custom
-  (company-lsp-async t)
-  (company-lsp-enable-snippets nil)
-  (company-lsp-enable-recompletion t)
-  :config
-  (add-to-list 'company-backends #'company-lsp))
 #+END_SRC
 
 ** Checkers/Linters
@@ -417,14 +392,14 @@
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
   :custom-face
-  (flycheck-info ((t (:underline (:style line :color "#80FF80")))))
-  (flycheck-warning ((t (:underline (:style line :color "#FF9933")))))
-  (flycheck-error ((t (:underline (:style line :color "#FF5C33")))))
+  (flycheck-info ((nil (:foreground "#80FF80" :underline nil))))
+  (flycheck-warning ((nil (:foreground "#daa848" :underline nil))))
+  (flycheck-error ((nil (:foreground "#ff6c6b" :underline nil))))
   :custom
-  (flycheck-python-pylint-executable ign:python)
-  (flycheck-python-pycompile-executable ign:python)
-  (flycheck-python-flake8-executable ign:python)
-  (flycheck-python-mypy-executable ign:python)
+  (flycheck-python-pylint-executable ign:python-executable)
+  (flycheck-python-pycompile-executable ign:python-executable)
+  (flycheck-python-flake8-executable ign:python-executable)
+  (flycheck-python-mypy-executable ign:python-executable)
   (flycheck-check-syntax-automatically '(mode-enabled save))
   :config
   (global-flycheck-mode t))
@@ -463,13 +438,26 @@
 
 (use-package python
   :ensure nil
-  :after (flycheck lsp-mode dap-mode)
+  :after flycheck
   :custom
   (python-indent 4)
-  (python-shell-interpreter ign:ipython)
+  (python-shell-interpreter ign:ipython-executable)
   (python-shell-interpreter-args "--simple-prompt -i")
   (python-fill-docstring-style 'pep-257)
+  (gud-pdb-command-name (concat ign:python-executable " -m gdb"))
   (py-split-window-on-execute t))
+
+(use-package elpy
+  :demand t
+  :after company
+  :custom
+  (elpy-rpc-python-command ign:python-executable)
+  :config
+  (delete 'elpy-module-highlight-indentation elpy-modules)
+  (delete 'elpy-module-flymake elpy-modules)
+  (delete 'elpy-module-company elpy-modules)
+  (add-to-list 'company-backends #'elpy-company-backend)
+  (elpy-enable))
 #+END_SRC
 
 *** Jupyter
@@ -560,7 +548,6 @@
   (advice-add 'phi-search-backward :after #'phi-search-recenter)
   (advice-add 'phi-search-again-or-next :after #'phi-search-recenter)
   (advice-add 'phi-search-again-or-previous :after #'phi-search-recenter)
-  (advice-add 'phi-search-complete :after #'phi-search-recenter)
   (set-face-attribute 'phi-search-selection-face nil :background "orange"))
 #+END_SRC
 
