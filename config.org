@@ -46,6 +46,8 @@
 
 #+BEGIN_SRC emacs-lisp
 (defconst custom-file "/dev/zero")
+(defconst ign:python "python3")
+(defconst ign:ipython "ipython3")
 #+END_SRC
 
 * System
@@ -96,7 +98,7 @@
 (use-package doom-modeline
   :if (display-graphic-p)
   :custom
-  (doom-modeline-python-executable "python3")
+  (doom-modeline-python-executable ign:python)
   (doom-modeline-icon t)
   (doom-modeline-major-mode-icon t)
   (doom-modeline-version t)
@@ -340,6 +342,7 @@
   (c-mode . lsp)
   :bind
   (:map lsp-mode-map
+   ("M-/" . company-lsp)
    ("C-c C-j" . lsp-ui-imenu)
    ("C-c d" . lsp-find-definition)
    ("C-c e" . lsp-rename)
@@ -361,7 +364,7 @@
   :after lsp-mode
   :hook lsp-mode
   :custom
-  (dap-python-executable "python3")
+  (dap-python-executable ign:python)
   :config
   (require 'dap-python)
   (require 'dap-lldb))
@@ -418,10 +421,10 @@
   (flycheck-warning ((t (:underline (:style line :color "#FF9933")))))
   (flycheck-error ((t (:underline (:style line :color "#FF5C33")))))
   :custom
-  (flycheck-python-pylint-executable "python3")
-  (flycheck-python-pycompile-executable "python3")
-  (flycheck-python-flake8-executable "python3")
-  (flycheck-python-mypy-executable "python3")
+  (flycheck-python-pylint-executable ign:python)
+  (flycheck-python-pycompile-executable ign:python)
+  (flycheck-python-flake8-executable ign:python)
+  (flycheck-python-mypy-executable ign:python)
   (flycheck-check-syntax-automatically '(mode-enabled save))
   :config
   (global-flycheck-mode t))
@@ -463,7 +466,7 @@
   :after (flycheck lsp-mode dap-mode)
   :custom
   (python-indent 4)
-  (python-shell-interpreter (if (memq window-system '(mac ns)) "ipython" "ipython3"))
+  (python-shell-interpreter ign:ipython)
   (python-shell-interpreter-args "--simple-prompt -i")
   (python-fill-docstring-style 'pep-257)
   (py-split-window-on-execute t))
