@@ -358,6 +358,7 @@
 
 #+BEGIN_SRC emacs-lisp
 (use-package company
+  :demand t
   :bind
   ("M-/" . company-complete)
   (:map company-active-map
@@ -448,10 +449,7 @@
   (py-split-window-on-execute t))
 
 (use-package elpy
-  :demand t
   :after company
-  :hook
-  (python-mode . elpy-mode)
   :custom
   (elpy-rpc-python-command ign:python-executable)
   :config
