@@ -151,7 +151,7 @@
 (defun ign:term-toggle ()
   (interactive)
   (cond
-   ((get-buffer-window "*term*") (progn (switch-to-buffer "*term*") (kill-buffer-and-window)))
+   ((get-buffer-window "*term*") (kill-buffer "*term*"))
    ((get-buffer "*term*") (progn (kill-buffer "*term*") (ign:term-toggle)))
    (t (ign:popwin-term "*term*"))))
 
@@ -560,6 +560,7 @@
 (keyboard-translate ?\C-x ?\C-t)
 
 (define-key key-translation-map (kbd "M-t") (kbd "M-x"))
+(define-key key-translation-map (kbd "M-x") (kbd "M-t"))
 (define-key comint-mode-map (kbd "C-l") #'comint-clear-buffer)
 
 (use-package bind-key)
