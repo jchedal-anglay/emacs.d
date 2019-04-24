@@ -254,6 +254,7 @@
 (use-package counsel
   :bind
   (("M-x" . counsel-M-x)
+   ("C-c C-j" . counsel-imenu)
    ("C-x C-f" . counsel-find-file)
    ("C-h v" . counsel-describe-variable)
    ("C-h f" . counsel-describe-function)))
@@ -392,6 +393,21 @@
   (company-minimum-prefix-length 128)
   :config
   (global-company-mode t))
+
+(use-package company-quickhelp
+  :demand t
+  :after company
+  :config
+  (company-quickhelp-mode))
+
+(use-package company-lsp
+  :after (company lsp-mode)
+  :custom
+  (company-lsp-async t)
+  (company-lsp-enable-snippets nil)
+  (company-lsp-enable-recompletion t)
+  :config
+  (add-to-list 'company-backends #'company-lsp))
 #+END_SRC
 
 ** Checkers/Linters
@@ -435,6 +451,39 @@
   :after (counsel projectile))
 #+END_SRC
 
+** LSP
+
+#+BEGIN_SRC emacs-lisp
+(use-package lsp-mode
+  :demand t
+  :hook
+  (c-mode . lsp)
+  :bind
+  (:map lsp-mode-map
+   ("M-/" . company-lsp)
+   ("C-c C-j" . lsp-ui-imenu)
+   ("C-c d" . lsp-find-definition)
+   ("C-c e" . lsp-rename)
+   ("C-c f" . lsp-format-buffer)
+   ("C-c r" . lsp-ui-peek-find-references)
+   ("C-c t" . lsp-find-type-definition))
+  :custom
+  (lsp-auto-guess-root t)
+  (lsp-before-save-edits t)
+  (lsp-enable-indentation t)
+  (lsp-auto-configure nil)
+  :config
+  (require 'lsp-clients))
+
+(use-package lsp-ui)
+
+(use-package dap-mode
+  :after lsp-mode
+  :hook lsp-mode
+  :config
+  (require 'dap-lldb))
+#+END_SRC
+
 ** Python
 
 #+BEGIN_SRC emacs-lisp
@@ -456,6 +505,12 @@
 
 (use-package elpy
   :after company
+  :bind
+  (:map python-mode-map
+   ("C-c d" . elpy-goto-definition)
+   ("C-c e" . elpy-multiedit-python-symbol-at-point)
+   ("C-c f" . elpy-black-fix-code))
+  :hook (python-mode . elpy-mode)
   :custom
   (elpy-rpc-python-command ign:python-executable)
   :config
