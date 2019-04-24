@@ -538,19 +538,6 @@
   ("C-'" . avy-goto-char-2)
   :custom
   (avy-keys '(?a ?o ?e ?u ?h ?t ?n ?s)))
-
-(use-package phi-search
-  :bind
-  ("C-r" . phi-search)
-  ([remap phi-search-maybe-next-line] . phi-search-again-or-next)
-  ([remap phi-search-maybe-previous-line] . phi-search-again-or-previous)
-  :custom-face
-  (phi-search-selection-face ((nil (:background "orange"))))
-  :config
-  (advice-add 'phi-search :after #'phi-search-recenter)
-  (advice-add 'phi-search-backward :after #'phi-search-recenter)
-  (advice-add 'phi-search-again-or-next :after #'phi-search-recenter)
-  (advice-add 'phi-search-again-or-previous :after #'phi-search-recenter))
 #+END_SRC
 
 * Bindings
