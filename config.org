@@ -176,6 +176,18 @@
 (defun ign:reload ()
   (interactive)
   (load-file (concat user-emacs-directory "init.el")))
+
+(defun ign:toggle-mark ()
+  (interactive)
+  (if (region-active-p)
+     (deactivate-mark)
+    (push-mark nil nil t)))
+
+(defun ign:toggle-mark-rectangle ()
+  (interactive)
+  (if (region-active-p)
+     (deactivate-mark)
+    (rectangle-mark-mode)))
 #+END_SRC
 
 * Interface
