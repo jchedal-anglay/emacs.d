@@ -266,9 +266,7 @@
   :bind
   (("M-x" . counsel-M-x)
    ("C-c C-j" . counsel-imenu)
-   ("C-x C-f" . counsel-find-file)
-   ("C-h v" . counsel-describe-variable)
-   ("C-h f" . counsel-describe-function)))
+   ("C-x C-f" . counsel-find-file)))
 
 (use-package swiper
   :bind
@@ -669,16 +667,50 @@
 (bind-key* "C-x t" 'ign:term-toggle)
 #+END_SRC
 
+** Hydra
+
+#+BEGIN_SRC emacs-lisp
+(use-package hydra
+  :bind
+  ("C-SPC" . hydra-mark/body)
+  ("C-h" . hydra-help/body))
+
+(defhydra hydra-help (:color blue)
+  ("q" nil "Quit")
+  ("b" which-key-show-top-level "Top level" :column "Bindings")
+  ("m" which-key-show-major-mode "Major mode")
+  ("f" counsel-describe-function "Function" :column "Describes")
+  ("v" counsel-describe-variable "Variable")
+  ("l" view-lossage "Command history" :column "Others"))
+
+(defhydra hydra-mark (:body-pre (progn (setq cursor-type 'box) (push-mark nil nil t))
+                      :body-post (setq cursor-type 'hbar)
+                      :color pink)
+  ("q" nil "Quit")
+  ("b" backward-char "Left" :column "Movements")
+  ("f" forward-char "Right")
+  ("n" next-line "Down")
+  ("p" previous-line "Up")
+  ("a" beginning-of-line "BOL")
+  ("e" end-of-line "EOL")
+  ("SPC" er/expand-region "Expand" :column "Selection")
+  ("." ign:toggle-mark "Mark")
+  ("," ign:toggle-mark-rectangle "Mark Rectangle")
+  ("t" string-rectangle "Insert Rectangle" :column "Actions")
+  ("d" delete-region "Delete")
+  ("k" kill-region "Kill")
+  ("l" recenter-top-bottom "Center")
+  ("u" undo "Undo")
+  ("w" kill-ring-save "Save")
+  ("y" yank "Yank"))
+#+END_SRC
+
 ** Which-key
 
 #+BEGIN_SRC emacs-lisp
 (use-package which-key
-  :demand t
   :config
-  (which-key-mode)
-  :bind
-  ("C-h m" . which-key-show-major-mode)
-  ("C-h b" . which-key-show-top-level))
+  (which-key-mode))
 #+END_SRC
 
 * Community
