@@ -658,9 +658,9 @@
 #+BEGIN_SRC emacs-lisp
 (keyboard-translate ?\C-t ?\C-x)
 (keyboard-translate ?\C-x ?\C-t)
-
 (define-key key-translation-map (kbd "M-t") (kbd "M-x"))
 (define-key key-translation-map (kbd "M-x") (kbd "M-t"))
+
 (define-key comint-mode-map (kbd "C-l") #'comint-clear-buffer)
 
 (use-package bind-key)
