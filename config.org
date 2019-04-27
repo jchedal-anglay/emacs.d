@@ -644,7 +644,7 @@
 
 (defhydra hydra-mark (:body-pre (progn (setq cursor-type 'box) (push-mark nil nil t))
                       :body-post (setq cursor-type 'hbar)
-                      :color pink)
+                      :color amaranth)
   ("q" nil "Quit")
   ("b" backward-char "Left" :column "Movements")
   ("f" forward-char "Right")
