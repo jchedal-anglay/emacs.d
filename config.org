@@ -265,7 +265,6 @@
 (use-package counsel
   :bind
   (("M-x" . counsel-M-x)
-   ("C-c C-j" . counsel-imenu)
    ("C-x C-f" . counsel-find-file)))
 
 (use-package swiper
@@ -606,6 +605,13 @@
   ("C-'" . avy-goto-char-2)
   :custom
   (avy-keys '(?a ?o ?e ?u ?h ?t ?n ?s)))
+
+(use-package imenu-list
+  :bind
+  ("C-x C-j" . imenu-list-smart-toggle)
+  :custom
+  (imenu-list-auto-resize t)
+  (imenu-auto-rescan t))
 #+END_SRC
 
 * Bindings
