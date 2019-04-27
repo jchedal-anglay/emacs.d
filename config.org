@@ -424,9 +424,9 @@
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
   :custom-face
-  (flycheck-info ((nil (:foreground "#80FF80" :underline nil))))
-  (flycheck-warning ((nil (:foreground "#daa848" :underline nil))))
-  (flycheck-error ((nil (:foreground "#ff6c6b" :underline nil))))
+  (flycheck-info ((t (:underline (:style line :color "#80FF80")))))
+  (flycheck-warning ((t (:underline (:style line :color "#FF9933")))))
+  (flycheck-error ((t (:underline (:style line :color "#FF5C33")))))
   :custom
   (flycheck-python-pylint-executable ign:python-executable)
   (flycheck-python-pycompile-executable ign:python-executable)
