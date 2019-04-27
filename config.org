@@ -408,32 +408,13 @@
   :after company
   :config
   (company-quickhelp-mode))
-
-(use-package company-lsp
-  :after (company lsp-mode)
-  :custom
-  (company-lsp-async t)
-  (company-lsp-enable-snippets nil)
-  (company-lsp-enable-recompletion t)
-  :config
-  (add-to-list 'company-backends #'company-lsp))
 #+END_SRC
 
 ** Checkers/Linters
 
 #+BEGIN_SRC emacs-lisp
 (use-package flycheck
-  :custom-face
-  (flycheck-info ((t (:underline (:style line :color "#80FF80")))))
-  (flycheck-warning ((t (:underline (:style line :color "#FF9933")))))
-  (flycheck-error ((t (:underline (:style line :color "#FF5C33")))))
-  :custom
-  (flycheck-python-pylint-executable ign:python-executable)
-  (flycheck-python-pycompile-executable ign:python-executable)
-  (flycheck-python-flake8-executable ign:python-executable)
-  (flycheck-python-mypy-executable ign:python-executable)
-  (flycheck-check-syntax-automatically '(mode-enabled save))
-  :config
+  :preface
   (define-fringe-bitmap 'flycheck-fringe-bitmap-ball
     [#b00000000
 	 #b00000000
@@ -497,39 +478,6 @@
 
 (use-package counsel-projectile
   :after (counsel projectile))
-#+END_SRC
-
-** LSP
-
-#+BEGIN_SRC emacs-lisp
-(use-package lsp-mode
-  :demand t
-  :hook
-  (c-mode . lsp)
-  :bind
-  (:map lsp-mode-map
-   ("M-/" . company-lsp)
-   ("C-c C-j" . lsp-ui-imenu)
-   ("C-c d" . lsp-find-definition)
-   ("C-c e" . lsp-rename)
-   ("C-c f" . lsp-format-buffer)
-   ("C-c r" . lsp-ui-peek-find-references)
-   ("C-c t" . lsp-find-type-definition))
-  :custom
-  (lsp-auto-guess-root t)
-  (lsp-before-save-edits t)
-  (lsp-enable-indentation t)
-  (lsp-auto-configure nil)
-  :config
-  (require 'lsp-clients))
-
-(use-package lsp-ui)
-
-(use-package dap-mode
-  :after lsp-mode
-  :hook lsp-mode
-  :config
-  (require 'dap-lldb))
 #+END_SRC
 
 ** Python
