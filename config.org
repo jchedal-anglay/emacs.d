@@ -433,6 +433,17 @@
 	 #b00000000
 	 #b00000000
 	 #b00000000])
+  :custom-face
+  (flycheck-info ((t (:underline (:style line :color "#80FF80")))))
+  (flycheck-warning ((t (:underline (:style line :color "#FF9933")))))
+  (flycheck-error ((t (:underline (:style line :color "#FF5C33")))))
+  :custom
+  (flycheck-python-pylint-executable ign:python-executable)
+  (flycheck-python-pycompile-executable ign:python-executable)
+  (flycheck-python-flake8-executable ign:python-executable)
+  (flycheck-python-mypy-executable ign:python-executable)
+  (flycheck-check-syntax-automatically '(mode-enabled save))
+  :config
   (flycheck-define-error-level 'info
     :severity 100
     :compilation-level 2
