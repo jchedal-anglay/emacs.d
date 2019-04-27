@@ -595,9 +595,7 @@
 
 (global-set-key [remap fill-paragraph] #'ign:fill-or-unfill)
 
-(use-package expand-region
-  :bind
-  ("C-=" . er/expand-region))
+(use-package expand-region)
 #+END_SRC
 
 * Text Navigation
