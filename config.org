@@ -170,8 +170,8 @@
 
 (defun ign:sh-run-safe (command &rest args)
   (if (executable-find command)
-      (shell-command (string-join (nconc (list command) args) " "))
-     (message (concat "'" command "' not found found; please install"))))
+     (shell-command (string-join (nconc (list command) args) " "))
+    (message (concat "'" command "' not found found; please install"))))
 
 (defun ign:reload ()
   (interactive)
