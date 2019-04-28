@@ -649,8 +649,7 @@
   ("v" counsel-describe-variable "Variable")
   ("l" view-lossage "Command history" :column "Others"))
 
-(defhydra hydra-mark (:body-pre (progn (setq cursor-type 'box) (push-mark nil nil t))
-                      :body-post (setq cursor-type 'hbar)
+(defhydra hydra-mark (:body-pre (push-mark nil nil t)
                       :color amaranth)
   ("q" nil "Quit")
   ("b" backward-char "Left" :column "Movements")
@@ -668,7 +667,8 @@
   ("l" recenter-top-bottom "Center")
   ("u" undo "Undo")
   ("w" kill-ring-save "Save")
-  ("y" yank "Yank"))
+  ("y" yank "Yank")
+  (";" comment-dwim "Comment"))
 #+END_SRC
 
 ** Which-key
