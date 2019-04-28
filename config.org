@@ -248,6 +248,7 @@
 
 #+BEGIN_SRC emacs-lisp
 (use-package ivy
+  :demand t
   :bind
   ("C-x b" . ivy-switch-buffer)
   (:map ivy-minibuffer-map
@@ -260,7 +261,9 @@
   (ivy-format-function 'ivy-format-function-line)
   (ivy-re-builders-alist
       '((t . ivy--regex-plus)))
-  (ivy-initial-inputs-alist nil))
+  (ivy-initial-inputs-alist nil)
+  :config
+  (ivy-mode))
 
 (use-package counsel
   :bind
