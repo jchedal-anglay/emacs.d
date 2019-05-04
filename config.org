@@ -342,8 +342,8 @@
     :custom
     (aggressive-indent-comments-too t)
     (aggressive-indent-dont-indent-if t)
-    :config
-    (global-aggressive-indent-mode 1))
+    :hook
+    (prog-mode . aggressive-indent-mode))
 
   (use-package rainbow-delimiters
     :hook
@@ -514,6 +514,122 @@
 ** Python
 
 #+BEGIN_SRC emacs-lisp
+  (defvar ign/python-font-lock-keywords
+    ;; Keywords
+    `(,(rx symbol-start
+           (or
+            "and" "del" "from" "not" "while" "as" "elif" "global" "or" "with"
+            "assert" "else" "if" "pass" "yield" "break" "except" "import" "class"
+            "in" "raise" "continue" "finally" "is" "return" "def" "for" "lambda"
+            "try"
+            ;; Python 3:
+            ;; False, None, and True are listed as keywords on the Python 3
+            ;; documentation, but since they also qualify as constants they are
+            ;; fontified like that in order to keep font-lock consistent between
+            ;; Python versions.
+            "nonlocal"
+            ;; Python 3.5+ PEP492
+            (and "async" (+ space) (or "def" "for" "with"))
+            "await"
+            ;; Extra:
+            "self" "other" "cls")
+           symbol-end)
+      ;; functions
+      (,(rx symbol-start "def" (1+ space) (group (1+ (or word ?_))))
+       (1 font-lock-function-name-face))
+      ;; classes
+      (,(rx symbol-start "class" (1+ space) (group (1+ (or word ?_))))
+       (1 font-lock-type-face))
+      ;; Constants
+      (,(rx symbol-start
+            (or
+             "Ellipsis" "False" "None" "NotImplemented" "True" "__debug__"
+             ;; copyright, license, credits, quit and exit are added by the site
+             ;; module and they are not intended to be used in programs
+             "copyright" "credits" "exit" "license" "quit")
+            symbol-end) . font-lock-constant-face)
+      ;; Decorators.
+      (,(rx line-start (* (any " \t")) (group "@" (1+ (or word ?_))
+                                              (0+ "." (1+ (or word ?_)))))
+       (1 font-lock-type-face))
+      ;; Builtin Exceptions
+      (,(rx symbol-start
+            (or
+             ;; Python 2 and 3:
+             "ArithmeticError" "AssertionError" "AttributeError" "BaseException"
+             "BufferError" "BytesWarning" "DeprecationWarning" "EOFError"
+             "EnvironmentError" "Exception" "FloatingPointError" "FutureWarning"
+             "GeneratorExit" "IOError" "ImportError" "ImportWarning"
+             "IndentationError" "IndexError" "KeyError" "KeyboardInterrupt"
+             "LookupError" "MemoryError" "NameError" "NotImplementedError"
+             "OSError" "OverflowError" "PendingDeprecationWarning"
+             "ReferenceError" "RuntimeError" "RuntimeWarning" "StopIteration"
+             "SyntaxError" "SyntaxWarning" "SystemError" "SystemExit" "TabError"
+             "TypeError" "UnboundLocalError" "UnicodeDecodeError"
+             "UnicodeEncodeError" "UnicodeError" "UnicodeTranslateError"
+             "UnicodeWarning" "UserWarning" "ValueError" "Warning"
+             "ZeroDivisionError"
+
+             ;; Python 3:
+             "BlockingIOError" "BrokenPipeError" "ChildProcessError"
+             "ConnectionAbortedError" "ConnectionError" "ConnectionRefusedError"
+             "ConnectionResetError" "FileExistsError" "FileNotFoundError"
+             "InterruptedError" "IsADirectoryError" "NotADirectoryError"
+             "PermissionError" "ProcessLookupError" "RecursionError"
+             "ResourceWarning" "StopAsyncIteration" "TimeoutError"
+             ;; OS specific
+             "VMSError" "WindowsError"
+             )
+             symbol-end) . font-lock-type-face)
+      ;; Builtin functions
+      (,(rx symbol-start
+            (or
+             "bool" "complex" "dict" "float" "frozenset" "int"
+             "list" "memoryview" "object" "set" "str" "tuple"
+             "type" "abs" "all" "any" "bin" "callable" "chr"
+             "compile" "delattr" "dir" "divmod" "enumerate"
+             "eval" "filter" "format" "getattr" "globals"
+             "hasattr" "hash" "help" "hex" "id" "input" "isinstance"
+             "issubclass" "iter" "len" "locals" "map" "max"
+             "min" "next" "oct" "open" "ord" "pow" "print" "property"
+             "range" "repr" "reversed" "round" "setattr" "slice" "sorted"
+             "staticmethod" "sum" "super" "vars" "zip" "classmethod"
+             "__import__"
+             ;; Python 3:
+             "ascii" "bytearray" "bytes" "exec"
+             ;; Extra:
+             "__all__" "__doc__" "__name__" "__package__")
+            symbol-end) . font-lock-builtin-face)
+      ;; Convention for classes
+      (,(rx symbol-start
+            upper-case
+            (* wordchar)
+            symbol-end) . font-lock-type-face)
+      ;; assignments
+      ;; support for a = b = c = 5
+      (,(lambda (limit)
+          (let ((re (python-rx (group (+ (any word ?. ?_)))
+                               (? ?\[ (+ (not (any  ?\]))) ?\]) (* space)
+                               assignment-operator))
+                (res nil))
+            (while (and (setq res (re-search-forward re limit t))
+                        (or (python-syntax-context 'paren)
+                            (equal (char-after (point)) ?=))))
+            res))
+       (1 font-lock-variable-name-face nil nil))
+      ;; support for a, b, c = (1, 2, 3)
+      (,(lambda (limit)
+          (let ((re (python-rx (group (+ (any word ?. ?_))) (* space)
+                               (* ?, (* space) (+ (any word ?. ?_)) (* space))
+                               ?, (* space) (+ (any word ?. ?_)) (* space)
+                               assignment-operator))
+                (res nil))
+            (while (and (setq res (re-search-forward re limit t))
+                        (goto-char (match-end 1))
+                        (python-syntax-context 'paren)))
+            res))
+       (1 font-lock-variable-name-face nil nil))))
+
   (use-package pip-requirements)
   (use-package sphinx-doc
     :hook
@@ -528,7 +644,8 @@
     (python-shell-interpreter-args "--simple-prompt -i")
     (python-fill-docstring-style 'pep-257)
     (gud-pdb-command-name (concat ign/python-executable " -m gdb"))
-    (py-split-window-on-execute t))
+    (py-split-window-on-execute t)
+    (python-font-lock-keywords #'ign/python-font-lock-keywords))
 
   (use-package elpy
     :after company
