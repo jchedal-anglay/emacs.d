@@ -246,6 +246,16 @@
 ** Line numbers
 
 #+BEGIN_SRC emacs-lisp
+  (use-package linum
+    :ensure nil
+    :if (< emacs-major-version 26)
+    :hook
+    (prog-mode . linum-mode)
+    :custom
+    (linum-format " %d ")
+    :config
+    (set-face-underline 'linum nil))
+
   (use-package display-line-numbers
     :ensure nil
     :if (>= emacs-major-version 26)
