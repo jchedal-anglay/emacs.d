@@ -734,8 +734,7 @@
 
   (use-package merlin
     :ensure-system-package
-    (opam
-     (merlin . "opam install merlin -y && opam user-setup install"))
+    ("~/.emacs.d/opam-user-setup.el" . "opam install merlin -y && opam user-setup install")
     :after tuareg
     :hook
     (tuareg-mode . merlin-mode)
