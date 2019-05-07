@@ -40,12 +40,101 @@
   (setq-default use-package-always-ensure t)
 #+END_SRC
 
+* Functions
+** Dependencies
+
+#+BEGIN_SRC emacs-lisp
+  (use-package popwin)
+  (use-package multi-term
+    :custom
+    (multi-term-program "/bin/zsh"))
+#+END_SRC
+
+** Definitions
+
+#+BEGIN_SRC emacs-lisp
+   (defun ign/split-window-right ()
+     (interactive)
+     (split-window-right)
+     (balance-windows))
+
+   (defun ign/split-window-below ()
+     (interactive)
+     (split-window-below)
+     (balance-windows))
+
+   (defun ign/delete-window ()
+     (interactive)
+     (delete-window)
+     (balance-windows))
+
+   (defun ign/popwin-term (name)
+     (popwin:display-buffer-1
+      (or (get-buffer name)
+          (save-window-excursion
+            (multi-term)))
+      :default-config-keywords '(:height 15 :position :bottom :noselect nil :stick t))
+     (rename-buffer name))
+
+   (cl-defun ign/term-toggle (&optional (name "*term*"))
+     (interactive)
+     (cond
+      ((get-buffer-window name) (kill-buffer name))
+      ((get-buffer name) (progn (kill-buffer name) (ign/term-toggle)))
+      (t (ign/popwin-term name))))
+
+   (defun ign/fill-or-unfill ()
+     (interactive)
+     (let ((fill-column
+            (if (eq last-command 'ign/fill-or-unfill)
+                (progn (setq this-command nil)
+                       (point-max))
+              fill-column)))
+       (call-interactively #'fill-paragraph)))
+
+   (defun ign/refresh-buffer ()
+     (interactive)
+     (revert-buffer :ignore-auto :noconfirm))
+
+   (defun ign/sh-run-safe (command &rest args)
+     (if (executable-find command)
+         (shell-command (string-join (nconc (list command) args) " "))
+       (message (concat "'" command "' not found found; please install"))))
+
+   (defun ign/reload ()
+     (interactive)
+     (load-file (concat user-emacs-directory "init.el")))
+
+   (defun ign/toggle-mark ()
+     (interactive)
+     (if (region-active-p)
+         (deactivate-mark)
+       (push-mark nil nil t)))
+
+   (defun ign/toggle-mark-rectangle ()
+     (interactive)
+     (if (region-active-p)
+         (deactivate-mark)
+       (rectangle-mark-mode)))
+
+  (defun ign/first-occurence (f list)
+    (let ((head (car list))
+          (tail (cdr list)))
+      (if (or (not head) (funcall f head))
+          head
+        (ign/first-occurence f tail))))
+
+  (defmacro ign/find-executables (list)
+    (ign/first-occurence #'executable-find list))
+#+END_SRC
+
 * Custom Variables
 
 #+BEGIN_SRC emacs-lisp
   (defconst custom-file "/dev/zero")
-  (defconst ign/python-executable "python3")
-  (defconst ign/ipython-executable "ipython3")
+  (defconst ign/is-a-mac (memq window-system '(mac ns)))
+  (defconst ign/python-executable (ign/find-executables ("python3.5" "python3.7" "python3")))
+  (defconst ign/ipython-executable (ign/find-executables ("ipython3" "ipython")))
 #+END_SRC
 
 * System
@@ -110,84 +199,6 @@
 #+BEGIN_SRC emacs-lisp
   (setq-default cursor-type 'hbar)
   (setq-default cursor-in-non-selected-windows nil)
-#+END_SRC
-
-* Functions
-** Dependencies
-
-#+BEGIN_SRC emacs-lisp
-  (use-package popwin)
-  (use-package multi-term
-    :custom
-    (multi-term-program "/bin/zsh"))
-#+END_SRC
-
-** Definitions
-
-#+BEGIN_SRC emacs-lisp
-  (defun ign/split-window-right ()
-    (interactive)
-    (split-window-right)
-    (balance-windows))
-
-  (defun ign/split-window-below ()
-    (interactive)
-    (split-window-below)
-    (balance-windows))
-
-  (defun ign/delete-window ()
-    (interactive)
-    (delete-window)
-    (balance-windows))
-
-  (defun ign/popwin-term (name)
-    (popwin:display-buffer-1
-     (or (get-buffer name)
-         (save-window-excursion
-           (multi-term)))
-     :default-config-keywords '(:height 15 :position :bottom :noselect nil :stick t))
-    (rename-buffer name))
-
-  (cl-defun ign/term-toggle (&optional (name "*term*"))
-    (interactive)
-    (cond
-     ((get-buffer-window name) (kill-buffer name))
-     ((get-buffer name) (progn (kill-buffer name) (ign/term-toggle)))
-     (t (ign/popwin-term name))))
-
-  (defun ign/fill-or-unfill ()
-    (interactive)
-    (let ((fill-column
-           (if (eq last-command 'ign/fill-or-unfill)
-               (progn (setq this-command nil)
-                      (point-max))
-             fill-column)))
-      (call-interactively #'fill-paragraph)))
-
-  (defun ign/refresh-buffer ()
-    (interactive)
-    (revert-buffer :ignore-auto :noconfirm))
-
-  (defun ign/sh-run-safe (command &rest args)
-    (if (executable-find command)
-        (shell-command (string-join (nconc (list command) args) " "))
-      (message (concat "'" command "' not found found; please install"))))
-
-  (defun ign/reload ()
-    (interactive)
-    (load-file (concat user-emacs-directory "init.el")))
-
-  (defun ign/toggle-mark ()
-    (interactive)
-    (if (region-active-p)
-        (deactivate-mark)
-      (push-mark nil nil t)))
-
-  (defun ign/toggle-mark-rectangle ()
-    (interactive)
-    (if (region-active-p)
-        (deactivate-mark)
-      (rectangle-mark-mode)))
 #+END_SRC
 
 * Interface
