@@ -332,6 +332,7 @@
     :custom
     (org-image-actual-width 480)
     (org-src-fontify-natively t)
+    (org-src-tab-acts-natively t)
     (org-pretty-entities t)
     (org-hide-emphasis-markers t)
     (org-startup-with-inline-images t)
@@ -343,7 +344,6 @@
      'org-babel-load-languages
      '((python . t)
        (ipython . t)
-       (js . t)
        (ocaml . t)
        (gnuplot . t))))
 
@@ -816,9 +816,9 @@
   (define-key comint-mode-map (kbd "C-l") #'comint-clear-buffer)
 
   (use-package bind-key)
-  (bind-key* "C-x k" 'delete-window)
-  (bind-key* "C-x w" 'split-window-right)
-  (bind-key* "C-x t" 'ign/term-toggle)
+  (bind-key* "C-x k" #'delete-window)
+  (bind-key* "C-x w" #'split-window-right)
+  (bind-key* "C-x t" #'ign/term-toggle)
 #+END_SRC
 
 ** Hydra
