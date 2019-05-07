@@ -142,13 +142,20 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package exec-path-from-shell
-    :if (memq window-system '(mac ns))
+    :if ign/is-a-mac
     :demand t
     :config
     (exec-path-from-shell-initialize))
 
   (when (memq window-system '(mac ns))
     (setq mac-command-modifier 'meta))
+#+END_SRC
+
+** Version-specific
+
+#+BEGIN_SRC emacs-lisp
+  (when (>= emacs-major-version 26)
+    (setq-default confirm-kill-processes nil))
 #+END_SRC
 
 * GUI
@@ -164,7 +171,7 @@
 ** Font
 
 #+BEGIN_SRC emacs-lisp
-  (set-frame-font (if (memq window-system '(mac ns)) "Menlo-14" "SourceCodePro-10") nil t)
+  (set-frame-font (if ign/is-a-mac "Menlo-14" "SourceCodePro-10") nil t)
 #+END_SRC
 
 ** Theme
@@ -208,13 +215,12 @@
   (use-package dashboard
     :custom
     (dashboard-banner-logo-title
-     (format "[Emacs ready in %.2f seconds with %d garbage collections.]"
-             (float-time (time-subtract after-init-time before-init-time)) gcs-done))
+     (format "[Emacs ready in %.2f seconds with %d packages loaded and %d garbage collections.]"
+             (float-time (time-subtract after-init-time before-init-time))
+             (length package-activated-list) gcs-done))
     (dashboard-startup-banner 'logo)
     (dashboard-items '((recents  . 5)
-                       (bookmarks . 5)
-                       (projects . 5)
-                       (registers . 5)))
+                       (projects . 5)))
     :config
     (dashboard-setup-startup-hook))
 #+END_SRC
@@ -276,7 +282,7 @@
   (use-package ivy
     :demand t
     :bind
-    ("C-x b" . ivy-switch-buffer)
+    ([switch-to-buffer] . ivy-switch-buffer)
     (:map ivy-minibuffer-map
           ("<return>" . ivy-alt-done))
     :custom
@@ -293,13 +299,13 @@
 
   (use-package counsel
     :bind
-    (("M-x" . counsel-M-x)
-     ("C-x C-f" . counsel-find-file)))
+    (([remap execute-extended-command] . counsel-M-x)
+     ([remap find-file] . counsel-find-file)))
 
   (use-package swiper
     :bind
-    ("C-r" . swiper-isearch)
-    ("C-s" . swiper))
+    ([isearch-backward] . swiper-isearch)
+    ([isearch] . swiper))
 
   (use-package all-the-icons-ivy
     :after ivy
@@ -318,6 +324,8 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package org
+    :mode
+    ("\\.\\(org\\|ORG\\)\\'" . org-mode)
     :ensure nil
     :hook
     (org-babel-after-execute . org-redisplay-inline-images)
@@ -346,7 +354,7 @@
   (use-package px)
 #+END_SRC
 
-* Programming
+* Programming Related
 
 #+BEGIN_SRC emacs-lisp
   (use-package aggressive-indent
@@ -379,7 +387,10 @@
     ("C-c g" . magit-status))
 
   (use-package gitignore-mode
-    :mode ("\\.gitignore\\'" . gitignore-mode))
+    :mode "\\.gitignore\\'")
+
+  (use-package gitconfig-mode
+    :mode "\\.gitconfig\\'")
 #+END_SRC
 
 ** TRAMP
@@ -387,6 +398,8 @@
 #+BEGIN_SRC emacs-lisp
   (use-package tramp
     :ensure nil
+    :custom
+    (password-cache-expiry nil)
     :config
     (add-to-list 'tramp-methods
                  '("gssh"
@@ -409,6 +422,7 @@
     :bind
     ("M-/" . company-complete)
     (:map company-active-map
+          ("M-/" . company-other-backend)
           ("M-n" . nil)
           ("M-p" . nil)
           ("C-n" . company-select-next)
@@ -641,7 +655,10 @@
             res))
        (1 font-lock-variable-name-face nil nil))))
 
-  (use-package pip-requirements)
+  (use-package pip-requirements
+    :mode
+    ("requirements\\.txt" . pip-requirements-mode))
+
   (use-package sphinx-doc
     :hook
     (python-mode . sphinx-doc-mode))
@@ -649,6 +666,8 @@
   (use-package python
     :ensure nil
     :after flycheck
+    :mode
+    ("\\.py[iw]?\\'" . python-mode)
     :custom
     (python-indent 4)
     (python-shell-interpreter ign/ipython-executable)
@@ -676,6 +695,8 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package ein
+    :mode
+    (".*\\.ipynb\\'" . ein:ipynb-mode)
     :custom
     (ein:completion-backend 'ein:use-company-jedi-backends)
     (ein:use-auto-complete-superpack t))
@@ -687,7 +708,12 @@
   (use-package tuareg
     :demand t
     :after company
-    :mode ("\\.mly\\'" . tuareg-menhir-mode)
+    :mode
+    (("\\.ml[ip]?\\'" . tuareg-mode)
+     ("\\.mly\\'" . tuareg-menhir-mode)
+     ("[./]opam_?\\'" . tuareg-opam-mode)
+     ("\\(?:\\`\\|/\\)jbuild\\(?:\\.inc\\)?\\'" . tuareg-jbuild-mode)
+     ("\\.eliomi?\\'" . tuareg-mode))
     :custom
     (tuareg-match-patterns-aligned t)
     (tuareg-indent-align-with-first-arg t))
@@ -721,17 +747,32 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package cider
+    :mode
+    (("\\.\\(clj\\|dtm\\|edn\\)\\'" . clojure-mode)
+     ("\\.cljs\\'" . clojurescript-mode)
+     ("\\.cljc\\'" . clojurec-mode))
     :custom
     (cider-repl-pop-to-buffer-on-connect nil)
     (cider-repl-display-in-current-window nil)
     (cider-font-lock-dynamically t))
+
+  (use-package elein)
 #+END_SRC
 
 ** GNUplot
 
 #+BEGIN_SRC emacs-lisp
   (use-package gnuplot)
-  (use-package gnuplot-mode)
+  (use-package gnuplot-mode
+    :mode
+    ("\\.gp\\'" "\\.gnuplot\\'"))
+#+END_SRC
+
+** CSV
+
+#+BEGIN_SRC emacs-lisp
+  (use-package csv-mode
+    :mode "\\.[Cc][Ss][Vv]\\'")
 #+END_SRC
 
 * Text Editing
