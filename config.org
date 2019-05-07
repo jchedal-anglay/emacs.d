@@ -38,6 +38,9 @@
   (eval-when-compile
     (require 'use-package))
   (setq-default use-package-always-ensure t)
+
+  (use-package use-package-ensure-system-package
+    :ensure t)
 #+END_SRC
 
 * Functions
@@ -46,6 +49,7 @@
 #+BEGIN_SRC emacs-lisp
   (use-package popwin)
   (use-package multi-term
+    :ensure-system-package zsh
     :custom
     (multi-term-program "/bin/zsh"))
 #+END_SRC
@@ -133,8 +137,10 @@
 #+BEGIN_SRC emacs-lisp
   (defconst custom-file "/dev/zero")
   (defconst ign/is-a-mac (memq window-system '(mac ns)))
-  (defconst ign/python-executable (ign/find-executables ("python3.5" "python3.7" "python3")))
+  (defconst ign/system-packages-use-sudo (if ign/is-a-mac nil t))
+  (defconst ign/python-executable (ign/find-executables ("python3")))
   (defconst ign/ipython-executable (ign/find-executables ("ipython3" "ipython")))
+  (defconst ign/cl-executable (ign/find-executables ("sbcl" "lisp" "ccl")))
 #+END_SRC
 
 * System
@@ -304,8 +310,8 @@
 
   (use-package swiper
     :bind
-    ([isearch-backward] . swiper-isearch)
-    ([isearch] . swiper))
+    ("C-r" . swiper-isearch)
+    ("C-s" . swiper))
 
   (use-package all-the-icons-ivy
     :after ivy
@@ -383,6 +389,7 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package magit
+    :ensure-system-package git
     :bind
     ("C-c g" . magit-status))
 
@@ -397,6 +404,7 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package tramp
+    :ensure-system-package ssh
     :ensure nil
     :custom
     (password-cache-expiry nil)
@@ -517,6 +525,7 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
+    :ensure-system-package grep
     :demand t
     :bind
     (:map projectile-mode-map
@@ -664,6 +673,7 @@
     (python-mode . sphinx-doc-mode))
 
   (use-package python
+    :ensure-system-package python3
     :ensure nil
     :after flycheck
     :mode
@@ -673,7 +683,7 @@
     (python-shell-interpreter ign/ipython-executable)
     (python-shell-interpreter-args "--simple-prompt -i")
     (python-fill-docstring-style 'pep-257)
-    (gud-pdb-command-name (concat ign/python-executable " -m gdb"))
+    (gud-pdb-command-name (concat ign/python-executable " -m pdb"))
     (py-split-window-on-execute t)
     (python-font-lock-keywords #'ign/python-font-lock-keywords))
 
@@ -695,6 +705,7 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package ein
+    :ensure-system-package jupyter
     :mode
     (".*\\.ipynb\\'" . ein:ipynb-mode)
     :custom
@@ -706,6 +717,9 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package tuareg
+    :ensure-system-package
+    (ocaml
+     opam)
     :demand t
     :after company
     :mode
@@ -719,7 +733,9 @@
     (tuareg-indent-align-with-first-arg t))
 
   (use-package merlin
-    :if (file-exists-p "~/.emacs.d/opam-user-setup.el")
+    :ensure-system-package
+    (opam
+     (merlin . "opam install merlin -y && opam user-setup install"))
     :after tuareg
     :hook
     (tuareg-mode . merlin-mode)
@@ -733,6 +749,7 @@
   (use-package cc-mode
     :ensure nil
     :custom
+    (c-auto-newline t)
     (c-default-style "linux")
     (c-basic-offset 4))
 
@@ -747,6 +764,7 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package cider
+    :ensure-system-package clojure
     :mode
     (("\\.\\(clj\\|dtm\\|edn\\)\\'" . clojure-mode)
      ("\\.cljs\\'" . clojurescript-mode)
@@ -756,13 +774,31 @@
     (cider-repl-display-in-current-window nil)
     (cider-font-lock-dynamically t))
 
-  (use-package elein)
+  (use-package elein
+    :ensure-system-package lein)
+#+END_SRC
+
+** Common Lisp
+
+#+BEGIN_SRC emacs-lisp
+  (use-package slime
+    :custom
+    (inferior-lisp-program ign/cl-executable)
+    (slime-contribs '(slime-fancy)))
+#+END_SRC
+
+** R & Julia
+
+#+BEGIN_SRC emacs-lisp
+   (use-package ess
+     :pin melpa-stable)
 #+END_SRC
 
 ** GNUplot
 
 #+BEGIN_SRC emacs-lisp
-  (use-package gnuplot)
+  (use-package gnuplot
+    :ensure-system-package gnuplot)
   (use-package gnuplot-mode
     :mode
     ("\\.gp\\'" "\\.gnuplot\\'"))
@@ -882,3 +918,83 @@
     :config
     (elcord-mode))
 #+END_SRC
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+lmao get r3kt shan
