@@ -624,7 +624,7 @@
              ;; OS specific
              "VMSError" "WindowsError"
              )
-             symbol-end) . font-lock-type-face)
+            symbol-end) . font-lock-type-face)
       ;; Builtin functions
       (,(rx symbol-start
             (or
@@ -644,10 +644,15 @@
              ;; Extra:
              "__all__" "__doc__" "__name__" "__package__")
             symbol-end) . font-lock-builtin-face)
+      ;; Convention for constants
+      (,(rx bol
+            symbol-start
+            (+ (or upper-case ?_))
+            symbol-end) . font-lock-constant-face)
       ;; Convention for classes
       (,(rx symbol-start
             upper-case
-            (* wordchar)
+            (* (or wordchar ?_))
             symbol-end) . font-lock-type-face)
       ;; assignments
       ;; support for a = b = c = 5
