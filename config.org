@@ -796,6 +796,9 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package slime
+    :bind
+    (:map slime-repl-mode-map
+          ("C-l" . slime-repl-clear-buffer))
     :custom
     (inferior-lisp-program ign/cl-executable)
     (slime-contribs '(slime-fancy)))
