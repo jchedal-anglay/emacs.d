@@ -1,10 +1,3 @@
-* Personal Informations
-
-#+BEGIN_SRC emacs-lisp
-  (setq-default user-full-name "Julien Chedal-Anglay"
-                user-mail-address "chedala.julien@gmail.com")
-#+END_SRC
-
 * Encoding
 
 #+BEGIN_SRC emacs-lisp
