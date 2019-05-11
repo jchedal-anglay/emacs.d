@@ -819,8 +819,20 @@
     (c-default-style "linux")
     (c-basic-offset 4))
 
+  (use-package irony
+    :ensure-system-package 
+    (clang cmake)
+    :hook
+    (c++-mode . irony-mode)
+    (c-mode . irony-mode)
+    (irony-mode . irony-cdb-autosetup-compile-options))
+
+  (use-package company-irony
+    :after (irony company)
+    :config
+    (add-to-list 'company-backends 'company-irony))
+
   (use-package company-c-headers
-    :demand t
     :after company
     :config
     (add-to-list 'company-backends 'company-c-headers))
