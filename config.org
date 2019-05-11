@@ -693,7 +693,10 @@
 
   (use-package sphinx-doc
     :hook
-    (python-mode . sphinx-doc-mode))
+    (python-mode . sphinx-doc-mode)
+    :bind
+    (:map python-mode-map
+          ("C-c C-d" . sphinx-doc)))
 
   (use-package python
     :ensure-system-package python3
@@ -714,6 +717,9 @@
     :after company
     :hook
     (python-mode . elpy-mode)
+    :bind
+    (:map python-mode-map
+          ("M-." . elpy-goto-definition))
     :custom
     (elpy-rpc-python-command ign/python-executable)
     :config
