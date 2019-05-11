@@ -523,7 +523,6 @@
     (flycheck-python-pylint-executable ign/python-executable)
     (flycheck-python-pycompile-executable ign/python-executable)
     (flycheck-python-flake8-executable ign/python-executable)
-    (flycheck-python-mypy-executable ign/python-executable)
     (flycheck-check-syntax-automatically '(mode-enabled save))
     :config
     (flycheck-define-error-level 'info
