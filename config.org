@@ -898,7 +898,6 @@
   (setq-default require-final-newline t)
   (global-subword-mode t)
   (delete-selection-mode t)
-  (add-hook 'before-save-hook #'delete-trailing-whitespace)
 
   (global-set-key [remap fill-paragraph] #'ign/fill-or-unfill)
 
@@ -936,6 +935,7 @@
   (bind-key* "C-x k" #'delete-window)
   (bind-key* "C-x w" #'split-window-right)
   (bind-key* "C-x t" #'ign/term-toggle)
+  (bind-key* "C-x C-s" #'ign/save-buffer)
 #+END_SRC
 
 ** Hydra
