@@ -590,8 +590,7 @@
     (python-shell-interpreter-args "--simple-prompt -i")
     (python-fill-docstring-style 'pep-257)
     (gud-pdb-command-name (concat ign/python-executable " -m pdb"))
-    (py-split-window-on-execute t)
-    (python-font-lock-keywords #'ign/python-font-lock-keywords))
+    (py-split-window-on-execute t))
 
   (use-package elpy
     :after company
