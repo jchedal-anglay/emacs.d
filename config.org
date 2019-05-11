@@ -652,40 +652,59 @@
     :hook
     (tuareg-mode . merlin-mode)
     :bind
-    (:map tuareg-mode-map
+    (:map merlin-mode-map
           ("M-." . merlin-locate)
-          ("C-c C-h" . merlin-type-enclosing))
+          ("C-c C-h" . merlin-type-enclosing)
+          ("C-c C-r" . nil))
     :custom
     (merlin-error-after-save nil)
     (merlin-completion-with-doc t)
     :config
     (require 'opam-user-setup "~/.emacs.d/opam-user-setup.el"))
 
-  (use-package ocp-indent
-    :ensure-system-package
-    (ocp-indent . "opam install ocp-indent -y")
-    :after tuareg
-    :commands (ocp-indent-caml-mode-setup)
-    :hook (tuareg-mode . ocp-indent-caml-mode-setup))
-
   (use-package utop
     :ensure-system-package
     (utop . "opam install utop -y")
     :after opam
+    :preface
+    (defun ign/utop-eval-phrase ()
+      "Eval the surrounding Caml phrase (or block) in utop."
+      (interactive)
+      (utop-prepare-for-eval)
+      (let ((end (point)))
+        (save-excursion
+          (let ((triple (funcall utop-discover-phrase)))
+            (utop-eval (car triple) (cdr triple))))
+        (when utop-skip-after-eval-phrase
+          (goto-char end)
+          (funcall utop-next-phrase-beginning))))
     :hook
     (tuareg-mode . utop-minor-mode)
     :bind
     (:map tuareg-mode-map
-          ("C-c C-c" . utop-eval-phrase)
+          ("C-c C-c" . ign/utop-eval-phrase)
           ("C-c C-z" . utop))
+    (:map utop-mode-map
+          ("C-c C-g" . nil)
+          ("C-c C-k" . nil)
+          ("C-c C-s" . nil))
     :custom
+    (utop-command "opam config exec -- utop -emacs")
     (utop-edit-command nil))
+
+  (use-package ocp-indent
+    :ensure-system-package
+    (ocp-indent . "opam install ocp-indent -y")
+    :after tuareg
+    :bind
+    (:map merlin-mode-map
+          ("C-c C-r f" . ocp-indent-buffer))
+    :hook (tuareg-mode . ocp-indent-caml-mode-setup))
 
   (use-package flycheck-ocaml
     :after merlin
     :config
     (flycheck-ocaml-setup))
-
 #+END_SRC
 
 ** C
