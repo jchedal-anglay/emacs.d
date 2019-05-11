@@ -746,11 +746,13 @@
 ** OCaml
 
 #+BEGIN_SRC emacs-lisp
-  (use-package tuareg
+  (use-package opam
     :ensure-system-package
-    (ocaml
-     opam)
-    :demand t
+    (ocaml opam)
+    :init
+    (opam-init))
+
+  (use-package tuareg
     :after company
     :mode
     (("\\.ml[ip]?\\'" . tuareg-mode)
@@ -764,12 +766,47 @@
 
   (use-package merlin
     :ensure-system-package
-    ("~/.emacs.d/opam-user-setup.el" . "opam install merlin -y && opam user-setup install")
-    :after tuareg
+    ((ocamlmerlin . "opam install merlin -y")
+     ("~/.emacs.d/opam-user-setup.el" . "opam user-setup install"))
+    :after
+    (opam tuareg)
     :hook
     (tuareg-mode . merlin-mode)
+    :bind
+    (:map tuareg-mode-map
+          ("M-." . merlin-locate)
+          ("C-c C-h" . merlin-type-enclosing))
+    :custom
+    (merlin-error-after-save nil)
+    (merlin-completion-with-doc t)
     :config
     (require 'opam-user-setup "~/.emacs.d/opam-user-setup.el"))
+
+  (use-package ocp-indent
+    :ensure-system-package
+    (ocp-indent . "opam install ocp-indent -y")
+    :after tuareg
+    :commands (ocp-indent-caml-mode-setup)
+    :hook (tuareg-mode . ocp-indent-caml-mode-setup))
+
+  (use-package utop
+    :ensure-system-package
+    (utop . "opam install utop -y")
+    :after opam
+    :hook
+    (tuareg-mode . utop-minor-mode)
+    :bind
+    (:map tuareg-mode-map
+          ("C-c C-c" . utop-eval-phrase)
+          ("C-c C-z" . utop))
+    :custom
+    (utop-edit-command nil))
+
+  (use-package flycheck-ocaml
+    :after merlin
+    :config
+    (flycheck-ocaml-setup))
+
 #+END_SRC
 
 ** C
