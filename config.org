@@ -859,7 +859,7 @@
   _b_: Switch buffer      | _f_: Find File        | _p_: Switch project
   _c_: Compile            | _g_: Grep             | _t_: Impl ↔ Test
   _d_: Find directory     | _i_: IBuffer          | _v_: Version control
-      "
+    "
     ("a" projectile-find-other-file)
     ("b" projectile-switch-to-buffer)
     ("c" projectile-compile-project)
