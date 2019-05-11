@@ -169,7 +169,6 @@
 #+BEGIN_SRC emacs-lisp
   (use-package exec-path-from-shell
     :if ign/is-a-mac
-    :demand t
     :config
     (exec-path-from-shell-initialize))
 
@@ -319,10 +318,10 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
-    :demand t
     :bind
     ([switch-to-buffer] . ivy-switch-buffer)
     (:map ivy-minibuffer-map
+          ("M-." . ign/do-nothing)
           ("<return>" . ivy-alt-done))
     :custom
     (ivy-use-virtual-buffers t)
@@ -353,7 +352,6 @@
     (all-the-icons-ivy-setup))
 
   (use-package ivy-xref
-    :demand t
     :after ivy
     :custom
     (xref-show-xrefs-function #'ivy-xref-show-xrefs))
@@ -459,7 +457,6 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package company
-    :demand t
     :bind
     ("M-/" . company-complete)
     (:map company-active-map
@@ -490,7 +487,6 @@
     (global-company-mode t))
 
   (use-package company-quickhelp
-    :demand t
     :after company
     :config
     (company-quickhelp-mode))
@@ -559,10 +555,6 @@
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
     :ensure-system-package grep
-    :demand t
-    :bind
-    (:map projectile-mode-map
-          ("C-c p" . projectile-command-map))
     :custom
     (projectile-project-search-path '("~/Projects/"))
     (projectile-indexing-method 'hybrid)
