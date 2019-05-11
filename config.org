@@ -350,11 +350,6 @@
     :config
     (setq-default all-the-icons-ivy-file-commands (append all-the-icons-ivy-file-commands '(counsel-projectile-find-file counsel-projectile-find-file-dwim)))
     (all-the-icons-ivy-setup))
-
-  (use-package ivy-xref
-    :after ivy
-    :custom
-    (xref-show-xrefs-function #'ivy-xref-show-xrefs))
 #+END_SRC
 
 * Org
