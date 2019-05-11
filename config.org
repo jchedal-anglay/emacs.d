@@ -37,10 +37,12 @@
     (package-install 'use-package))
   (eval-when-compile
     (require 'use-package))
+  (setq-default use-package-always-defer nil)
+  (setq-default use-package-always-demand t)
   (setq-default use-package-always-ensure t)
+  (setq-default byte-compile-warnings nil)
 
-  (use-package use-package-ensure-system-package
-    :ensure t)
+  (use-package use-package-ensure-system-package)
 #+END_SRC
 
 * Functions
