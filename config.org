@@ -152,6 +152,9 @@
 
   (defmacro ign/if (predicate then &optional else)
     (if (eval predicate) `(ign/ensure-dispatch ,then) (or `(ign/ensure-dispatch ,else) ''ls)))
+
+  (defmacro ign/unless (predicate then &optional else)
+    (if (eval (not predicate)) `(ign/ensure-dispatch ,then) (or `(ign/ensure-dispatch ,else) ''ls)))
 #+END_SRC
 
 * Custom Variables
