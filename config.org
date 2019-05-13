@@ -30,6 +30,7 @@
     (package-install 'use-package))
   (eval-when-compile
     (require 'use-package))
+
   (setq-default use-package-always-defer nil)
   (setq-default use-package-always-demand t)
   (setq-default use-package-always-ensure t)
@@ -143,6 +144,14 @@
     (when (/= arg 1)
       (delete-trailing-whitespace))
     (save-buffer))
+
+  (defmacro ign/ensure-dispatch (expr)
+    (if (stringp expr)
+        `'(ls . ,expr)
+      `',expr))
+
+  (defmacro ign/if (predicate then &optional else)
+    (if (eval predicate) `(ign/ensure-dispatch ,then) (or `(ign/ensure-dispatch ,else) ''ls)))
 #+END_SRC
 
 * Custom Variables
@@ -571,19 +580,21 @@
     (:map python-mode-map
           ("C-c C-d" . sphinx-doc)))
 
-  (use-package python
-    :ensure-system-package python3
-    :ensure nil
-    :after flycheck
-    :mode
-    ("\\.py[iw]?\\'" . python-mode)
-    :custom
-    (python-indent 4)
-    (python-shell-interpreter ign/ipython-executable)
-    (python-shell-interpreter-args "--simple-prompt -i")
-    (python-fill-docstring-style 'pep-257)
-    (gud-pdb-command-name (concat ign/python-executable " -m pdb"))
-    (py-split-window-on-execute t))
+  (eval `(use-package python
+           :ensure-system-package 
+           (python3
+            ,(ign/if ign/is-a-mac ipython ipython3))
+           :ensure nil
+           :after flycheck
+           :mode
+           ("\\.py[iw]?\\'" . python-mode)
+           :custom
+           (python-indent 4)
+           (python-shell-interpreter ign/ipython-executable)
+           (python-shell-interpreter-args "--simple-prompt -i")
+           (python-fill-docstring-style 'pep-257)
+           (gud-pdb-command-name (concat ign/python-executable " -m pdb"))
+           (py-split-window-on-execute t)))
 
   (use-package elpy
     :after company
