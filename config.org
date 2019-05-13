@@ -147,7 +147,7 @@
 
   (defmacro ign/ensure-dispatch (expr)
     (if (stringp expr)
-        `'(ls . ,expr)
+        `'(t . ,expr)
       `',expr))
 
   (defmacro ign/if (predicate then &optional else)
