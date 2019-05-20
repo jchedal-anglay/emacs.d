@@ -183,6 +183,7 @@
 
 #+BEGIN_SRC emacs-lisp
   (defconst custom-file "/dev/zero")
+  (defconst ign/config-path (concat user-emacs-directory "config.org"))
   (defconst ign/is-a-mac (memq window-system '(mac ns)))
   (defconst ign/system-packages-use-sudo (if ign/is-a-mac nil t))
   (defconst ign/python-executable (ign/find-executables ("python3")))
