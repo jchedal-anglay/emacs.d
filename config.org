@@ -349,7 +349,11 @@
     :bind
     ([switch-to-buffer] . ivy-switch-buffer)
     (:map ivy-minibuffer-map
-          ("M-." . ign/do-nothing)
+          ([remap xref-find-definitions] . ign/do-nothing)
+          ([remap xref-find-definitions-other-frame] . ign/do-nothing)
+          ([remap xref-find-definitions-other-window] . ign/do-nothing)
+          ([remap xref-find-references] . ign/do-nothing)
+          ([remap xref-find-apropos] . ign/do-nothing)
           ("<return>" . ivy-alt-done))
     :custom
     (ivy-use-virtual-buffers t)
@@ -364,9 +368,8 @@
     (ivy-mode))
 
   (use-package counsel
-    :bind
-    (([remap execute-extended-command] . counsel-M-x)
-     ([remap find-file] . counsel-find-file)))
+    :config
+    (counsel-mode))
 
   (use-package swiper
     :bind
