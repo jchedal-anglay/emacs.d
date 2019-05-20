@@ -632,7 +632,6 @@
     (python-mode . elpy-mode)
     :bind
     (:map python-mode-map
-          ("M-." . elpy-goto-definition)
           ("C-c C-c" . elpy-shell-send-top-statement))
     :custom
     (elpy-rpc-python-command ign/python-executable)
