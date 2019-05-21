@@ -35,22 +35,9 @@
   (setq-default use-package-always-demand t)
   (setq-default use-package-always-ensure t)
   (setq-default byte-compile-warnings nil)
-
-  (use-package use-package-ensure-system-package)
 #+END_SRC
 
 * Functions
-** Dependencies
-
-#+BEGIN_SRC emacs-lisp
-  (use-package popwin)
-  (use-package multi-term
-    :ensure-system-package zsh
-    :custom
-    (multi-term-program "/bin/zsh"))
-#+END_SRC
-
-** Definitions
 
 #+BEGIN_SRC emacs-lisp
   (defun ign/do-nothing ()
@@ -185,10 +172,9 @@
   (defconst custom-file "/dev/zero")
   (defconst ign/config-path (concat user-emacs-directory "config.org"))
   (defconst ign/is-a-mac (memq window-system '(mac ns)))
-  (defconst ign/system-packages-use-sudo (if ign/is-a-mac nil t))
-  (defconst ign/python-executable (ign/find-executables ("python3")))
-  (defconst ign/ipython-executable (ign/find-executables ("ipython3" "ipython")))
-  (defconst ign/cl-executable (ign/find-executables ("sbcl" "lisp" "ccl")))
+  (defconst ign/python-executable "python3")
+  (defconst ign/ipython-executable (if ign/is-a-mac "ipython" "ipython3"))
+  (defconst ign/cl-executable "sbcl")
 #+END_SRC
 
 * System
@@ -342,6 +328,15 @@
                 ring-bell-function 'ignore)
 #+END_SRC
 
+** Dependencies
+
+#+BEGIN_SRC emacs-lisp
+  (use-package popwin)
+  (use-package multi-term
+    :custom
+    (multi-term-program (ign/find-executables "/bin/zsh" "/bin/bash" "/bin/sh")))
+#+END_SRC
+
 * Completion Frontend
 
 #+BEGIN_SRC emacs-lisp
@@ -446,7 +441,6 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package magit
-    :ensure-system-package git
     :bind
     ("C-c g" . magit-status))
 
@@ -461,7 +455,6 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package tramp
-    :ensure-system-package ssh
     :ensure nil
     :custom
     (password-cache-expiry nil)
@@ -579,7 +572,6 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
-    :ensure-system-package grep
     :custom
     (projectile-project-search-path '("~/Projects/"))
     (projectile-indexing-method 'hybrid)
@@ -610,21 +602,18 @@
           ("C-c C-d" . sphinx-doc)))
 
   ;; To anyone that is cursed enough to see this code, I'm sorry
-  (eval `(use-package python
-           :ensure-system-package 
-           (python3
-            ,(ign/if ign/is-a-mac ipython ipython3))
-           :ensure nil
-           :after flycheck
-           :mode
-           ("\\.py[iw]?\\'" . python-mode)
-           :custom
-           (python-indent 4)
-           (python-shell-interpreter ign/ipython-executable)
-           (python-shell-interpreter-args "--simple-prompt -i")
-           (python-fill-docstring-style 'pep-257)
-           (gud-pdb-command-name (concat ign/python-executable " -m pdb"))
-           (py-split-window-on-execute t)))
+  (use-package python
+    :ensure nil
+    :after flycheck
+    :mode
+    ("\\.py[iw]?\\'" . python-mode)
+    :custom
+    (python-indent 4)
+    (python-shell-interpreter ign/ipython-executable)
+    (python-shell-interpreter-args "--simple-prompt -i")
+    (python-fill-docstring-style 'pep-257)
+    (gud-pdb-command-name (concat ign/python-executable " -m pdb"))
+    (py-split-window-on-execute t))
 
   (use-package elpy
     :after company
@@ -647,7 +636,6 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package ein
-    :ensure-system-package jupyter
     :mode
     (".*\\.ipynb\\'" . ein:ipynb-mode)
     :custom
@@ -659,8 +647,6 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package opam
-    :ensure-system-package
-    (ocaml opam)
     :init
     (opam-init))
 
@@ -677,9 +663,7 @@
     (tuareg-indent-align-with-first-arg t))
 
   (use-package merlin
-    :ensure-system-package
-    ((ocamlmerlin . "opam install merlin -y")
-     ("~/.emacs.d/opam-user-setup.el" . "opam user-setup install"))
+    :if (file-exists-p "~/.emacs.d/opam-user-setup.el")
     :after
     (opam tuareg)
     :hook
@@ -696,8 +680,6 @@
     (require 'opam-user-setup "~/.emacs.d/opam-user-setup.el"))
 
   (use-package utop
-    :ensure-system-package
-    (utop . "opam install utop -y")
     :after opam
     :preface
     (defun ign/utop-eval-phrase ()
@@ -726,8 +708,6 @@
     (utop-edit-command nil))
 
   (use-package ocp-indent
-    :ensure-system-package
-    (ocp-indent . "opam install ocp-indent -y")
     :after tuareg
     :bind
     (:map merlin-mode-map
@@ -751,8 +731,6 @@
     (c-basic-offset 4))
 
   (use-package irony
-    :ensure-system-package 
-    (clang cmake)
     :hook
     (c++-mode . irony-mode)
     (c-mode . irony-mode)
@@ -773,7 +751,6 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package cider
-    :ensure-system-package clojure
     :mode
     (("\\.\\(clj\\|dtm\\|edn\\)\\'" . clojure-mode)
      ("\\.cljs\\'" . clojurescript-mode)
@@ -783,8 +760,7 @@
     (cider-repl-display-in-current-window nil)
     (cider-font-lock-dynamically t))
 
-  (use-package elein
-    :ensure-system-package lein)
+  (use-package elein)
 #+END_SRC
 
 ** Common Lisp
@@ -809,8 +785,8 @@
 ** GNUplot
 
 #+BEGIN_SRC emacs-lisp
-  (use-package gnuplot
-    :ensure-system-package gnuplot)
+  (use-package gnuplot)
+
   (use-package gnuplot-mode
     :mode
     ("\\.gp\\'" "\\.gnuplot\\'"))
