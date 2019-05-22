@@ -143,7 +143,7 @@
     "Return the last occurence in LIST which, when applied to PREDICATE returns t."
     (ign/first-occurence predicate (reverse list)))
 
-  (defmacro ign/find-executables (list)
+  (defmacro ign/find-executables (&rest list)
     "Return the first occurence in LIST whose value corresponds to an executable."
     (ign/first-occurence #'executable-find list))
 
@@ -153,17 +153,6 @@
     (when (/= arg 1)
       (delete-trailing-whitespace))
     (save-buffer))
-
-  (defmacro ign/ensure-dispatch (expr)
-    (if (stringp expr)
-        `'(t . ,expr)
-      `',expr))
-
-  (defmacro ign/if (predicate then &optional else)
-    (if (eval predicate) `(ign/ensure-dispatch ,then) (or `(ign/ensure-dispatch ,else) ''ls)))
-
-  (defmacro ign/unless (predicate then &optional else)
-    (if (eval (not predicate)) `(ign/ensure-dispatch ,then) (or `(ign/ensure-dispatch ,else) ''ls)))
 #+END_SRC
 
 * Custom Variables
@@ -175,6 +164,7 @@
   (defconst ign/python-executable "python3")
   (defconst ign/ipython-executable (if ign/is-a-mac "ipython" "ipython3"))
   (defconst ign/cl-executable "sbcl")
+
 #+END_SRC
 
 * System
@@ -334,7 +324,7 @@
   (use-package popwin)
   (use-package multi-term
     :custom
-    (multi-term-program (ign/find-executables "/bin/zsh" "/bin/bash" "/bin/sh")))
+    (multi-term-program (ign/find-executables "zsh" "bash" "sh")))
 #+END_SRC
 
 * Completion Frontend
