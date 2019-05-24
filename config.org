@@ -786,7 +786,7 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package csv-mode
-    :mode "\\.[Cc][Ss][Vv]\\'")
+    :mode "\\.csv\\'")
 #+END_SRC
 
 * Text Editing
