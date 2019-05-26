@@ -156,7 +156,6 @@
 #+END_SRC
 
 * Custom Variables
-
 #+BEGIN_SRC emacs-lisp
   (defconst custom-file "/dev/zero")
   (defconst ign/config-path (concat user-emacs-directory "config.org"))
@@ -164,7 +163,8 @@
   (defconst ign/python-executable "python3")
   (defconst ign/ipython-executable (if ign/is-a-mac "ipython" "ipython3"))
   (defconst ign/cl-executable "sbcl")
-
+  (defvar ign/leader-map (make-sparse-keymap))
+  (define-prefix-command 'ign/leader-map)
 #+END_SRC
 
 * System
@@ -208,6 +208,8 @@
 #+BEGIN_SRC emacs-lisp
   (use-package doom-themes
     :if (display-graphic-p)
+    :custom-face
+    (font-lock-function ((t (:foreground "#e06c75"))))
     :config
     (doom-themes-org-config)
     (load-theme 'doom-vibrant t))
@@ -248,11 +250,15 @@
           ("p" . widget-backward))
     :custom
     (dashboard-banner-logo-title
-     (format "[Emacs ready in %.2f seconds with %d packages loaded and %d garbage collections.]"
+     (format ""
              (float-time (time-subtract after-init-time before-init-time))
              (length package-activated-list) gcs-done))
     (dashboard-startup-banner 'logo)
     (dashboard-items '((recents  . 5)))
+    (dashboard-set-heading-icons t)
+    (dashboard-set-file-icons t)
+    (dashboard-set-init-info t)
+    (dashboard-center-content t)
     :config
     (dashboard-setup-startup-hook))
 #+END_SRC
@@ -405,13 +411,6 @@
 * Programming Related
 
 #+BEGIN_SRC emacs-lisp
-  (use-package aggressive-indent
-    :custom
-    (aggressive-indent-comments-too t)
-    (aggressive-indent-dont-indent-if t)
-    :hook
-    (prog-mode . aggressive-indent-mode))
-
   (use-package rainbow-delimiters
     :hook
     (prog-mode . rainbow-delimiters-mode))
@@ -432,7 +431,8 @@
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :bind
-    ("C-c g" . magit-status))
+    (:map ign/leader-map
+          ("g" . magit-status)))
 
   (use-package gitignore-mode
     :mode "\\.gitignore\\'")
@@ -697,6 +697,8 @@
     (utop-command "opam config exec -- utop -emacs")
     (utop-edit-command nil))
 
+  (use-package dune)
+
   (use-package ocp-indent
     :after tuareg
     :bind
@@ -800,21 +802,21 @@
 
   (use-package expand-region
     :bind
-    ("C-=" . er/expand-region))
+    (:map ign/leader-map
+          ("SPC" . er/expand-region)))
 #+END_SRC
 
 * Text Navigation
 
 #+BEGIN_SRC emacs-lisp
   (use-package avy
-    :bind
-    ("C-'" . avy-goto-char-2)
     :custom
     (avy-keys '(?a ?o ?e ?u ?h ?t ?n ?s)))
 
   (use-package imenu-list
     :bind
-    ("C-x C-j" . imenu-list-smart-toggle)
+    (:map ign/leader-map
+          ("j" . imenu-list-smart-toggle))
     :custom
     (imenu-list-auto-resize t)
     (imenu-auto-rescan t))
@@ -829,11 +831,12 @@
   (define-key key-translation-map (kbd "M-x") (kbd "M-t"))
 
   (define-key comint-mode-map (kbd "C-l") #'comint-clear-buffer)
+  (define-key ign/leader-map (kbd "t") #'ign/term-toggle)
 
   (use-package bind-key)
+  (bind-key* "M-m" #'ign/leader-map)
   (bind-key* "C-x k" #'delete-window)
   (bind-key* "C-x w" #'split-window-right)
-  (bind-key* "C-x t" #'ign/term-toggle)
   (bind-key* "C-x C-s" #'ign/save-buffer)
 #+END_SRC
 
@@ -843,8 +846,9 @@
   (use-package hydra
     :bind
     ("C-h" . hydra-help/body)
-    (:map projectile-mode-map
-          ("C-c p" . hydra-projectile/body)))
+    (:map ign/leader-map
+          ("a" . hydra-avy/body)
+          ("p" . hydra-projectile/body)))
 
   (defhydra hydra-help (:color blue :hint none)
     "
@@ -881,6 +885,27 @@
     ("p" projectile-switch-project)
     ("t" projectile-toggle-between-implementation-and-test)
     ("v" projectile-vc))
+
+  (defhydra hydra-avy (:exit t :hint nil)
+    "
+  Line          | Region        | Goto
+  ------------- | ------------- | ------------------
+  _y_: Yank       | _Y_: Yank       | _c_: Char Timed   _C_: Char
+  _m_: Move       | _M_: Move       | _w_: Word         _W_: Word*
+  _k_: Kill       | _K_: Kill       | _l_: Line         _L_: End of Line
+    "
+    ("c" avy-goto-char-timer)
+    ("C" avy-goto-char)
+    ("w" avy-goto-word-1)
+    ("W" avy-goto-word-0)
+    ("l" avy-goto-line)
+    ("L" avy-goto-end-of-line)
+    ("m" avy-move-line)
+    ("M" avy-move-region)
+    ("k" avy-kill-whole-line)
+    ("K" avy-kill-region)
+    ("y" avy-copy-line)
+    ("Y" avy-copy-region))
 #+END_SRC
 
 ** Which-key
