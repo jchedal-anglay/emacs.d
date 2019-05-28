@@ -717,6 +717,8 @@
 #+BEGIN_SRC emacs-lisp
   (use-package cc-mode
     :ensure nil
+    :hook
+    (c-mode . (lambda () (setq indent-tabs-mode t)))
     :custom
     (c-auto-newline t)
     (c-default-style "linux")
