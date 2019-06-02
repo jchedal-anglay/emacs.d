@@ -28,6 +28,7 @@
   (unless (package-installed-p 'use-package)
     (package-refresh-contents)
     (package-install 'use-package))
+
   (eval-when-compile
     (require 'use-package))
 
@@ -163,6 +164,7 @@
   (defconst ign/python-executable "python3")
   (defconst ign/ipython-executable (if ign/is-a-mac "ipython" "ipython3"))
   (defconst ign/cl-executable "sbcl")
+  (defconst ign/frontend 'ivy)
   (defvar ign/leader-map (make-sparse-keymap))
   (define-prefix-command 'ign/leader-map)
 #+END_SRC
@@ -201,6 +203,8 @@
 
 #+BEGIN_SRC emacs-lisp
   (set-frame-font (if ign/is-a-mac "Menlo-14" "SourceCodePro-10") nil t)
+
+  (use-package all-the-icons)
 #+END_SRC
 
 ** Theme
@@ -210,6 +214,10 @@
     :if (display-graphic-p)
     :custom-face
     (font-lock-function ((t (:foreground "#e06c75"))))
+    :custom
+    (doom-vibrant-brighter-comments t)
+    (doom-vibrant-brighter-modeline t)
+    (doom-vibrant-padded-modeline t)
     :config
     (doom-themes-org-config)
     (load-theme 'doom-vibrant t))
@@ -246,15 +254,16 @@
   (use-package dashboard
     :bind
     (:map dashboard-mode-map
-          ("n" . widget-forward)
-          ("p" . widget-backward))
+          ("C-n" . widget-forward)
+          ("C-p" . widget-backward))
     :custom
     (dashboard-banner-logo-title
      (format ""
              (float-time (time-subtract after-init-time before-init-time))
              (length package-activated-list) gcs-done))
     (dashboard-startup-banner 'logo)
-    (dashboard-items '((recents  . 5)))
+    (dashboard-items '((recents  . 5)
+                       (projects . 5)))
     (dashboard-set-heading-icons t)
     (dashboard-set-file-icons t)
     (dashboard-set-init-info t)
@@ -337,6 +346,7 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
+    :if (eq ign/frontend 'ivy)
     :bind
     ([switch-to-buffer] . ivy-switch-buffer)
     (:map ivy-minibuffer-map
@@ -359,16 +369,21 @@
     (ivy-mode))
 
   (use-package counsel
+    :if (eq ign/frontend 'ivy)
+    :after ivy
     :config
     (counsel-mode))
 
   (use-package swiper
+    :if (eq ign/frontend 'ivy)
+    :after ivy
     :bind
     ("C-r" . swiper-isearch)
     ("C-s" . swiper))
 
   (use-package all-the-icons-ivy
-    :after ivy
+    :if (eq ign/frontend 'ivy)
+    :after (ivy counsel counsel-projectile)
     :config
     (setq-default all-the-icons-ivy-file-commands (append all-the-icons-ivy-file-commands '(counsel-projectile-find-file counsel-projectile-find-file-dwim)))
     (all-the-icons-ivy-setup))
@@ -570,11 +585,13 @@
     (projectile-require-project-root t)
     (projectile-completion-system 'ivy)
     :config
-    (projectile-mode t)
-    (counsel-projectile-mode))
+    (projectile-mode t))
 
   (use-package counsel-projectile
-    :after (counsel projectile))
+    :after
+    (counsel projectile)
+    :config
+    (counsel-projectile-mode t))
 #+END_SRC
 
 ** Python
@@ -591,7 +608,6 @@
     (:map python-mode-map
           ("C-c C-d" . sphinx-doc)))
 
-  ;; To anyone that is cursed enough to see this code, I'm sorry
   (use-package python
     :ensure nil
     :after flycheck
@@ -731,7 +747,8 @@
     (irony-mode . irony-cdb-autosetup-compile-options))
 
   (use-package company-irony
-    :after (irony company)
+    :after
+    (irony company)
     :config
     (add-to-list 'company-backends 'company-irony))
 
@@ -930,6 +947,8 @@
 #+BEGIN_SRC emacs-lisp
   (use-package elcord
     :if (executable-find "discord")
+    :custom
+    (elcord-display-elapsed t)
     :config
     (elcord-mode))
 #+END_SRC
