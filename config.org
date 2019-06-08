@@ -154,6 +154,13 @@
     (when (/= arg 1)
       (delete-trailing-whitespace))
     (save-buffer))
+
+  (defun ign/kill-line-or-region ()
+    "Cut selection or, if no selection, cut cursor line."
+    (interactive)
+    (if (region-active-p)
+        (call-interactively #'kill-region)
+      (kill-line)))
 #+END_SRC
 
 * Custom Variables
@@ -857,6 +864,7 @@
   (bind-key* "C-x k" #'delete-window)
   (bind-key* "C-x w" #'split-window-right)
   (bind-key* "C-x C-s" #'ign/save-buffer)
+  (bind-key* "C-k" #'ign/kill-line-or-region)
 #+END_SRC
 
 ** Hydra
@@ -867,7 +875,18 @@
     ("C-h" . hydra-help/body)
     (:map ign/leader-map
           ("a" . hydra-avy/body)
-          ("p" . hydra-projectile/body)))
+          ("p" . hydra-projectile/body)
+          ("RET" . hydra-config/body)))
+
+  (defhydra hydra-config (:color blue :hint none)
+    "
+  _e_: Edit configuration
+  _g_: Refresh current buffer
+  _r_: Reload Emacs
+    "
+    ("e" ign/edit-config)
+    ("g" ign/refresh-buffer)
+    ("r" ign/reload))
 
   (defhydra hydra-help (:color blue :hint none)
     "
@@ -875,17 +894,17 @@
   --------------- | --------------- | ------------------
   _b_: Top level    | _f_: Function     | _l_: Command history
   _m_: Major mode   | _v_: Variable     |
-
+                  | _k_: Key          |
     "
     ("b" which-key-show-top-level)
-    ("m" which-key-show-major-mode)
     ("f" counsel-describe-function)
-    ("v" counsel-describe-variable)
-    ("l" view-lossage))
+    ("k" describe-key-briefly)
+    ("l" view-lossage)
+    ("m" which-key-show-major-mode)
+    ("v" counsel-describe-variable))
 
   (defhydra hydra-projectile (:color blue :hint none)
     "
-  --------------------- | ------------------- | ------------------
   _a_: Find other file    | _e_: Recent Files     | _k_: Kill buffers
   _b_: Switch buffer      | _f_: Find File        | _p_: Switch project
   _c_: Compile            | _g_: Grep             | _t_: Impl ↔ Test
