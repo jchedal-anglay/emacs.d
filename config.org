@@ -966,8 +966,6 @@
 #+BEGIN_SRC emacs-lisp
   (use-package elcord
     :if (executable-find "discord")
-    :custom
-    (elcord-display-elapsed t)
     :config
     (elcord-mode))
 #+END_SRC
