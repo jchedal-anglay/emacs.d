@@ -155,12 +155,12 @@
       (delete-trailing-whitespace))
     (save-buffer))
 
-  (defun ign/kill-line-or-region ()
+  (defun ign/kill-line-or-region (arg)
     "Cut selection or, if no selection, cut cursor line."
-    (interactive)
+    (interactive "p")
     (if (region-active-p)
         (call-interactively #'kill-region)
-      (kill-line)))
+      (kill-visual-line (if (= arg 1) nil arg))))
 #+END_SRC
 
 * Custom Variables
