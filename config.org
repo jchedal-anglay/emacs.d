@@ -224,7 +224,6 @@
     :custom
     (doom-vibrant-brighter-comments t)
     (doom-vibrant-brighter-modeline t)
-    (doom-vibrant-padded-modeline t)
     :config
     (doom-themes-org-config)
     (load-theme 'doom-vibrant t))
@@ -243,6 +242,7 @@
     (doom-modeline-icon t)
     (doom-modeline-major-mode-icon t)
     (doom-modeline-version t)
+    (doom-modeline-buffer-file-name-style 'file-name)
     :config
     (doom-modeline-mode))
 #+END_SRC
