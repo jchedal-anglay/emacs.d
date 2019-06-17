@@ -252,6 +252,10 @@
 #+BEGIN_SRC emacs-lisp
   (setq-default cursor-type 'hbar)
   (setq-default cursor-in-non-selected-windows nil)
+
+  (use-package beacon
+      :config
+      (beacon-mode))
 #+END_SRC
 
 * Interface
