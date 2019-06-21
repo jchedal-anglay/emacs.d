@@ -250,7 +250,7 @@
 ** Cursor
 
 #+BEGIN_SRC emacs-lisp
-  (setq-default cursor-type 'hbar)
+  (setq-default cursor-type 'box)
   (setq-default cursor-in-non-selected-windows nil)
 
   (use-package beacon
@@ -276,6 +276,7 @@
     (dashboard-items '((recents  . 5)
                        (projects . 5)))
     (dashboard-set-heading-icons t)
+    (dashboard-set-footer nil)
     (dashboard-set-file-icons t)
     (dashboard-set-init-info t)
     (dashboard-center-content t)
@@ -624,15 +625,16 @@
   (use-package python
     :ensure nil
     :after flycheck
-    :mode
-    ("\\.py[iw]?\\'" . python-mode)
     :custom
     (python-indent 4)
     (python-shell-interpreter ign/ipython-executable)
-    (python-shell-interpreter-args "--simple-prompt -i")
+    ;; Required for MacOS, prevents newlines to be displayed as ^G
+    (python-shell-interpreter-args "--simple-prompt -c exec('__import__(\\'readline\\')') -i")
     (python-fill-docstring-style 'pep-257)
     (gud-pdb-command-name (concat ign/python-executable " -m pdb"))
     (py-split-window-on-execute t))
+
+  (use-package cython-mode)
 
   (use-package elpy
     :after company
@@ -699,7 +701,8 @@
     (require 'opam-user-setup "~/.emacs.d/opam-user-setup.el"))
 
   (use-package utop
-    :after opam
+    :after
+    (opam tuareg)
     :preface
     (defun ign/utop-eval-phrase ()
       "Eval the surrounding Caml phrase (or block) in utop."
@@ -729,7 +732,8 @@
   (use-package dune)
 
   (use-package ocp-indent
-    :after tuareg
+    :after
+    (tuareg merlin)
     :bind
     (:map merlin-mode-map
           ("C-c C-r f" . ocp-indent-buffer))
@@ -914,19 +918,18 @@
   _a_: Find other file    | _e_: Recent Files     | _k_: Kill buffers
   _b_: Switch buffer      | _f_: Find File        | _p_: Switch project
   _c_: Compile            | _g_: Grep             | _t_: Impl ↔ Test
-  _d_: Find directory     | _i_: IBuffer          | _v_: Version control
+  _d_: Find directory     |                     | _v_: Version control
     "
     ("a" projectile-find-other-file)
-    ("b" projectile-switch-to-buffer)
+    ("b" counsel-projectile-switch-to-buffer)
     ("c" projectile-compile-project)
-    ("d" projectile-find-dir)
+    ("d" counsel-projectile-find-dir)
     ("e" projectile-recentf)
-    ("f" projectile-find-file)
-    ("g" projectile-grep)
-    ("i" projectile-ibuffer)
+    ("f" counsel-projectile-find-file)
+    ("g" counsel-projectile-grep)
     ("j" projectile-find-tag)
     ("k" projectile-kill-buffers)
-    ("p" projectile-switch-project)
+    ("p" counsel-projectile-switch-project)
     ("t" projectile-toggle-between-implementation-and-test)
     ("v" projectile-vc))
 
