@@ -1,3 +1,51 @@
+* Table of Contents                                                     :TOC:
+- [[#encoding][Encoding]]
+- [[#backups][Backups]]
+- [[#packages][Packages]]
+- [[#functions][Functions]]
+- [[#custom-variables][Custom Variables]]
+- [[#system][System]]
+  - [[#macos][MacOS]]
+  - [[#version-specific][Version-specific]]
+- [[#gui][GUI]]
+- [[#appearance][Appearance]]
+  - [[#font][Font]]
+  - [[#theme][Theme]]
+  - [[#modeline][Modeline]]
+  - [[#cursor][Cursor]]
+- [[#interface][Interface]]
+  - [[#splash-screen][Splash Screen]]
+  - [[#lines][Lines]]
+  - [[#line-numbers][Line numbers]]
+  - [[#scrolling][Scrolling]]
+  - [[#confirmation-messages][Confirmation messages]]
+  - [[#bells][Bells]]
+  - [[#dependencies][Dependencies]]
+- [[#completion-frontend][Completion Frontend]]
+- [[#org][Org]]
+- [[#programming-related][Programming Related]]
+  - [[#git][Git]]
+  - [[#tramp][TRAMP]]
+  - [[#auto-completion][Auto-Completion]]
+  - [[#checkerslinters][Checkers/Linters]]
+  - [[#project][Project]]
+  - [[#python][Python]]
+  - [[#ocaml][OCaml]]
+  - [[#c][C]]
+  - [[#clojure][Clojure]]
+  - [[#common-lisp][Common Lisp]]
+  - [[#r--julia][R & Julia]]
+  - [[#gnuplot][GNUplot]]
+  - [[#csv][CSV]]
+- [[#text-editing][Text Editing]]
+- [[#text-navigation][Text Navigation]]
+- [[#bindings][Bindings]]
+  - [[#hydra][Hydra]]
+  - [[#which-key][Which-key]]
+- [[#community][Community]]
+  - [[#browser][Browser]]
+  - [[#discord][Discord]]
+
 * Encoding
 
 #+BEGIN_SRC emacs-lisp
@@ -429,6 +477,11 @@
        (ipython . t)
        (ocaml . t)
        (gnuplot . t))))
+
+  (use-package toc-org
+    :after org
+    :hook
+    (org-mode . toc-org-enable))
 
   (use-package org-bullets
     :hook
