@@ -463,6 +463,9 @@
     (:map ign/leader-map
           ("g" . magit-status)))
 
+  (use-package forge
+    :after magit)
+
   (use-package gitignore-mode
     :mode "\\.gitignore\\'")
 
@@ -646,6 +649,7 @@
     :custom
     (elpy-rpc-python-command ign/python-executable)
     :config
+    (advice-add 'elpy-format-code :override #'elpy-black-fix-code)
     (delete 'elpy-module-highlight-indentation elpy-modules)
     (delete 'elpy-module-flymake elpy-modules)
     (delete 'elpy-module-company elpy-modules)
