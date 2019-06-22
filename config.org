@@ -929,7 +929,6 @@
   (use-package bind-key)
   (bind-key* "M-m" #'ign/leader-map)
   (bind-key* "C-x k" #'delete-window)
-  (bind-key* "C-x w" #'split-window-right)
   (bind-key* "C-x C-s" #'ign/save-buffer)
   (bind-key* "C-k" #'ign/kill-line-or-region)
 #+END_SRC
