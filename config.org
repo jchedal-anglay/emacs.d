@@ -37,8 +37,8 @@
   - [[#r--julia][R & Julia]]
   - [[#gnuplot][GNUplot]]
   - [[#csv][CSV]]
-- [[#text-editing][Text Editing]]
-- [[#text-navigation][Text Navigation]]
+- [[#editing][Editing]]
+- [[#navigation][Navigation]]
 - [[#bindings][Bindings]]
   - [[#hydra][Hydra]]
   - [[#which-key][Which-key]]
@@ -259,7 +259,8 @@
 #+BEGIN_SRC emacs-lisp
   (set-frame-font (if ign/is-a-mac "Menlo-14" "SourceCodePro-10") nil t)
 
-  (use-package all-the-icons)
+  (use-package all-the-icons
+    :if (display-graphic-p))
 #+END_SRC
 
 ** Theme
@@ -311,6 +312,7 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package dashboard
+    :if (display-graphic-p)
     :bind
     (:map dashboard-mode-map
           ("C-n" . widget-forward)
@@ -442,7 +444,7 @@
     ("C-s" . swiper))
 
   (use-package all-the-icons-ivy
-    :if (eq ign/frontend 'ivy)
+    :if (and (eq ign/frontend 'ivy) (display-graphic-p))
     :after (ivy counsel counsel-projectile)
     :config
     (setq-default all-the-icons-ivy-file-commands (append all-the-icons-ivy-file-commands '(counsel-projectile-find-file counsel-projectile-find-file-dwim)))
@@ -884,7 +886,7 @@
     :mode "\\.csv\\'")
 #+END_SRC
 
-* Text Editing
+* Editing
 
 #+BEGIN_SRC emacs-lisp
   (setq-default require-final-newline t)
@@ -899,7 +901,7 @@
           ("SPC" . er/expand-region)))
 #+END_SRC
 
-* Text Navigation
+* Navigation
 
 #+BEGIN_SRC emacs-lisp
   (use-package avy
@@ -913,6 +915,14 @@
     :custom
     (imenu-list-auto-resize t)
     (imenu-auto-rescan t))
+
+  (use-package frog-jump-buffer
+    :bind
+    (:map ign/leader-map
+          ("b" . frog-jump-buffer))
+    :custom
+    (frog-jump-buffer-default-filter 'frog-jump-buffer-filter-file-buffers)
+    (frog-menu-avy-keys '(?a ?o ?e ?u ?h ?t ?n ?s)))
 #+END_SRC
 
 * Bindings
@@ -1031,6 +1041,8 @@
 #+BEGIN_SRC emacs-lisp
   (use-package elcord
     :if (executable-find "discord")
+    :custom
+    (elcord-use-major-mode-as-main-icon t)
     :config
     (elcord-mode))
 #+END_SRC
