@@ -220,8 +220,6 @@
   (defconst ign/ipython-executable (if ign/is-a-mac "ipython" "ipython3"))
   (defconst ign/cl-executable "sbcl")
   (defconst ign/frontend 'ivy)
-  (defvar ign/leader-map (make-sparse-keymap))
-  (define-prefix-command 'ign/leader-map)
 #+END_SRC
 
 * System
@@ -515,10 +513,7 @@
 ** Git
 
 #+BEGIN_SRC emacs-lisp
-  (use-package magit
-    :bind
-    (:map ign/leader-map
-          ("g" . magit-status)))
+  (use-package magit)
 
   (use-package forge
     :after magit)
@@ -897,10 +892,7 @@
 
   (global-set-key [remap fill-paragraph] #'ign/fill-or-unfill)
 
-  (use-package expand-region
-    :bind
-    (:map ign/leader-map
-          ("SPC" . er/expand-region)))
+  (use-package expand-region)
 #+END_SRC
 
 * Navigation
@@ -911,17 +903,11 @@
     (avy-keys '(?a ?o ?e ?u ?h ?t ?n ?s)))
 
   (use-package imenu-list
-    :bind
-    (:map ign/leader-map
-          ("j" . imenu-list-smart-toggle))
     :custom
     (imenu-list-auto-resize t)
     (imenu-auto-rescan t))
 
   (use-package frog-jump-buffer
-    :bind
-    (:map ign/leader-map
-          ("b" . frog-jump-buffer))
     :custom
     (frog-jump-buffer-default-filter 'frog-jump-buffer-filter-file-buffers)
     (frog-menu-avy-keys '(?a ?o ?e ?u ?h ?t ?n ?s)))
@@ -936,10 +922,8 @@
   (define-key key-translation-map (kbd "M-x") (kbd "M-t"))
 
   (define-key comint-mode-map (kbd "C-l") #'comint-clear-buffer)
-  (define-key ign/leader-map (kbd "t") #'ign/term-toggle)
 
   (use-package bind-key)
-  (bind-key* "M-m" #'ign/leader-map)
   (bind-key* "C-x k" #'delete-window)
   (bind-key* "C-x C-s" #'ign/save-buffer)
   (bind-key* "C-k" #'ign/kill-line-or-region)
@@ -951,10 +935,7 @@
   (use-package hydra
     :bind
     ("C-h" . hydra-help/body)
-    (:map ign/leader-map
-          ("a" . hydra-avy/body)
-          ("p" . hydra-projectile/body)
-          ("RET" . hydra-config/body)))
+    ("M-m" . hydra-leader/body))
 
   (defhydra hydra-config (:color blue :hint none)
     "
@@ -1004,7 +985,7 @@
   (defhydra hydra-avy (:exit t :hint nil)
     "
   Line          | Region        | Goto
-  ------------- | ------------- | ------------------
+  ------------- | ------------- | ------------------------------
   _y_: Yank       | _Y_: Yank       | _c_: Char Timed   _C_: Char
   _m_: Move       | _M_: Move       | _w_: Word         _W_: Word*
   _k_: Kill       | _K_: Kill       | _l_: Line         _L_: End of Line
@@ -1021,6 +1002,21 @@
     ("K" avy-kill-region)
     ("y" avy-copy-line)
     ("Y" avy-copy-region))
+
+  (defhydra hydra-leader (:color blue :hint none)
+    "
+  ---------------------- | --------------- | --------------- | -----------
+  _RET_: Configuration     | _a_: Avy          | _g_: Magit        | _j_: IMenu
+  _SPC_: Expand Region     | _b_ Jump buffer   | _p_: Projectile   | _t_: Terminal
+    "
+    ("RET" hydra-config/body)
+    ("SPC" er/expand-region)
+    ("a" hydra-avy/body)
+    ("b" frog-jump-buffer)
+    ("g" magit-status)
+    ("j" imenu-list-smart-toggle)
+    ("p" hydra-projectile-body)
+    ("t" term-toggle))
 #+END_SRC
 
 ** Which-key
