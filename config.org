@@ -303,8 +303,10 @@
   (setq-default cursor-in-non-selected-windows nil)
 
   (use-package beacon
-      :config
-      (beacon-mode))
+    :hook
+    (focus-in . beacon-blink)
+    :config
+    (beacon-mode))
 #+END_SRC
 
 * Interface
