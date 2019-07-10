@@ -29,14 +29,7 @@
   - [[#auto-completion][Auto-Completion]]
   - [[#checkerslinters][Checkers/Linters]]
   - [[#project][Project]]
-  - [[#python][Python]]
-  - [[#ocaml][OCaml]]
-  - [[#c][C]]
-  - [[#clojure][Clojure]]
-  - [[#common-lisp][Common Lisp]]
-  - [[#r--julia][R & Julia]]
-  - [[#gnuplot][GNUplot]]
-  - [[#csv][CSV]]
+  - [[#languages][Languages]]
 - [[#editing][Editing]]
 - [[#navigation][Navigation]]
 - [[#bindings][Bindings]]
@@ -209,6 +202,14 @@
     (if (region-active-p)
         (call-interactively #'kill-region)
       (kill-visual-line (if (= arg 1) nil arg))))
+
+  (defun -ign/set (pairs)
+    "Dispatch a list of dotted PAIRS into a single list, used by IGN/SET."
+    (mapcan (lambda (p) (list (car p) (cdr p))) pairs))
+
+  (defmacro ign/set (&rest pairs)
+    "(ign/set (a . b) (c . d)) => (setq a b c d)"
+    `(lambda () (setq ,@(-ign/set pairs))))
 #+END_SRC
 
 * Custom Variables
@@ -663,50 +664,81 @@
     (counsel-projectile-mode t))
 #+END_SRC
 
-** Python
+** Languages
+*** C/C++
 
 #+BEGIN_SRC emacs-lisp
-  (use-package pip-requirements
-    :mode
-    ("requirements\\.txt" . pip-requirements-mode))
-
-  (use-package sphinx-doc
-    :hook
-    (python-mode . sphinx-doc-mode)
-    :bind
-    (:map python-mode-map
-          ("C-c C-d" . sphinx-doc)))
-
-  (use-package python
+  (use-package cc-mode
     :ensure nil
-    :after flycheck
-    :custom
-    (python-indent 4)
-    (python-shell-interpreter ign/ipython-executable)
-    ;; Required for MacOS, prevents newlines to be displayed as ^G
-    (python-shell-interpreter-args "--simple-prompt -c exec('__import__(\\'readline\\')') -i")
-    (python-fill-docstring-style 'pep-257)
-    (gud-pdb-command-name (concat ign/python-executable " -m pdb"))
-    (py-split-window-on-execute t))
-
-  (use-package cython-mode)
-
-  (use-package elpy
-    :after company
     :hook
-    (python-mode . elpy-mode)
-    :bind
-    (:map python-mode-map
-          ("C-c C-c" . elpy-shell-send-top-statement))
+    (c-mode . (ign/set (indent-tabs-mode . t)))
     :custom
-    (elpy-rpc-python-command ign/python-executable)
+    (cc-search-directories '("." "/usr/include" "usr/local/include/*" "../*/include"))
+    (c-default-style "linux")
+    (c-basic-offset 4))
+
+  (use-package ggtags
+    :hook
+    (c-mode . ggtags-mode)
+    (c++-mode . ggtags-mode))
+
+  (use-package irony
+    :hook
+    (c-mode . irony-mode)
+    (c++-mode . irony-mode)
+    (irony-mode . irony-cdb-autosetup-compile-options))
+
+  (use-package company-irony
+    :after
+    (irony company)
     :config
-    (advice-add 'elpy-format-code :override #'elpy-black-fix-code)
-    (delete 'elpy-module-highlight-indentation elpy-modules)
-    (delete 'elpy-module-flymake elpy-modules)
-    (delete 'elpy-module-company elpy-modules)
-    (add-to-list 'company-backends #'elpy-company-backend)
-    (elpy-enable))
+    (add-to-list 'company-backends 'company-irony))
+
+  (use-package company-c-headers
+    :after company
+    :config
+    (add-to-list 'company-backends 'company-c-headers))
+#+END_SRC
+
+*** Clojure
+
+#+BEGIN_SRC emacs-lisp
+  (use-package cider
+    :custom
+    (cider-repl-pop-to-buffer-on-connect nil)
+    (cider-repl-display-in-current-window nil)
+    (cider-font-lock-dynamically t))
+
+  (use-package elein)
+#+END_SRC
+
+*** Common Lisp
+
+#+BEGIN_SRC emacs-lisp
+  (use-package slime
+    :bind
+    (:map slime-repl-mode-map
+          ("C-l" . slime-repl-clear-buffer))
+    :custom
+    (inferior-lisp-program ign/cl-executable)
+    (slime-contribs '(slime-fancy)))
+#+END_SRC
+
+*** CSV
+
+#+BEGIN_SRC emacs-lisp
+  (use-package csv-mode
+    :mode "\\.csv\\'")
+#+END_SRC
+
+*** GNUplot
+
+#+BEGIN_SRC emacs-lisp
+  (use-package gnuplot)
+
+  (use-package gnuplot-mode
+    :mode
+    ("\\.gp\\'" "\\.gnuplot\\'"))
 #+END_SRC
 
 *** Jupyter
@@ -720,7 +752,7 @@
     (ein:use-auto-complete-superpack t))
 #+END_SRC
 
-** OCaml
+*** OCaml
 
 #+BEGIN_SRC emacs-lisp
   (use-package opam
@@ -801,86 +833,50 @@
     (flycheck-ocaml-setup))
 #+END_SRC
 
-** C
+*** Python
 
 #+BEGIN_SRC emacs-lisp
-  (use-package cc-mode
-    :ensure nil
-    :hook
-    (c-mode . (lambda () (setq indent-tabs-mode t)))
-    :custom
-    (c-auto-newline t)
-    (c-default-style "linux")
-    (c-basic-offset 4))
-
-  (use-package irony
-    :hook
-    (c++-mode . irony-mode)
-    (c-mode . irony-mode)
-    (irony-mode . irony-cdb-autosetup-compile-options))
-
-  (use-package company-irony
-    :after
-    (irony company)
-    :config
-    (add-to-list 'company-backends 'company-irony))
-
-  (use-package company-c-headers
-    :after company
-    :config
-    (add-to-list 'company-backends 'company-c-headers))
-#+END_SRC
-
-** Clojure
-
-#+BEGIN_SRC emacs-lisp
-  (use-package cider
+  (use-package pip-requirements
     :mode
-    (("\\.\\(clj\\|dtm\\|edn\\)\\'" . clojure-mode)
-     ("\\.cljs\\'" . clojurescript-mode)
-     ("\\.cljc\\'" . clojurec-mode))
-    :custom
-    (cider-repl-pop-to-buffer-on-connect nil)
-    (cider-repl-display-in-current-window nil)
-    (cider-font-lock-dynamically t))
+    ("requirements\\.txt" . pip-requirements-mode))
 
-  (use-package elein)
-#+END_SRC
-
-** Common Lisp
-
-#+BEGIN_SRC emacs-lisp
-  (use-package slime
+  (use-package sphinx-doc
+    :hook
+    (python-mode . sphinx-doc-mode)
     :bind
-    (:map slime-repl-mode-map
-          ("C-l" . slime-repl-clear-buffer))
+    (:map python-mode-map
+          ("C-c C-d" . sphinx-doc)))
+
+  (use-package python
+    :ensure nil
+    :after flycheck
     :custom
-    (inferior-lisp-program ign/cl-executable)
-    (slime-contribs '(slime-fancy)))
-#+END_SRC
+    (python-indent 4)
+    (python-shell-interpreter ign/ipython-executable)
+    ;; Required for MacOS, prevents newlines to be displayed as ^G
+    (python-shell-interpreter-args "--simple-prompt -c exec('__import__(\\'readline\\')') -i")
+    (python-fill-docstring-style 'pep-257)
+    (gud-pdb-command-name (concat ign/python-executable " -m pdb"))
+    (py-split-window-on-execute t))
 
-** R & Julia
+  (use-package elpy
+    :after company
+    :hook
+    (python-mode . elpy-mode)
+    :bind
+    (:map python-mode-map
+          ("C-c C-c" . elpy-shell-send-top-statement))
+    :custom
+    (elpy-rpc-python-command ign/python-executable)
+    :config
+    (advice-add 'elpy-format-code :override #'elpy-black-fix-code)
+    (delete 'elpy-module-highlight-indentation elpy-modules)
+    (delete 'elpy-module-flymake elpy-modules)
+    (delete 'elpy-module-company elpy-modules)
+    (add-to-list 'company-backends #'elpy-company-backend)
+    (elpy-enable))
 
-#+BEGIN_SRC emacs-lisp
-   (use-package ess
-     :pin melpa-stable)
-#+END_SRC
-
-** GNUplot
-
-#+BEGIN_SRC emacs-lisp
-  (use-package gnuplot)
-
-  (use-package gnuplot-mode
-    :mode
-    ("\\.gp\\'" "\\.gnuplot\\'"))
-#+END_SRC
-
-** CSV
-
-#+BEGIN_SRC emacs-lisp
-  (use-package csv-mode
-    :mode "\\.csv\\'")
+  (use-package cython-mode)
 #+END_SRC
 
 * Editing
