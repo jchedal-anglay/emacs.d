@@ -192,7 +192,7 @@
   (defun ign/save-buffer (arg)
     "Save the current buffer and remove trailing whitespace if called interactively."
     (interactive "p")
-    (when (/= arg 1)
+    (when (= arg 1)
       (delete-trailing-whitespace))
     (save-buffer))
 
@@ -828,7 +828,8 @@
     :hook (tuareg-mode . ocp-indent-caml-mode-setup))
 
   (use-package flycheck-ocaml
-    :after merlin
+    :after
+    (flycheck merlin)
     :config
     (flycheck-ocaml-setup))
 #+END_SRC
