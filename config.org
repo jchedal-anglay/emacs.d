@@ -1004,7 +1004,7 @@
     "
   ---------------------- | --------------- | --------------- | -----------
   _RET_: Configuration     | _a_: Avy          | _g_: Magit        | _j_: IMenu
-  _SPC_: Expand Region     | _b_ Jump buffer   | _p_: Projectile   | _t_: Terminal
+  _SPC_: Expand Region     | _b_: Jump buffer   | _p_: Projectile   | _t_: Terminal
     "
     ("RET" hydra-config/body)
     ("SPC" er/expand-region)
