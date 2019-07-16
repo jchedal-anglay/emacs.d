@@ -22,6 +22,7 @@
   - [[#bells][Bells]]
   - [[#dependencies][Dependencies]]
 - [[#completion-frontend][Completion Frontend]]
+  - [[#ivy][Ivy]]
 - [[#org][Org]]
 - [[#programming-related][Programming Related]]
   - [[#git][Git]]
@@ -62,8 +63,13 @@
 
 #+BEGIN_SRC emacs-lisp
   (require 'package)
-  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-  (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t)
+
+  ;; Hotfix, require in emacs 26.1 due to bug #34341
+  ;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=34341
+  (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+
   (package-initialize)
 
   (unless (package-installed-p 'use-package)
@@ -82,11 +88,6 @@
 * Functions
 
 #+BEGIN_SRC emacs-lisp
-  (defun ign/do-nothing ()
-    "Do nothing."
-    (interactive)
-    nil)
-
   (defun ign/before (to-call-before f)
     "Run TO-CALL-BEFORE then run F."
     (funcall to-call-before)
@@ -219,8 +220,6 @@
   (defconst ign/is-a-mac (memq window-system '(mac ns)))
   (defconst ign/python-executable "python3")
   (defconst ign/ipython-executable (if ign/is-a-mac "ipython" "ipython3"))
-  (defconst ign/cl-executable "sbcl")
-  (defconst ign/frontend 'ivy)
 #+END_SRC
 
 * System
@@ -256,7 +255,7 @@
 ** Font
 
 #+BEGIN_SRC emacs-lisp
-  (set-frame-font (if ign/is-a-mac "Menlo-14" "SourceCodePro-10") nil t)
+  (set-frame-font (if ign/is-a-mac "Menlo-18" "SourceCodePro-12") nil t)
 
   (use-package all-the-icons
     :if (display-graphic-p))
@@ -355,6 +354,7 @@
     (global-hl-line-mode t))
 
   (use-package highlight-indent-guides
+    :disabled
     :hook
     (prog-mode . (lambda () (setq highlight-indent-guides-character (-> (buffer-name) all-the-icons-icon-for-file string-to-char))))
     (prog-mode . highlight-indent-guides-mode)
@@ -421,18 +421,12 @@
 #+END_SRC
 
 * Completion Frontend
-
+** Ivy
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
-    :if (eq ign/frontend 'ivy)
     :bind
-    ([switch-to-buffer] . ivy-switch-buffer)
+  ;;  ([switch-to-buffer] . ivy-switch-buffer)
     (:map ivy-minibuffer-map
-          ([remap xref-find-definitions] . ign/do-nothing)
-          ([remap xref-find-definitions-other-frame] . ign/do-nothing)
-          ([remap xref-find-definitions-other-window] . ign/do-nothing)
-          ([remap xref-find-references] . ign/do-nothing)
-          ([remap xref-find-apropos] . ign/do-nothing)
           ("<return>" . ivy-alt-done))
     :custom
     (ivy-use-virtual-buffers t)
@@ -440,6 +434,8 @@
     (ivy-height 20)
     (ivy-display-style 'fancy)
     (ivy-format-function 'ivy-format-function-line)
+    (ivy-wrap t)
+    (ivy-action-wrap t)
     (ivy-re-builders-alist
      '((t . ivy--regex-plus)))
     (ivy-initial-inputs-alist nil)
@@ -447,24 +443,17 @@
     (ivy-mode))
 
   (use-package counsel
-    :if (eq ign/frontend 'ivy)
     :after ivy
     :config
     (counsel-mode))
 
   (use-package swiper
-    :if (eq ign/frontend 'ivy)
     :after ivy
     :bind
-    ("C-r" . swiper-isearch)
-    ("C-s" . swiper))
+    ("C-s" . swiper-isearch))
 
-  (use-package all-the-icons-ivy
-    :if (and (eq ign/frontend 'ivy) (display-graphic-p))
-    :after (ivy counsel counsel-projectile)
-    :config
-    (setq-default all-the-icons-ivy-file-commands (append all-the-icons-ivy-file-commands '(counsel-projectile-find-file counsel-projectile-find-file-dwim)))
-    (all-the-icons-ivy-setup))
+  ;; This will make counsel-M-x sort candidates by frequency
+  (use-package smex)
 #+END_SRC
 
 * Org
@@ -472,7 +461,7 @@
 #+BEGIN_SRC emacs-lisp
   (use-package org
     :mode
-    ("\\.\\(org\\|ORG\\)\\'" . org-mode)
+    ("\\.org\\'" . org-mode)
     :ensure nil
     :hook
     (org-babel-after-execute . org-redisplay-inline-images)
@@ -679,7 +668,12 @@
     :after
     (counsel projectile)
     :config
-    (counsel-projectile-mode t))
+    (counsel-projectile-mode t)
+    (defalias 'projectile-switch-to-buffer 'counsel-projectile-switch-to-buffer)
+    (defalias 'projectile-find-dir 'counsel-projectile-find-dir)
+    (defalias 'projectile-find-file 'counsel-projectile-find-file)
+    (defalias 'projectile-grep 'counsel-projectile-grep)
+    (defalias 'projectile-switch-project 'counsel-projectile-switch-project))
 #+END_SRC
 
 ** Languages
@@ -744,7 +738,7 @@
     (:map slime-repl-mode-map
           ("C-l" . slime-repl-clear-buffer))
     :custom
-    (inferior-lisp-program ign/cl-executable)
+    (inferior-lisp-program "sbcl")
     (slime-contribs '(slime-fancy)))
 #+END_SRC
 
@@ -812,35 +806,6 @@
     :config
     (require 'opam-user-setup "~/.emacs.d/opam-user-setup.el"))
 
-  (use-package utop
-    :after
-    (opam tuareg)
-    :preface
-    (defun ign/utop-eval-phrase ()
-      "Eval the surrounding Caml phrase (or block) in utop."
-      (interactive)
-      (utop-prepare-for-eval)
-      (let ((end (point)))
-        (save-excursion
-          (let ((triple (funcall utop-discover-phrase)))
-            (utop-eval (car triple) (cdr triple))))
-        (when utop-skip-after-eval-phrase
-          (goto-char end)
-          (funcall utop-next-phrase-beginning))))
-    :hook
-    (tuareg-mode . utop-minor-mode)
-    :bind
-    (:map tuareg-mode-map
-          ("C-c C-c" . ign/utop-eval-phrase)
-          ("C-c C-z" . utop))
-    (:map utop-mode-map
-          ("C-c C-g" . nil)
-          ("C-c C-k" . nil)
-          ("C-c C-s" . nil))
-    :custom
-    (utop-command "opam config exec -- utop -emacs")
-    (utop-edit-command nil))
-
   (use-package dune)
 
   (use-package ocp-indent
@@ -878,7 +843,7 @@
     :custom
     (python-indent 4)
     (python-shell-interpreter ign/ipython-executable)
-    ;; Required for MacOS, prevents newlines to be displayed as ^G
+    ;; Required for MacOS, prevents newlines from being displayed as ^G
     (python-shell-interpreter-args "--simple-prompt -c exec('__import__(\\'readline\\')') -i")
     (python-fill-docstring-style 'pep-257)
     (gud-pdb-command-name (concat ign/python-executable " -m pdb"))
@@ -894,7 +859,7 @@
     :custom
     (elpy-rpc-python-command ign/python-executable)
     :config
-    (advice-add 'elpy-format-code :override #'elpy-black-fix-code)
+    (defalias 'elpy-format-code 'elpy-black-fix-code)
     (delete 'elpy-module-highlight-indentation elpy-modules)
     (delete 'elpy-module-flymake elpy-modules)
     (delete 'elpy-module-company elpy-modules)
@@ -902,6 +867,7 @@
     (elpy-enable))
 
   (use-package cython-mode)
+  (use-package flycheck-cython)
 #+END_SRC
 
 * Editing
@@ -922,16 +888,6 @@
   (use-package avy
     :custom
     (avy-keys '(?a ?o ?e ?u ?h ?t ?n ?s)))
-
-  (use-package imenu-list
-    :custom
-    (imenu-list-auto-resize t)
-    (imenu-auto-rescan t))
-
-  (use-package frog-jump-buffer
-    :custom
-    (frog-jump-buffer-default-filter 'frog-jump-buffer-filter-file-buffers)
-    (frog-menu-avy-keys '(?a ?o ?e ?u ?h ?t ?n ?s)))
 #+END_SRC
 
 * Bindings
@@ -977,11 +933,11 @@
                   | _k_: Key          |
     "
     ("b" which-key-show-top-level)
-    ("f" counsel-describe-function)
+    ("f" describe-function)
     ("k" describe-key-briefly)
     ("l" view-lossage)
     ("m" which-key-show-major-mode)
-    ("v" counsel-describe-variable))
+    ("v" describe-variable))
 
   (defhydra hydra-projectile (:color blue :hint none)
     "
@@ -991,15 +947,15 @@
   _d_: Find directory     |                     | _v_: Version control
     "
     ("a" projectile-find-other-file)
-    ("b" counsel-projectile-switch-to-buffer)
+    ("b" projectile-switch-to-buffer)
     ("c" projectile-compile-project)
-    ("d" counsel-projectile-find-dir)
+    ("d" projectile-find-dir)
     ("e" projectile-recentf)
-    ("f" counsel-projectile-find-file)
-    ("g" counsel-projectile-grep)
+    ("f" projectile-find-file)
+    ("g" projectile-grep)
     ("j" projectile-find-tag)
     ("k" projectile-kill-buffers)
-    ("p" counsel-projectile-switch-project)
+    ("p" projectile-switch-project)
     ("t" projectile-toggle-between-implementation-and-test)
     ("v" projectile-vc))
 
@@ -1027,16 +983,14 @@
   (defhydra hydra-leader (:color blue :hint none)
     "
   ---------------------- | --------------- | --------------- | -----------
-  _RET_: Configuration     | _a_: Avy          | _g_: Magit        | _j_: IMenu
-  _SPC_: Expand Region     | _b_: Jump buffer   | _p_: Projectile   | _t_: Terminal
+  _RET_: Configuration     | _a_: Avy          | _g_: Magit        | _t_: Terminal
+  _SPC_: Expand Region     |                 | _p_: Projectile   |
     "
     ("RET" hydra-config/body)
     ("SPC" er/expand-region)
     ("a" hydra-avy/body)
-    ("b" frog-jump-buffer)
     ("g" magit-status)
-    ("j" imenu-list-smart-toggle)
-    ("p" hydra-projectile-body)
+    ("p" hydra-projectile/body)
     ("t" ign/term-toggle))
 #+END_SRC
 
