@@ -2,6 +2,7 @@
 - [[#encoding][Encoding]]
 - [[#backups][Backups]]
 - [[#packages][Packages]]
+- [[#dependencies][Dependencies]]
 - [[#functions][Functions]]
 - [[#custom-variables][Custom Variables]]
 - [[#system][System]]
@@ -20,7 +21,7 @@
   - [[#scrolling][Scrolling]]
   - [[#confirmation-messages][Confirmation messages]]
   - [[#bells][Bells]]
-  - [[#dependencies][Dependencies]]
+  - [[#terminal][Terminal]]
 - [[#completion-frontend][Completion Frontend]]
   - [[#ivy][Ivy]]
 - [[#org][Org]]
@@ -29,7 +30,7 @@
   - [[#tramp][TRAMP]]
   - [[#auto-completion][Auto-Completion]]
   - [[#checkerslinters][Checkers/Linters]]
-  - [[#project][Project]]
+  - [[#project-management][Project Management]]
   - [[#languages][Languages]]
 - [[#editing][Editing]]
 - [[#navigation][Navigation]]
@@ -85,6 +86,12 @@
   (setq-default byte-compile-warnings nil)
 #+END_SRC
 
+* Dependencies
+
+#+BEGIN_SRC emacs-lisp
+(use-package popwin)
+#+END_SRC
+
 * Functions
 
 #+BEGIN_SRC emacs-lisp
@@ -118,7 +125,7 @@
     (popwin:display-buffer-1
      (or (get-buffer name)
          (save-window-excursion
-           (multi-term)))
+           (eshell)))
      :default-config-keywords '(:height 15 :position :bottom :noselect nil :stick t))
     (rename-buffer name))
 
@@ -272,7 +279,15 @@
     (doom-vibrant-brighter-modeline t)
     :config
     (doom-themes-org-config)
-    (load-theme 'doom-vibrant t))
+    (load-theme 'doom-one t))
+
+  (use-package solaire-mode
+    :hook
+    (prog-mode . turn-on-solaire-mode)
+    :custom
+    (solaire-mode-remap-modeline nil)
+    :config
+    (solaire-mode-swap-bg))
 #+END_SRC
 
 ** Modeline
@@ -350,7 +365,7 @@
                 tab-width 4)
 
   (when (display-graphic-p)
-    (global-hl-line-mode t))
+    (add-hook 'prog-mode-hook #'hl-line-mode))
 
   (use-package highlight-indent-guides
     :disabled
@@ -410,13 +425,21 @@
                 ring-bell-function 'ignore)
 #+END_SRC
 
-** Dependencies
+** Terminal
 
 #+BEGIN_SRC emacs-lisp
-  (use-package popwin)
-  (use-package multi-term
+  (use-package eshell
     :custom
-    (multi-term-program (ign/find-executables "zsh" "bash" "sh")))
+    (eshell-banner-message "")
+    :config
+    (defalias 'eshell/clear 'eshell/clear-scrollback))
+
+  (use-package eshell-prompt-extras
+    :after eshell
+    :custom
+    (epe-path-style 'single)
+    (epe-show-python-info nil)
+    (eshell-prompt-function #'epe-theme-lambda))
 #+END_SRC
 
 * Completion Frontend
@@ -599,7 +622,7 @@
     (global-flycheck-mode))
 #+END_SRC
 
-** Project
+** Project Management
 
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
@@ -632,8 +655,6 @@
   (use-package lsp-mode
     :bind
     (:map lsp-mode-map
-          ("M-/" . company-lsp)
-          ("C-c C-j" . lsp-ui-imenu)
           ("C-c d" . lsp-find-definition)
           ("C-c e" . lsp-rename)
           ("C-c f" . lsp-format-buffer))
@@ -646,11 +667,16 @@
     (lsp-mode . lsp-ui-mode)
     :bind
     (:map lsp-mode-map
+          ("C-c j" . lsp-ui-imenu)
+          ("C-c l" . lsp-ui-flycheck-list)
           ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
           ([remap xref-find-references] . lsp-ui-peek-find-references)))
 
   (use-package company-lsp
     :after (company lsp-mode)
+    :bind
+    (:map lsp-mode-map
+          ("M-/" . company-lsp))
     :custom
     (company-lsp-async t)
     (company-lsp-cache-candidates t)
@@ -793,88 +819,74 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package hydra
+    :custom
+    (hydra-hint-display-type 'lv)
     :bind
     ("C-h" . hydra-help/body)
     ("M-m" . hydra-leader/body))
 
-  (defhydra hydra-config (:color blue :hint none)
-    "
-  _e_: Edit configuration
-  _g_: Refresh current buffer
-  _r_: Reload Emacs
-    "
-    ("e" ign/edit-config)
-    ("g" ign/refresh-buffer)
-    ("r" ign/reload))
+  (use-package pretty-hydra
+    :after hydra)
 
-  (defhydra hydra-help (:color blue :hint none)
-    "
-  Bindings        | Describes       | Others
-  --------------- | --------------- | ------------------
-  _b_: Top level    | _f_: Function     | _l_: Command history
-  _m_: Major mode   | _v_: Variable     |
-                  | _k_: Key          |
-    "
-    ("b" which-key-show-top-level)
-    ("f" describe-function)
-    ("k" describe-key-briefly)
-    ("l" view-lossage)
-    ("m" which-key-show-major-mode)
-    ("v" describe-variable))
+  (pretty-hydra-define hydra-config (:exit t)
+    ("Configuration"
+     (("e" ign/edit-config "Config file")
+      ("g" ign/refresh-buffer "Refresh buffer")
+      ("r" ign/reload "Reload"))))
 
-  (defhydra hydra-projectile (:color blue :hint none)
-    "
-  _a_: Find other file    | _e_: Recent Files     | _k_: Kill buffers
-  _b_: Switch buffer      | _f_: Find File        | _p_: Switch project
-  _c_: Compile            | _g_: Grep             | _t_: Impl ↔ Test
-  _d_: Find directory     |                     | _v_: Version control
-    "
-    ("a" projectile-find-other-file)
-    ("b" projectile-switch-to-buffer)
-    ("c" projectile-compile-project)
-    ("d" projectile-find-dir)
-    ("e" projectile-recentf)
-    ("f" projectile-find-file)
-    ("g" projectile-grep)
-    ("j" projectile-find-tag)
-    ("k" projectile-kill-buffers)
-    ("p" projectile-switch-project)
-    ("t" projectile-toggle-between-implementation-and-test)
-    ("v" projectile-vc))
+  (pretty-hydra-define hydra-help (:exit t)
+    ("Bindings"
+     (("b" which-key-show-top-level "Top-level")
+      ("m" which-key-show-major-mode "Major mode"))
+     "Describes"
+     (("k" describe-key-briefly "Key")
+      ("f" describe-function "Function")
+      ("v" describe-variable "Variable"))
+     "Others"
+     (("l" view-lossage "Command history"))))
 
-  (defhydra hydra-avy (:exit t :hint nil)
-    "
-  Line          | Region        | Goto
-  ------------- | ------------- | ------------------------------
-  _y_: Yank       | _Y_: Yank       | _c_: Char Timed   _C_: Char
-  _m_: Move       | _M_: Move       | _w_: Word         _W_: Word*
-  _k_: Kill       | _K_: Kill       | _l_: Line         _L_: End of Line
-    "
-    ("c" avy-goto-char-timer)
-    ("C" avy-goto-char)
-    ("w" avy-goto-word-1)
-    ("W" avy-goto-word-0)
-    ("l" avy-goto-line)
-    ("L" avy-goto-end-of-line)
-    ("m" avy-move-line)
-    ("M" avy-move-region)
-    ("k" avy-kill-whole-line)
-    ("K" avy-kill-region)
-    ("y" avy-copy-line)
-    ("Y" avy-copy-region))
+  (pretty-hydra-define hydra-projectile (:exit t)
+    ("Projectile"
+     (("a" projectile-find-other-file "Find other file")
+      ("b" projectile-switch-to-buffer "Switch buffer")
+      ("c" projectile-compile-project "Compile")
+      ("d" projectile-find-dir "Find directory"))
+     ""
+     (("e" projectile-recentf "Recent files")
+      ("f" projectile-find-file "Find file")
+      ("g" projectile-grep "Grep")
+      ("k" projectile-kill-buffers "Kill project buffers"))
+     ""
+     (("p" projectile-switch-project "Switch project")
+      ("t" projectile-toggle-between-implementation-and-test "Impl ↔ Test")
+      ("v" projectile-vc "Version control"))))
 
-  (defhydra hydra-leader (:color blue :hint none)
-    "
-  ---------------------- | --------------- | --------------- | -----------
-  _RET_: Configuration     | _a_: Avy          | _g_: Magit        | _t_: Terminal
-  _SPC_: Expand Region     |                 | _p_: Projectile   |
-    "
-    ("RET" hydra-config/body)
-    ("SPC" er/expand-region)
-    ("a" hydra-avy/body)
-    ("g" magit-status)
-    ("p" hydra-projectile/body)
-    ("t" ign/term-toggle))
+  (pretty-hydra-define hydra-avy (:exit t)
+    ("Goto"
+     (("c" avy-goto-char-timer "Timed char")
+      ("C" avy-goto-char "Char")
+      ("w" avy-goto-word-1 "Word")
+      ("W" avy-goto-word-0 "Word*")
+      ("l" avy-goto-line "BOL")
+      ("L" avy-goto-end-of-line "EOL"))
+    "Line"
+    (("m" avy-move-line "Move")
+     ("k" avy-kill-whole-line "Kill")
+     ("y" avy-copy-line "Yank"))
+    "Region"
+    (("M" avy-move-region "Move")
+     ("K" avy-kill-region "Kill")
+     ("Y" avy-copy-region "Yank"))))
+
+  (pretty-hydra-define hydra-leader (:exit t)
+    ("Leader"
+     (("RET" hydra-config/body "Configuration")
+      ("SPC" er/expand-region "Expand Region")
+      ("'" hydra-avy/body "Avy"))
+     ""
+     (("g" magit-status "Magit")
+      ("p" hydra-projectile/body "Projectile")
+      ("t" ign/term-toggle "Terminal"))))
 #+END_SRC
 
 ** Which-key
