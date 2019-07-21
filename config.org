@@ -1,7 +1,8 @@
 * Table of Contents                                                     :TOC:
-- [[#encoding][Encoding]]
 - [[#backups][Backups]]
+- [[#initialization][Initialization]]
 - [[#packages][Packages]]
+- [[#encoding][Encoding]]
 - [[#dependencies][Dependencies]]
 - [[#functions][Functions]]
 - [[#custom-variables][Custom Variables]]
@@ -22,6 +23,7 @@
   - [[#confirmation-messages][Confirmation messages]]
   - [[#bells][Bells]]
   - [[#terminal][Terminal]]
+  - [[#parentheses][Parentheses]]
 - [[#completion-frontend][Completion Frontend]]
   - [[#ivy][Ivy]]
 - [[#org][Org]]
@@ -41,16 +43,6 @@
   - [[#browser][Browser]]
   - [[#discord][Discord]]
 
-* Encoding
-
-#+BEGIN_SRC emacs-lisp
-  (setq-default locale-coding-system 'utf-8)
-  (set-terminal-coding-system 'utf-8)
-  (set-keyboard-coding-system 'utf-8)
-  (set-selection-coding-system 'utf-8)
-  (prefer-coding-system 'utf-8)
-#+END_SRC
-
 * Backups
 
 #+BEGIN_SRC emacs-lisp
@@ -60,17 +52,22 @@
                 make-backup-files nil)
 #+END_SRC
 
+* Initialization
+
+Add lexical binding support
+#+BEGIN_SRC emacs-lisp
+;; -*- lexical-binding: t -*-
+#+END_SRC
+
 * Packages
 
 #+BEGIN_SRC emacs-lisp
   (require 'package)
 
-  ;; Hotfix, require in emacs 26.1 due to bug #34341
+  ;; Hotfix, requires in emacs 26.1 due to bug #34341
   ;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=34341
   (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
-
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-
   (package-initialize)
 
   (unless (package-installed-p 'use-package)
@@ -84,12 +81,28 @@
   (setq-default use-package-always-demand t)
   (setq-default use-package-always-ensure t)
   (setq-default byte-compile-warnings nil)
+
+  ;; Useful to speed up start-up time
+  (setq gc-cons-threshold most-positive-fixnum)
+  (add-hook 'after-init-hook (lambda () (setq gc-cons-threshold 800000)))
+#+END_SRC
+
+* Encoding
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default locale-coding-system 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+  (set-selection-coding-system 'utf-8)
+  (prefer-coding-system 'utf-8)
 #+END_SRC
 
 * Dependencies
 
 #+BEGIN_SRC emacs-lisp
-(use-package popwin)
+  (use-package popwin
+    :defer t
+    :commands popwin:display-buffer-1)
 #+END_SRC
 
 * Functions
@@ -282,6 +295,7 @@
     (load-theme 'doom-one t))
 
   (use-package solaire-mode
+    :defer t
     :hook
     (prog-mode . turn-on-solaire-mode)
     :custom
@@ -315,6 +329,7 @@
   (setq-default cursor-in-non-selected-windows nil)
 
   (use-package beacon
+    :defer t
     :hook
     (focus-in . beacon-blink)
     :config
@@ -370,7 +385,7 @@
   (use-package highlight-indent-guides
     :disabled
     :hook
-    (prog-mode . (lambda () (setq highlight-indent-guides-character (-> (buffer-name) all-the-icons-icon-for-file string-to-char))))
+    (focus-in . (lambda () (setq highlight-indent-guides-character (-> (buffer-name) all-the-icons-icon-for-file string-to-char))))
     (prog-mode . highlight-indent-guides-mode)
     :custom
     (highlight-indent-guides-method 'character))
@@ -429,6 +444,7 @@
 
 #+BEGIN_SRC emacs-lisp
   (use-package eshell
+    :ensure nil
     :custom
     (eshell-banner-message "")
     :config
@@ -440,6 +456,26 @@
     (epe-path-style 'single)
     (epe-show-python-info nil)
     (eshell-prompt-function #'epe-theme-lambda))
+#+END_SRC
+
+** Parentheses
+
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-delimiters
+    :defer t
+    :hook
+    (prog-mode . rainbow-delimiters-mode))
+
+  (use-package smartparens
+    :defer t
+    :hook
+    (prog-mode . smartparens-mode)
+    :custom
+    (sp-escape-quotes-after-insert nil)
+    :config
+    (require 'smartparens-config))
+
+  (show-paren-mode t)
 #+END_SRC
 
 * Completion Frontend
@@ -525,27 +561,12 @@
 #+END_SRC
 
 * Programming Related
-
-#+BEGIN_SRC emacs-lisp
-  (use-package rainbow-delimiters
-    :hook
-    (prog-mode . rainbow-delimiters-mode))
-
-  (use-package smartparens
-    :hook
-    (prog-mode . smartparens-mode)
-    :custom
-    (sp-escape-quotes-after-insert nil)
-    :config
-    (require 'smartparens-config))
-
-  (show-paren-mode t)
-#+END_SRC
-
 ** Git
 
 #+BEGIN_SRC emacs-lisp
-  (use-package magit)
+  (use-package magit
+    :defer t
+    :commands magit-status)
 
   (use-package forge
     :after magit)
@@ -701,6 +722,7 @@
     (c-basic-offset 4))
 
   (use-package ccls
+    :after lsp-mode
     :hook
     ((c-mode c++-mode) . lsp)
     :custom
@@ -793,7 +815,9 @@
 
   (global-set-key [remap fill-paragraph] #'ign/fill-or-unfill)
 
-  (use-package expand-region)
+  (use-package expand-region
+    :defer t
+    :commands er/expand-region)
 #+END_SRC
 
 * Navigation
@@ -884,7 +908,7 @@
      ("Y" avy-copy-region "Yank"))))
 
   (pretty-hydra-define hydra-leader (:exit t)
-    (" Leader"
+    (" Leader"
      (("RET" hydra-config/body "Configuration")
       ("SPC" er/expand-region "Expand Region")
       ("'" hydra-avy/body "Avy"))
