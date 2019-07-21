@@ -447,9 +447,13 @@
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
     :bind
-  ;;  ([switch-to-buffer] . ivy-switch-buffer)
+    ([switch-to-buffer] . ivy-switch-buffer)
     (:map ivy-minibuffer-map
-          ("<return>" . ivy-alt-done))
+          ("<return>" . ivy-alt-done)
+          ("C-s" . ivy-next-line)
+          ("C-r" . ivy-previous-line))
+    :custom-face
+    (ivy-current-match ((t (:background "#3d4451"))))
     :custom
     (ivy-use-virtual-buffers t)
     (ivy-count-format "%d/%d ")
@@ -472,6 +476,7 @@
   (use-package swiper
     :after ivy
     :bind
+    ("C-r" . swiper-isearch-backward)
     ("C-s" . swiper-isearch))
 
   ;; This will make counsel-M-x sort candidates by frequency
@@ -829,7 +834,7 @@
     :after hydra)
 
   (pretty-hydra-define hydra-config (:exit t)
-    ("Configuration"
+    (" Configuration"
      (("e" ign/edit-config "Config file")
       ("g" ign/refresh-buffer "Refresh buffer")
       ("r" ign/reload "Reload"))))
@@ -846,7 +851,7 @@
      (("l" view-lossage "Command history"))))
 
   (pretty-hydra-define hydra-projectile (:exit t)
-    ("Projectile"
+    (" Projectile"
      (("a" projectile-find-other-file "Find other file")
       ("b" projectile-switch-to-buffer "Switch buffer")
       ("c" projectile-compile-project "Compile")
@@ -879,7 +884,7 @@
      ("Y" avy-copy-region "Yank"))))
 
   (pretty-hydra-define hydra-leader (:exit t)
-    ("Leader"
+    (" Leader"
      (("RET" hydra-config/body "Configuration")
       ("SPC" er/expand-region "Expand Region")
       ("'" hydra-avy/body "Avy"))
