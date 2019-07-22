@@ -10,6 +10,10 @@
   - [[#shell-path][Shell Path]]
   - [[#version-specific][Version-specific]]
 - [[#gui][GUI]]
+- [[#bindings][Bindings]]
+  - [[#hydra][Hydra]]
+  - [[#modal-editing][Modal Editing]]
+  - [[#which-key][Which-key]]
 - [[#appearance][Appearance]]
   - [[#font][Font]]
   - [[#theme][Theme]]
@@ -33,12 +37,10 @@
   - [[#auto-completion][Auto-Completion]]
   - [[#checkerslinters][Checkers/Linters]]
   - [[#project-management][Project Management]]
+  - [[#auto-ide][Auto-IDE]]
   - [[#languages][Languages]]
 - [[#editing][Editing]]
 - [[#navigation][Navigation]]
-- [[#bindings][Bindings]]
-  - [[#hydra][Hydra]]
-  - [[#which-key][Which-key]]
 - [[#community][Community]]
   - [[#browser][Browser]]
   - [[#discord][Discord]]
@@ -268,6 +270,146 @@ Add lexical binding support
     (menu-bar-mode 0)
     (toggle-scroll-bar 0)
     (tool-bar-mode 0))
+#+END_SRC
+
+* Bindings
+
+#+BEGIN_SRC emacs-lisp
+  (keyboard-translate ?\C-t ?\C-x)
+  (keyboard-translate ?\C-x ?\C-t)
+  (define-key key-translation-map (kbd "M-t") (kbd "M-x"))
+  (define-key key-translation-map (kbd "M-x") (kbd "M-t"))
+
+  (define-key comint-mode-map (kbd "C-l") #'comint-clear-buffer)
+
+  (use-package bind-key)
+  (bind-key* "C-x k" #'delete-window)
+  (bind-key* "C-x C-s" #'ign/save-buffer)
+  (bind-key* "C-k" #'ign/kill-line-or-region)
+#+END_SRC
+
+** Hydra
+
+NOTE: These hydras depend on packages defined below and are put here for documentation purposes.
+#+BEGIN_SRC emacs-lisp
+  (use-package hydra
+    :custom
+    (hydra-hint-display-type 'lv)
+    :bind
+    ("C-h" . hydra-help/body)
+    ("M-m" . hydra-leader/body))
+
+  (use-package pretty-hydra
+    :after hydra)
+
+  (pretty-hydra-define hydra-config (:exit t :color amaranth)
+    (" Configuration"
+     (("e" ign/edit-config "config file")
+      ("g" ign/refresh-buffer "refresh buffer")
+      ("r" ign/reload "reload"))))
+
+  (pretty-hydra-define hydra-help (:exit t :color amaranth)
+    ("Bindings"
+     (("b" which-key-show-top-level "top-level")
+      ("m" which-key-show-major-mode "major mode"))
+     "Describes"
+     (("k" describe-key-briefly "key")
+      ("f" describe-function "function")
+      ("v" describe-variable "variable"))
+     "Others"
+     (("l" view-lossage "command history"))))
+
+  (pretty-hydra-define hydra-projectile (:exit t :color amaranth)
+    (" Projectile"
+     (("a" projectile-find-other-file "find other file")
+      ("b" projectile-switch-to-buffer "switch buffer")
+      ("c" projectile-compile-project "compile")
+      ("d" projectile-find-dir "find directory"))
+     ""
+     (("e" projectile-recentf "recent files")
+      ("f" projectile-find-file "find file")
+      ("g" projectile-grep "grep")
+      ("k" projectile-kill-buffers "kill project buffers"))
+     ""
+     (("p" projectile-switch-project "switch project")
+      ("t" projectile-toggle-between-implementation-and-test "impl ↔ test")
+      ("v" projectile-vc "version control"))))
+
+  (pretty-hydra-define hydra-avy (:exit t :color amaranth)
+    ("Goto"
+     (("c" avy-goto-char-timer "timed char")
+      ("c" avy-goto-char "char")
+      ("w" avy-goto-word-1 "word")
+      ("w" avy-goto-word-0 "word*")
+      ("l" avy-goto-line "bol")
+      ("l" avy-goto-end-of-line "eol"))
+    "line"
+    (("m" avy-move-line "move")
+     ("k" avy-kill-whole-line "kill")
+     ("y" avy-copy-line "yank"))
+    "region"
+    (("m" avy-move-region "move")
+     ("k" avy-kill-region "kill")
+     ("y" avy-copy-region "yank"))))
+
+  (pretty-hydra-define hydra-find (:exit t :color amaranth)
+    ("Find"
+     (("d" dired "directory")
+      ("f" counsel-find-file "file"))))
+
+  (pretty-hydra-define hydra-window (:exit t :color amaranth)
+    ("Window"
+     (("2" split-window-below "split below")
+      ("3" split-window-right "split right")
+      ("s" counsel-switch-buffer "switch")
+      ("k" delete-window "delete"))))
+
+  (pretty-hydra-define hydra-leader (:exit t :color amaranth)
+    (" Leader"
+     (("RET" hydra-config/body "+config")
+      ("SPC" ign/ide-resolve "+ide")
+      (";" hydra-avy/body "+jump"))
+     ""
+     (("f" hydra-find/body "+find")
+      ("g" magit-status "git")
+      ("p" hydra-projectile/body "+project"))
+     ""
+     (("s" save-buffer "save buffer")
+      ("t" ign/term-toggle "terminal")
+      ("w" hydra-window/body "+window"))))
+#+END_SRC
+
+** Modal Editing
+
+#+BEGIN_SRC emacs-lisp
+  (use-package xah-fly-keys
+    :preface
+    (defun ign/command-mode ()
+      (interactive)
+      (define-key xah-fly-key-map (kbd "SPC") #'hydra-leader/body)
+      (define-key xah-fly-key-map (kbd "C-u") #'universal-argument)
+      (define-key xah-fly-key-map (kbd "a") #'counsel-M-x)
+      (define-key xah-fly-key-map (kbd "b") #'er/expand-region)
+      (define-key xah-fly-key-map (kbd "l") #'recenter-top-bottom))
+    (defun ign/insert-mode ()
+      (interactive)
+      (define-key xah-fly-key-map (kbd "C-u") #'xah-fly-command-mode-activate))
+    :hook
+    (xah-fly-insert-mode-activate . ign/insert-mode)
+    (xah-fly-command-mode-activate . ign/command-mode)
+    :custom
+    (xah-fly-use-control-key nil)
+    (xah-fly-use-meta-key nil)
+    :config
+    (xah-fly-keys))
+#+END_SRC
+
+** Which-key
+
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :config
+    (which-key-mode))
 #+END_SRC
 
 * Appearance
@@ -674,40 +816,53 @@ Add lexical binding support
     (defalias 'projectile-switch-project 'counsel-projectile-switch-project))
 #+END_SRC
 
+** Auto-IDE
+
+#+BEGIN_SRC emacs-lisp
+  (defvar ign/ide--alist '())
+  (defun ign/ide-add (mode hydra)
+    (push `(,mode . ,hydra) ign/ide--alist))
+  (defun ign/ide-resolve ()
+    (interactive)
+    (let ((hydra (alist-get major-mode ign/ide--alist)))
+      (if hydra
+          (funcall hydra)
+        (message "IDE not found for %s" major-mode))))
+#+END_SRC
+
 ** Languages
 *** LSP
 
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
-    :bind
-    (:map lsp-mode-map
-          ("C-c d" . lsp-find-definition)
-          ("C-c e" . lsp-rename)
-          ("C-c f" . lsp-format-buffer))
     :custom
     (lsp-enable-snippet nil))
 
   (use-package lsp-ui
     :after lsp-mode
     :hook
-    (lsp-mode . lsp-ui-mode)
-    :bind
-    (:map lsp-mode-map
-          ("C-c j" . lsp-ui-imenu)
-          ("C-c l" . lsp-ui-flycheck-list)
-          ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-          ([remap xref-find-references] . lsp-ui-peek-find-references)))
+    (lsp-mode . lsp-ui-mode))
 
   (use-package company-lsp
     :after (company lsp-mode)
-    :bind
-    (:map lsp-mode-map
-          ("M-/" . company-lsp))
     :custom
     (company-lsp-async t)
     (company-lsp-cache-candidates t)
     (company-lsp-enable-snippets nil)
     (company-lsp-enable-recompletion t))
+
+  (pretty-hydra-define hydra-lsp (:exit t :color amaranth :title " LSP")
+    ("Find"
+     (("." lsp-ui-peek-find-references "find references")
+      ("," lsp-find-definition "find definition")
+      ("t" lsp-find-type-definition "find type definition"))
+     "Refactor"
+     (("e" lsp-rename "rename symbol at point")
+      ("f" lsp-format-buffer "format buffer"))
+     "Show"
+     (("d" lsp-ui-doc-show "documentation")
+      ("j" lsp-ui-imenu "symbol table")
+      ("l" lsp-ui-flycheck-list "error list"))))
 #+END_SRC
 
 *** C/C++
@@ -726,31 +881,10 @@ Add lexical binding support
     :hook
     ((c-mode c++-mode) . lsp)
     :custom
-    (ccls-executable "~/ccls/Release/ccls"))
-#+END_SRC
-
-*** Clojure
-
-#+BEGIN_SRC emacs-lisp
-  (use-package cider
-    :custom
-    (cider-repl-pop-to-buffer-on-connect nil)
-    (cider-repl-display-in-current-window nil)
-    (cider-font-lock-dynamically t))
-
-  (use-package elein)
-#+END_SRC
-
-*** Common Lisp
-
-#+BEGIN_SRC emacs-lisp
-  (use-package slime
-    :bind
-    (:map slime-repl-mode-map
-          ("C-l" . slime-repl-clear-buffer))
-    :custom
-    (inferior-lisp-program "sbcl")
-    (slime-contribs '(slime-fancy)))
+    (ccls-executable "~/ccls/Release/ccls")
+    :config
+    (ign/ide-add 'c-mode #'hydra-lsp/body)
+    (ign/ide-add 'c++-mode #'hydra-lsp/body))
 #+END_SRC
 
 *** Jupyter
@@ -778,7 +912,9 @@ Add lexical binding support
      ("\\.eliomi?\\'" . tuareg-mode))
     :custom
     (tuareg-match-patterns-aligned t)
-    (tuareg-indent-align-with-first-arg t))
+    (tuareg-indent-align-with-first-arg t)
+    :config
+    (ign/ide-add 'tuareg-mode #'hydra-lsp/body))
 #+END_SRC
 
 *** Python
@@ -800,7 +936,9 @@ Add lexical binding support
     (python-shell-interpreter-args "--simple-prompt -c exec('__import__(\\'readline\\')') -i")
     (python-fill-docstring-style 'pep-257)
     (gud-pdb-command-name (concat ign/python-executable " -m pdb"))
-    (py-split-window-on-execute t))
+    (py-split-window-on-execute t)
+    :config
+    (ign/ide-add 'python-mode #'hydra-lsp/body))
 
   (use-package cython-mode)
   (use-package flycheck-cython)
@@ -826,104 +964,6 @@ Add lexical binding support
   (use-package avy
     :custom
     (avy-keys '(?a ?o ?e ?u ?h ?t ?n ?s)))
-#+END_SRC
-
-* Bindings
-
-#+BEGIN_SRC emacs-lisp
-  (keyboard-translate ?\C-t ?\C-x)
-  (keyboard-translate ?\C-x ?\C-t)
-  (define-key key-translation-map (kbd "M-t") (kbd "M-x"))
-  (define-key key-translation-map (kbd "M-x") (kbd "M-t"))
-
-  (define-key comint-mode-map (kbd "C-l") #'comint-clear-buffer)
-
-  (use-package bind-key)
-  (bind-key* "C-x k" #'delete-window)
-  (bind-key* "C-x C-s" #'ign/save-buffer)
-  (bind-key* "C-k" #'ign/kill-line-or-region)
-#+END_SRC
-
-** Hydra
-
-#+BEGIN_SRC emacs-lisp
-  (use-package hydra
-    :custom
-    (hydra-hint-display-type 'lv)
-    :bind
-    ("C-h" . hydra-help/body)
-    ("M-m" . hydra-leader/body))
-
-  (use-package pretty-hydra
-    :after hydra)
-
-  (pretty-hydra-define hydra-config (:exit t)
-    (" Configuration"
-     (("e" ign/edit-config "Config file")
-      ("g" ign/refresh-buffer "Refresh buffer")
-      ("r" ign/reload "Reload"))))
-
-  (pretty-hydra-define hydra-help (:exit t)
-    ("Bindings"
-     (("b" which-key-show-top-level "Top-level")
-      ("m" which-key-show-major-mode "Major mode"))
-     "Describes"
-     (("k" describe-key-briefly "Key")
-      ("f" describe-function "Function")
-      ("v" describe-variable "Variable"))
-     "Others"
-     (("l" view-lossage "Command history"))))
-
-  (pretty-hydra-define hydra-projectile (:exit t)
-    (" Projectile"
-     (("a" projectile-find-other-file "Find other file")
-      ("b" projectile-switch-to-buffer "Switch buffer")
-      ("c" projectile-compile-project "Compile")
-      ("d" projectile-find-dir "Find directory"))
-     ""
-     (("e" projectile-recentf "Recent files")
-      ("f" projectile-find-file "Find file")
-      ("g" projectile-grep "Grep")
-      ("k" projectile-kill-buffers "Kill project buffers"))
-     ""
-     (("p" projectile-switch-project "Switch project")
-      ("t" projectile-toggle-between-implementation-and-test "Impl ↔ Test")
-      ("v" projectile-vc "Version control"))))
-
-  (pretty-hydra-define hydra-avy (:exit t)
-    ("Goto"
-     (("c" avy-goto-char-timer "Timed char")
-      ("C" avy-goto-char "Char")
-      ("w" avy-goto-word-1 "Word")
-      ("W" avy-goto-word-0 "Word*")
-      ("l" avy-goto-line "BOL")
-      ("L" avy-goto-end-of-line "EOL"))
-    "Line"
-    (("m" avy-move-line "Move")
-     ("k" avy-kill-whole-line "Kill")
-     ("y" avy-copy-line "Yank"))
-    "Region"
-    (("M" avy-move-region "Move")
-     ("K" avy-kill-region "Kill")
-     ("Y" avy-copy-region "Yank"))))
-
-  (pretty-hydra-define hydra-leader (:exit t)
-    (" Leader"
-     (("RET" hydra-config/body "Configuration")
-      ("SPC" er/expand-region "Expand Region")
-      ("'" hydra-avy/body "Avy"))
-     ""
-     (("g" magit-status "Magit")
-      ("p" hydra-projectile/body "Projectile")
-      ("t" ign/term-toggle "Terminal"))))
-#+END_SRC
-
-** Which-key
-
-#+BEGIN_SRC emacs-lisp
-  (use-package which-key
-    :config
-    (which-key-mode))
 #+END_SRC
 
 * Community
