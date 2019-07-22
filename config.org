@@ -338,19 +338,19 @@ NOTE: These hydras depend on packages defined below and are put here for documen
   (pretty-hydra-define hydra-avy (:exit t :color amaranth)
     ("Goto"
      (("c" avy-goto-char-timer "timed char")
-      ("c" avy-goto-char "char")
+      ("C" avy-goto-char "char")
       ("w" avy-goto-word-1 "word")
-      ("w" avy-goto-word-0 "word*")
+      ("W" avy-goto-word-0 "word*")
       ("l" avy-goto-line "bol")
-      ("l" avy-goto-end-of-line "eol"))
+      ("L" avy-goto-end-of-line "eol"))
     "line"
     (("m" avy-move-line "move")
      ("k" avy-kill-whole-line "kill")
      ("y" avy-copy-line "yank"))
     "region"
-    (("m" avy-move-region "move")
-     ("k" avy-kill-region "kill")
-     ("y" avy-copy-region "yank"))))
+    (("M" avy-move-region "move")
+     ("K" avy-kill-region "kill")
+     ("Y" avy-copy-region "yank"))))
 
   (pretty-hydra-define hydra-find (:exit t :color amaranth)
     ("Find"
@@ -861,8 +861,7 @@ NOTE: These hydras depend on packages defined below and are put here for documen
      (("e" lsp-rename "rename symbol at point")
       ("f" lsp-format-buffer "format buffer"))
      "Show"
-     (("d" lsp-ui-doc-show "documentation")
-      ("j" lsp-ui-imenu "symbol table")
+     (("j" lsp-ui-imenu "symbol table")
       ("l" lsp-ui-flycheck-list "error list"))))
 #+END_SRC
 
