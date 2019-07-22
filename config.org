@@ -12,7 +12,6 @@
 - [[#gui][GUI]]
 - [[#bindings][Bindings]]
   - [[#hydra][Hydra]]
-  - [[#modal-editing][Modal Editing]]
   - [[#which-key][Which-key]]
 - [[#appearance][Appearance]]
   - [[#font][Font]]
@@ -306,8 +305,7 @@ NOTE: These hydras depend on packages defined below and are put here for documen
     (" Configuration"
      (("e" ign/edit-config "config file")
       ("g" ign/refresh-buffer "refresh buffer")
-      ("r" ign/reload "reload")
-      ("DEL" save-buffers-kill-terminal "quit"))))
+      ("r" ign/reload "reload"))))
 
   (pretty-hydra-define hydra-help (:exit t :color amaranth)
     ("Bindings"
@@ -344,26 +342,26 @@ NOTE: These hydras depend on packages defined below and are put here for documen
       ("W" avy-goto-word-0 "word*")
       ("l" avy-goto-line "bol")
       ("L" avy-goto-end-of-line "eol"))
-    "line"
+    "Line"
     (("m" avy-move-line "move")
      ("k" avy-kill-whole-line "kill")
      ("y" avy-copy-line "yank"))
-    "region"
+    "Region"
     (("M" avy-move-region "move")
      ("K" avy-kill-region "kill")
      ("Y" avy-copy-region "yank"))))
 
-  (pretty-hydra-define hydra-find (:exit t :color amaranth)
-    ("Find"
-     (("d" dired "directory")
-      ("f" counsel-find-file "file"))))
-
-  (pretty-hydra-define hydra-window (:exit t :color amaranth)
-    ("Window"
-     (("2" split-window-below "split below")
-      ("3" split-window-right "split right")
-      ("s" ivy-switch-buffer "switch")
-      ("q" delete-window "delete"))))
+  (pretty-hydra-define hydra-window (:exit t :color amaranth :title " Windows")
+    ("Split"
+     (("2" split-window-below "below")
+      ("3" split-window-right "right")
+      ("w" balance-windows "balance")
+      ("k" delete-window "kill"))
+     "Move"
+     (("h" windmove-left "left" :exit nil)
+      ("c" windmove-up "up" :exit nil)
+      ("t" windmove-down "down" :exit nil)
+      ("n" windmove-right "right" :exit nil))))
 
   (pretty-hydra-define hydra-leader (:exit t :color amaranth)
     (" Leader"
@@ -371,39 +369,11 @@ NOTE: These hydras depend on packages defined below and are put here for documen
       ("SPC" ign/ide-resolve "+ide")
       (";" hydra-avy/body "+jump"))
      ""
-     (("f" hydra-find/body "+find")
-      ("g" magit-status "git")
+     (("g" magit-status "git")
       ("p" hydra-projectile/body "+project"))
      ""
-     (("s" save-buffer "save buffer")
-      ("t" ign/term-toggle "terminal")
+     (("t" ign/term-toggle "terminal")
       ("w" hydra-window/body "+window"))))
-#+END_SRC
-
-** Modal Editing
-
-#+BEGIN_SRC emacs-lisp
-  (use-package xah-fly-keys
-    :preface
-    (defun ign/command-mode ()
-      (interactive)
-      (define-key xah-fly-key-map (kbd "SPC") #'hydra-leader/body)
-      (define-key xah-fly-key-map (kbd "C-u") #'universal-argument)
-      (define-key xah-fly-key-map (kbd "a") #'counsel-M-x)
-      (define-key xah-fly-key-map (kbd "b") #'er/expand-region)
-      (define-key xah-fly-key-map (kbd "l") #'recenter-top-bottom))
-    (defun ign/insert-mode ()
-      (interactive)
-      (define-key xah-fly-key-map (kbd "C-u") #'xah-fly-command-mode-activate))
-    :hook
-    (xah-fly-insert-mode-activate . ign/insert-mode)
-    (xah-fly-command-mode-activate . ign/command-mode)
-    :custom
-    (xah-fly-use-control-key nil)
-    (xah-fly-use-meta-key nil)
-    :config
-    (xah-fly-keys)
-    (ign/command-mode))
 #+END_SRC
 
 ** Which-key
@@ -474,6 +444,7 @@ NOTE: These hydras depend on packages defined below and are put here for documen
 
   (use-package beacon
     :defer t
+    :disabled
     :hook
     (focus-in . beacon-blink)
     :config
