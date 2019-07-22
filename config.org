@@ -362,7 +362,7 @@ NOTE: These hydras depend on packages defined below and are put here for documen
      (("2" split-window-below "split below")
       ("3" split-window-right "split right")
       ("s" ivy-switch-buffer "switch")
-      ("k" delete-window "delete"))))
+      ("q" delete-window "delete"))))
 
   (pretty-hydra-define hydra-leader (:exit t :color amaranth)
     (" Leader"
