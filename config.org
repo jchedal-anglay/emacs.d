@@ -306,7 +306,8 @@ NOTE: These hydras depend on packages defined below and are put here for documen
     (" Configuration"
      (("e" ign/edit-config "config file")
       ("g" ign/refresh-buffer "refresh buffer")
-      ("r" ign/reload "reload"))))
+      ("r" ign/reload "reload")
+      ("DEL" save-buffers-kill-terminal "quit"))))
 
   (pretty-hydra-define hydra-help (:exit t :color amaranth)
     ("Bindings"
