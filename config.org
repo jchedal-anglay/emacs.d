@@ -361,7 +361,7 @@ NOTE: These hydras depend on packages defined below and are put here for documen
     ("Window"
      (("2" split-window-below "split below")
       ("3" split-window-right "split right")
-      ("s" counsel-switch-buffer "switch")
+      ("s" ivy-switch-buffer "switch")
       ("k" delete-window "delete"))))
 
   (pretty-hydra-define hydra-leader (:exit t :color amaranth)
@@ -401,7 +401,8 @@ NOTE: These hydras depend on packages defined below and are put here for documen
     (xah-fly-use-control-key nil)
     (xah-fly-use-meta-key nil)
     :config
-    (xah-fly-keys))
+    (xah-fly-keys)
+    (ign/command-mode))
 #+END_SRC
 
 ** Which-key
