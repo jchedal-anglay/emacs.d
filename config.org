@@ -11,6 +11,7 @@
   - [[#version-specific][Version-specific]]
 - [[#gui][GUI]]
 - [[#bindings][Bindings]]
+  - [[#key-chord][Key-chord]]
   - [[#hydra][Hydra]]
   - [[#which-key][Which-key]]
 - [[#appearance][Appearance]]
@@ -287,27 +288,38 @@ Add lexical binding support
   (bind-key* "C-k" #'ign/kill-line-or-region)
 #+END_SRC
 
+** Key-chord
+
+#+BEGIN_SRC emacs-lisp
+  (use-package use-package-chords
+    :after key-chord)
+
+  (use-package key-chord
+    :custom
+    (key-chord-two-keys-delay 0.03)
+    :config
+    (key-chord-mode t))
+#+END_SRC
+
 ** Hydra
 
-NOTE: These hydras depend on packages defined below and are put here for documentation purposes.
 #+BEGIN_SRC emacs-lisp
   (use-package hydra
     :custom
-    (hydra-hint-display-type 'lv)
-    :bind
-    ("C-h" . hydra-help/body)
-    ("M-m" . hydra-leader/body))
+    (hydra-hint-display-type 'posframe)
+    :chords
+    ("th" . hydra-leader/body))
 
   (use-package pretty-hydra
     :after hydra)
 
-  (pretty-hydra-define hydra-config (:exit t :color amaranth)
+  (pretty-hydra-define hydra-config (:exit t :color amaranth :quit-key "q")
     (" Configuration"
      (("e" ign/edit-config "config file")
       ("g" ign/refresh-buffer "refresh buffer")
       ("r" ign/reload "reload"))))
 
-  (pretty-hydra-define hydra-help (:exit t :color amaranth)
+  (pretty-hydra-define hydra-help (:exit t :color amaranth :quit-key "q")
     ("Bindings"
      (("b" which-key-show-top-level "top-level")
       ("m" which-key-show-major-mode "major mode"))
@@ -318,7 +330,7 @@ NOTE: These hydras depend on packages defined below and are put here for documen
      "Others"
      (("l" view-lossage "command history"))))
 
-  (pretty-hydra-define hydra-projectile (:exit t :color amaranth)
+  (pretty-hydra-define hydra-projectile (:exit t :color amaranth :quit-key "q")
     (" Projectile"
      (("a" projectile-find-other-file "find other file")
       ("b" projectile-switch-to-buffer "switch buffer")
@@ -334,7 +346,7 @@ NOTE: These hydras depend on packages defined below and are put here for documen
       ("t" projectile-toggle-between-implementation-and-test "impl ↔ test")
       ("v" projectile-vc "version control"))))
 
-  (pretty-hydra-define hydra-avy (:exit t :color amaranth)
+  (pretty-hydra-define hydra-avy (:exit t :color amaranth :quit-key "q")
     ("Goto"
      (("c" avy-goto-char-timer "timed char")
       ("C" avy-goto-char "char")
@@ -351,29 +363,31 @@ NOTE: These hydras depend on packages defined below and are put here for documen
      ("K" avy-kill-region "kill")
      ("Y" avy-copy-region "yank"))))
 
-  (pretty-hydra-define hydra-window (:exit t :color amaranth :title " Windows")
+  (pretty-hydra-define hydra-window (:exit nil :color amaranth :title " Windows" :quit-key "q")
     ("Split"
      (("2" split-window-below "below")
-      ("3" split-window-right "right")
-      ("w" balance-windows "balance")
-      ("k" delete-window "kill"))
-     "Move"
-     (("h" windmove-left "left" :exit nil)
-      ("c" windmove-up "up" :exit nil)
-      ("t" windmove-down "down" :exit nil)
-      ("n" windmove-right "right" :exit nil))))
+      ("3" split-window-right "right"))
+     ""
+     (("b" balance-windows "balance")
+      ("k" delete-window "kill")
+      ("w" other-window "move"))))
 
-  (pretty-hydra-define hydra-leader (:exit t :color amaranth)
+  (pretty-hydra-define hydra-leader (:exit t :color amaranth :quit-key "q")
     (" Leader"
-     (("RET" hydra-config/body "+config")
-      ("SPC" ign/ide-resolve "+ide")
-      (";" hydra-avy/body "+jump"))
-     ""
-     (("g" magit-status "git")
-      ("p" hydra-projectile/body "+project"))
-     ""
-     (("t" ign/term-toggle "terminal")
-      ("w" hydra-window/body "+window"))))
+     (("RET" hydra-config/body (propertize "+config" 'face 'bold))
+      ("SPC" ign/ide-resolve (propertize "+ide" 'face 'bold) :toggle (alist-get major-mode ign/ide--alist))
+      (";" hydra-avy/body (propertize "+jump" 'face 'bold))
+      ("b" ivy-switch-buffer "switch buffer")
+      ("e" ign/term-toggle "eshell")
+      ("f" counsel-find-file "find file")
+      ("g" magit-status "git")
+      ("h" hydra-help/body "help")
+      ("l" recenter-top-bottom "recenter")
+      ("p" hydra-projectile/body (propertize "+project" 'face 'bold))
+      ("s" save-buffer "save")
+      ("t" counsel-M-x "M-x")
+      ("u" undo "undo")
+      ("w" hydra-window/body (propertize "+window" 'face 'bold)))))
 #+END_SRC
 
 ** Which-key
@@ -475,11 +489,11 @@ NOTE: These hydras depend on packages defined below and are put here for documen
     (dashboard-set-init-info t)
     (dashboard-set-navigator t)
     (dashboard-navigator-buttons
-     `(((,"" "Github" "Github"
+     `((("" "Github" "Github"
          (lambda (&rest _) (browse-url-generic "https://github.com/Lgneous")))
-        (,"" "Configuration" "Configuration"
+        ("" "Configuration" "Configuration"
          (lambda (&rest _) (ign/edit-config)))
-        (,"" "Reload" "Restart emacs"
+        ("" "Reload" "Restart emacs"
          (lambda (&rest _) (ign/reload))))))
     (dashboard-center-content t)
     :config
@@ -824,7 +838,7 @@ NOTE: These hydras depend on packages defined below and are put here for documen
     (company-lsp-enable-snippets nil)
     (company-lsp-enable-recompletion t))
 
-  (pretty-hydra-define hydra-lsp (:exit t :color amaranth :title " LSP")
+  (pretty-hydra-define hydra-lsp (:exit t :color amaranth :title " LSP")
     ("Find"
      (("." lsp-ui-peek-find-references "find references")
       ("," lsp-find-definition "find definition")
