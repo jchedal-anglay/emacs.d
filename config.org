@@ -304,11 +304,39 @@ Add lexical binding support
 ** Hydra
 
 #+BEGIN_SRC emacs-lisp
+  (use-package posframe
+    :preface
+    (defun posframe-poshandler-frame-bottom-center (info)
+        (cons (/ (- (plist-get info :parent-frame-width)
+                    (plist-get info :posframe-width))
+                 2)
+              (- -60
+                 (plist-get info :mode-line-height)
+                 (plist-get info :minibuffer-height)))))
+
   (use-package hydra
+    :after posframe
+    :preface
+    (defun hydra-posframe--hotfix (&rest _)
+      (posframe-funcall
+       " *hydra-posframe*"
+       (lambda ()
+         (fit-frame-to-buffer (selected-frame) nil
+                              (+ (count-lines (point-min) (point-max)) 1)
+                              nil nil)
+         (redirect-frame-focus (selected-frame) (frame-parent (selected-frame))))))
     :custom
+    (hydra--work-around-dedicated nil)
+    (hydra-posframe-show-params
+     (list
+      :internal-border-width 0
+      :background-color "#1c1e24"
+      :poshandler 'posframe-poshandler-frame-bottom-center))
     (hydra-hint-display-type 'posframe)
     :chords
-    ("th" . hydra-leader/body))
+    ("th" . hydra-leader/body)
+    :config
+    (advice-add 'hydra-posframe-show :after #'hydra-posframe--hotfix))
 
   (use-package pretty-hydra
     :after hydra)
@@ -321,12 +349,12 @@ Add lexical binding support
 
   (pretty-hydra-define hydra-help (:exit t :color amaranth :quit-key "q")
     ("Bindings"
-     (("b" which-key-show-top-level "top-level")
+     (("b" counsel-descbinds "all")
       ("m" which-key-show-major-mode "major mode"))
      "Describes"
-     (("k" describe-key-briefly "key")
-      ("f" describe-function "function")
-      ("v" describe-variable "variable"))
+     (("f" counsel-describe-function "function")
+      ("F" counsel-describe-face "face")
+      ("v" counsel-describe-variable "variable"))
      "Others"
      (("l" view-lossage "command history"))))
 
@@ -363,30 +391,32 @@ Add lexical binding support
      ("K" avy-kill-region "kill")
      ("Y" avy-copy-region "yank"))))
 
-  (pretty-hydra-define hydra-window (:exit nil :color amaranth :title " Windows" :quit-key "q")
-    ("Split"
+  (pretty-hydra-define hydra-window (:exit nil :color amaranth :quit-key "q")
+    (" Windows"
      (("2" split-window-below "below")
       ("3" split-window-right "right"))
      ""
      (("b" balance-windows "balance")
-      ("k" delete-window "kill")
+      ("k" delete-window "kill" :exit t)
       ("w" other-window "move"))))
 
   (pretty-hydra-define hydra-leader (:exit t :color amaranth :quit-key "q")
     (" Leader"
      (("RET" hydra-config/body (propertize "+config" 'face 'bold))
-      ("SPC" ign/ide-resolve (propertize "+ide" 'face 'bold) :toggle (alist-get major-mode ign/ide--alist))
+      ("SPC" ign/ide-resolve (propertize "+ide" 'face 'bold))
       (";" hydra-avy/body (propertize "+jump" 'face 'bold))
       ("b" ivy-switch-buffer "switch buffer")
-      ("e" ign/term-toggle "eshell")
-      ("f" counsel-find-file "find file")
+      ("e" ign/term-toggle "eshell"))
+     ""
+     (("f" counsel-find-file "find file")
       ("g" magit-status "git")
-      ("h" hydra-help/body "help")
+      ("h" hydra-help/body (propertize "+help" 'face 'bold))
       ("l" recenter-top-bottom "recenter")
-      ("p" hydra-projectile/body (propertize "+project" 'face 'bold))
-      ("s" save-buffer "save")
+      ("p" hydra-projectile/body (propertize "+project" 'face 'bold)))
+     ""
+     (("s" save-buffer "save")
       ("t" counsel-M-x "M-x")
-      ("u" undo "undo")
+      ("u" undo "undo" :exit nil)
       ("w" hydra-window/body (propertize "+window" 'face 'bold)))))
 #+END_SRC
 
@@ -423,6 +453,7 @@ Add lexical binding support
     (load-theme 'doom-one t))
 
   (use-package solaire-mode
+    :disabled
     :defer t
     :hook
     (prog-mode . turn-on-solaire-mode)
@@ -669,11 +700,9 @@ Add lexical binding support
     :config
     (add-to-list 'org-structure-template-alist
                  '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
-    (use-package ob-ipython)
     (org-babel-do-load-languages
      'org-babel-load-languages
      '((python . t)
-       (ipython . t)
        (ocaml . t)
        (gnuplot . t))))
 
@@ -683,6 +712,7 @@ Add lexical binding support
     (org-mode . toc-org-enable))
 
   (use-package org-bullets
+    :after org
     :hook
     (org-mode . org-bullets-mode))
 
