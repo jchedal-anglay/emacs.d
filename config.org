@@ -332,8 +332,9 @@ Add lexical binding support
       :internal-border-width 0
       :background-color "#1c1e24"
       :poshandler 'posframe-poshandler-frame-bottom-center))
-    (hydra-hint-display-type 'posframe)
+    (hydra-hint-display-type 'lv)
     :chords
+    ("eu" . hydra-leader/body)
     ("th" . hydra-leader/body)
     :config
     (advice-add 'hydra-posframe-show :after #'hydra-posframe--hotfix))
@@ -345,7 +346,8 @@ Add lexical binding support
     (" Configuration"
      (("e" ign/edit-config "config file")
       ("g" ign/refresh-buffer "refresh buffer")
-      ("r" ign/reload "reload"))))
+      ("r" ign/reload "reload")
+      ("DEL" save-buffers-kill-terminal "quit emacs"))))
 
   (pretty-hydra-define hydra-help (:exit t :color amaranth :quit-key "q")
     ("Bindings"
