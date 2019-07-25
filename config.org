@@ -855,6 +855,7 @@ Add lexical binding support
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
     :custom
+    (lsp-prefer-flymake nil)
     (lsp-enable-snippet nil))
 
   (use-package lsp-ui
