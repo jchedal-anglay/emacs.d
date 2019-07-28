@@ -44,6 +44,7 @@
 - [[#community][Community]]
   - [[#browser][Browser]]
   - [[#discord][Discord]]
+  - [[#key-frequency][Key Frequency]]
 
 * Backups
 
@@ -283,8 +284,6 @@ Add lexical binding support
   (define-key comint-mode-map (kbd "C-l") #'comint-clear-buffer)
 
   (use-package bind-key)
-  (bind-key* "C-x k" #'delete-window)
-  (bind-key* "C-x C-s" #'ign/save-buffer)
   (bind-key* "C-k" #'ign/kill-line-or-region)
 #+END_SRC
 
@@ -299,6 +298,14 @@ Add lexical binding support
     (key-chord-two-keys-delay 0.03)
     :config
     (key-chord-mode t))
+
+  ;; Required for it to work *exactly* like C-g as defined in delsel.el
+  (key-chord-define-global "eu" #'keyboard-quit)
+  (key-chord-define minibuffer-local-map "eu" #'minibuffer-keyboard-quit)
+  (key-chord-define minibuffer-local-ns-map "eu" #'minibuffer-keyboard-quit)
+  (key-chord-define minibuffer-local-completion-map "eu" #'minibuffer-keyboard-quit)
+  (key-chord-define minibuffer-local-must-match-map "eu" #'minibuffer-keyboard-quit)
+  (key-chord-define minibuffer-local-isearch-map "eu" #'minibuffer-keyboard-quit)
 #+END_SRC
 
 ** Hydra
@@ -334,7 +341,6 @@ Add lexical binding support
       :poshandler 'posframe-poshandler-frame-bottom-center))
     (hydra-hint-display-type 'lv)
     :chords
-    ("eu" . hydra-leader/body)
     ("th" . hydra-leader/body)
     :config
     (advice-add 'hydra-posframe-show :after #'hydra-posframe--hotfix))
@@ -348,17 +354,6 @@ Add lexical binding support
       ("g" ign/refresh-buffer "refresh buffer")
       ("r" ign/reload "reload")
       ("DEL" save-buffers-kill-terminal "quit emacs"))))
-
-  (pretty-hydra-define hydra-help (:exit t :color amaranth :quit-key "q")
-    ("Bindings"
-     (("b" counsel-descbinds "all")
-      ("m" which-key-show-major-mode "major mode"))
-     "Describes"
-     (("f" counsel-describe-function "function")
-      ("F" counsel-describe-face "face")
-      ("v" counsel-describe-variable "variable"))
-     "Others"
-     (("l" view-lossage "command history"))))
 
   (pretty-hydra-define hydra-projectile (:exit t :color amaranth :quit-key "q")
     (" Projectile"
@@ -393,33 +388,14 @@ Add lexical binding support
      ("K" avy-kill-region "kill")
      ("Y" avy-copy-region "yank"))))
 
-  (pretty-hydra-define hydra-window (:exit nil :color amaranth :quit-key "q")
-    (" Windows"
-     (("2" split-window-below "below")
-      ("3" split-window-right "right"))
-     ""
-     (("b" balance-windows "balance")
-      ("k" delete-window "kill" :exit t)
-      ("w" other-window "move"))))
-
   (pretty-hydra-define hydra-leader (:exit t :color amaranth :quit-key "q")
     (" Leader"
      (("RET" hydra-config/body (propertize "+config" 'face 'bold))
       ("SPC" ign/ide-resolve (propertize "+ide" 'face 'bold))
       (";" hydra-avy/body (propertize "+jump" 'face 'bold))
-      ("b" ivy-switch-buffer "switch buffer")
-      ("e" ign/term-toggle "eshell"))
-     ""
-     (("f" counsel-find-file "find file")
+      ("t" ign/term-toggle "terminal")
       ("g" magit-status "git")
-      ("h" hydra-help/body (propertize "+help" 'face 'bold))
-      ("l" recenter-top-bottom "recenter")
-      ("p" hydra-projectile/body (propertize "+project" 'face 'bold)))
-     ""
-     (("s" save-buffer "save")
-      ("t" counsel-M-x "M-x")
-      ("u" undo "undo" :exit nil)
-      ("w" hydra-window/body (propertize "+window" 'face 'bold)))))
+      ("p" hydra-projectile/body (propertize "+project" 'face 'bold)))))
 #+END_SRC
 
 ** Which-key
@@ -444,7 +420,7 @@ Add lexical binding support
 
 #+BEGIN_SRC emacs-lisp
   (use-package doom-themes
-    :if (display-graphic-p)
+    ;;:if (display-graphic-p)
     :custom-face
     (font-lock-function ((t (:foreground "#e06c75"))))
     :custom
@@ -549,6 +525,7 @@ Add lexical binding support
     :hook
     (focus-in . (lambda () (setq highlight-indent-guides-character (-> (buffer-name) all-the-icons-icon-for-file string-to-char))))
     (prog-mode . highlight-indent-guides-mode)
+    (prog-mode . (lambda () (setq highlight-indent-guides-character (-> (buffer-name) all-the-icons-icon-for-file string-to-char))))
     :custom
     (highlight-indent-guides-method 'character))
 #+END_SRC
@@ -1001,4 +978,11 @@ Add lexical binding support
     (elcord-use-major-mode-as-main-icon t)
     :config
     (elcord-mode))
+#+END_SRC
+** Key Frequency
+
+#+BEGIN_SRC emacs-lisp
+  (use-package keyfreq
+    :config
+    (keyfreq-mode))
 #+END_SRC
