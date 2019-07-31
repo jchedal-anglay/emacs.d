@@ -10,15 +10,9 @@
   - [[#shell-path][Shell Path]]
   - [[#version-specific][Version-specific]]
 - [[#gui][GUI]]
-- [[#bindings][Bindings]]
-  - [[#key-chord][Key-chord]]
-  - [[#hydra][Hydra]]
-  - [[#which-key][Which-key]]
 - [[#appearance][Appearance]]
   - [[#font][Font]]
   - [[#theme][Theme]]
-  - [[#modeline][Modeline]]
-  - [[#cursor][Cursor]]
 - [[#interface][Interface]]
   - [[#splash-screen][Splash Screen]]
   - [[#lines][Lines]]
@@ -37,10 +31,11 @@
   - [[#auto-completion][Auto-Completion]]
   - [[#checkerslinters][Checkers/Linters]]
   - [[#project-management][Project Management]]
-  - [[#auto-ide][Auto-IDE]]
   - [[#languages][Languages]]
 - [[#editing][Editing]]
 - [[#navigation][Navigation]]
+- [[#bindings][Bindings]]
+  - [[#which-key][Which-key]]
 - [[#community][Community]]
   - [[#browser][Browser]]
   - [[#discord][Discord]]
@@ -141,7 +136,7 @@ Add lexical binding support
     (popwin:display-buffer-1
      (or (get-buffer name)
          (save-window-excursion
-           (eshell)))
+           (multi-term)))
      :default-config-keywords '(:height 15 :position :bottom :noselect nil :stick t))
     (rename-buffer name))
 
@@ -273,139 +268,6 @@ Add lexical binding support
     (tool-bar-mode 0))
 #+END_SRC
 
-* Bindings
-
-#+BEGIN_SRC emacs-lisp
-  (keyboard-translate ?\C-t ?\C-x)
-  (keyboard-translate ?\C-x ?\C-t)
-  (define-key key-translation-map (kbd "M-t") (kbd "M-x"))
-  (define-key key-translation-map (kbd "M-x") (kbd "M-t"))
-
-  (define-key comint-mode-map (kbd "C-l") #'comint-clear-buffer)
-
-  (use-package bind-key)
-  (bind-key* "C-k" #'ign/kill-line-or-region)
-#+END_SRC
-
-** Key-chord
-
-#+BEGIN_SRC emacs-lisp
-  (use-package use-package-chords
-    :after key-chord)
-
-  (use-package key-chord
-    :custom
-    (key-chord-two-keys-delay 0.03)
-    :config
-    (key-chord-mode t))
-
-  ;; Required for it to work *exactly* like C-g as defined in delsel.el
-  (key-chord-define-global "eu" #'keyboard-quit)
-  (key-chord-define minibuffer-local-map "eu" #'minibuffer-keyboard-quit)
-  (key-chord-define minibuffer-local-ns-map "eu" #'minibuffer-keyboard-quit)
-  (key-chord-define minibuffer-local-completion-map "eu" #'minibuffer-keyboard-quit)
-  (key-chord-define minibuffer-local-must-match-map "eu" #'minibuffer-keyboard-quit)
-  (key-chord-define minibuffer-local-isearch-map "eu" #'minibuffer-keyboard-quit)
-#+END_SRC
-
-** Hydra
-
-#+BEGIN_SRC emacs-lisp
-  (use-package posframe
-    :preface
-    (defun posframe-poshandler-frame-bottom-center (info)
-        (cons (/ (- (plist-get info :parent-frame-width)
-                    (plist-get info :posframe-width))
-                 2)
-              (- -60
-                 (plist-get info :mode-line-height)
-                 (plist-get info :minibuffer-height)))))
-
-  (use-package hydra
-    :after posframe
-    :preface
-    (defun hydra-posframe--hotfix (&rest _)
-      (posframe-funcall
-       " *hydra-posframe*"
-       (lambda ()
-         (fit-frame-to-buffer (selected-frame) nil
-                              (+ (count-lines (point-min) (point-max)) 1)
-                              nil nil)
-         (redirect-frame-focus (selected-frame) (frame-parent (selected-frame))))))
-    :custom
-    (hydra--work-around-dedicated nil)
-    (hydra-posframe-show-params
-     (list
-      :internal-border-width 0
-      :background-color "#1c1e24"
-      :poshandler 'posframe-poshandler-frame-bottom-center))
-    (hydra-hint-display-type 'lv)
-    :chords
-    ("th" . hydra-leader/body)
-    :config
-    (advice-add 'hydra-posframe-show :after #'hydra-posframe--hotfix))
-
-  (use-package pretty-hydra
-    :after hydra)
-
-  (pretty-hydra-define hydra-config (:exit t :color amaranth :quit-key "q")
-    (" Configuration"
-     (("e" ign/edit-config "config file")
-      ("g" ign/refresh-buffer "refresh buffer")
-      ("r" ign/reload "reload")
-      ("DEL" save-buffers-kill-terminal "quit emacs"))))
-
-  (pretty-hydra-define hydra-projectile (:exit t :color amaranth :quit-key "q")
-    (" Projectile"
-     (("a" projectile-find-other-file "find other file")
-      ("b" projectile-switch-to-buffer "switch buffer")
-      ("c" projectile-compile-project "compile")
-      ("d" projectile-find-dir "find directory"))
-     ""
-     (("e" projectile-recentf "recent files")
-      ("f" projectile-find-file "find file")
-      ("g" projectile-grep "grep")
-      ("k" projectile-kill-buffers "kill project buffers"))
-     ""
-     (("p" projectile-switch-project "switch project")
-      ("t" projectile-toggle-between-implementation-and-test "impl ↔ test")
-      ("v" projectile-vc "version control"))))
-
-  (pretty-hydra-define hydra-avy (:exit t :color amaranth :quit-key "q")
-    ("Goto"
-     (("c" avy-goto-char-timer "timed char")
-      ("C" avy-goto-char "char")
-      ("w" avy-goto-word-1 "word")
-      ("W" avy-goto-word-0 "word*")
-      ("l" avy-goto-line "bol")
-      ("L" avy-goto-end-of-line "eol"))
-    "Line"
-    (("m" avy-move-line "move")
-     ("k" avy-kill-whole-line "kill")
-     ("y" avy-copy-line "yank"))
-    "Region"
-    (("M" avy-move-region "move")
-     ("K" avy-kill-region "kill")
-     ("Y" avy-copy-region "yank"))))
-
-  (pretty-hydra-define hydra-leader (:exit t :color amaranth :quit-key "q")
-    (" Leader"
-     (("RET" hydra-config/body (propertize "+config" 'face 'bold))
-      ("SPC" ign/ide-resolve (propertize "+ide" 'face 'bold))
-      (";" hydra-avy/body (propertize "+jump" 'face 'bold))
-      ("t" ign/term-toggle "terminal")
-      ("g" magit-status "git")
-      ("p" hydra-projectile/body (propertize "+project" 'face 'bold)))))
-#+END_SRC
-
-** Which-key
-
-#+BEGIN_SRC emacs-lisp
-  (use-package which-key
-    :config
-    (which-key-mode))
-#+END_SRC
-
 * Appearance
 ** Font
 
@@ -420,7 +282,6 @@ Add lexical binding support
 
 #+BEGIN_SRC emacs-lisp
   (use-package doom-themes
-    ;;:if (display-graphic-p)
     :custom-face
     (font-lock-function ((t (:foreground "#e06c75"))))
     :custom
@@ -439,39 +300,6 @@ Add lexical binding support
     (solaire-mode-remap-modeline nil)
     :config
     (solaire-mode-swap-bg))
-#+END_SRC
-
-** Modeline
-
-#+BEGIN_SRC emacs-lisp
-  (line-number-mode t)
-  (column-number-mode t)
-
-  (use-package doom-modeline
-    :if (display-graphic-p)
-    :custom
-    (doom-modeline-python-executable ign/python-executable)
-    (doom-modeline-icon t)
-    (doom-modeline-major-mode-icon t)
-    (doom-modeline-version t)
-    (doom-modeline-buffer-file-name-style 'file-name)
-    :config
-    (doom-modeline-mode))
-#+END_SRC
-
-** Cursor
-
-#+BEGIN_SRC emacs-lisp
-  (setq-default cursor-type 'box)
-  (setq-default cursor-in-non-selected-windows nil)
-
-  (use-package beacon
-    :defer t
-    :disabled
-    :hook
-    (focus-in . beacon-blink)
-    :config
-    (beacon-mode))
 #+END_SRC
 
 * Interface
@@ -582,19 +410,9 @@ Add lexical binding support
 ** Terminal
 
 #+BEGIN_SRC emacs-lisp
-  (use-package eshell
-    :ensure nil
+  (use-package multi-term
     :custom
-    (eshell-banner-message "")
-    :config
-    (defalias 'eshell/clear 'eshell/clear-scrollback))
-
-  (use-package eshell-prompt-extras
-    :after eshell
-    :custom
-    (epe-path-style 'single)
-    (epe-show-python-info nil)
-    (eshell-prompt-function #'epe-theme-lambda))
+    (multi-term-program (ign/find-executables "zsh" "bash" "sh")))
 #+END_SRC
 
 ** Parentheses
@@ -704,7 +522,8 @@ Add lexical binding support
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :defer t
-    :commands magit-status)
+    :bind
+    ("C-c g" . magit))
 
   (use-package forge
     :after magit)
@@ -781,15 +600,43 @@ Add lexical binding support
     (flycheck-error ((t (:underline (:style line :color "#FF5C33")))))
     (flycheck-check-syntax-automatically '(mode-enabled save))
     :custom
-    (flycheck-checkers nil)
+    (flycheck-python-pylint-executable ign/python-executable)
+    (flycheck-python-pycompile-executable ign/python-executable)
     :config
-    (global-flycheck-mode))
+    (add-to-list 'flycheck-disabled-checkers 'python-flake8)
+    (add-to-list 'flycheck-disabled-checkers 'python-mypy)
+    (add-to-list 'flycheck-disabled-checkers 'c/c++-gcc)
+    (add-to-list 'flycheck-disabled-checkers 'c/c++-clang)
+    (add-to-list 'flycheck-disabled-checkers 'c/c++-cppcheck)
+    (global-flycheck-mode)
+    ;; Bad flycheck design, override the default fringe without having to redefine entire checker levels
+    (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
+      [#b00000000
+       #b00000000
+       #b00000000
+       #b00000000
+       #b00000000
+       #b00000000
+       #b00000000
+       #b11100111
+       #b11100111
+       #b11100111
+       #b00000000
+       #b00000000
+       #b00000000
+       #b00000000
+       #b00000000
+       #b00000000
+       #b00000000]))
 #+END_SRC
 
 ** Project Management
 
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
+    :bind
+    (:map projectile-mode-map
+          ("C-c p" . projectile-command-map))
     :custom
     (projectile-project-search-path '("~/Projects/"))
     (projectile-indexing-method 'hybrid)
@@ -801,6 +648,7 @@ Add lexical binding support
     (projectile-mode t))
 
   (use-package counsel-projectile
+    :disabled
     :after
     (counsel projectile)
     :config
@@ -812,31 +660,28 @@ Add lexical binding support
     (defalias 'projectile-switch-project 'counsel-projectile-switch-project))
 #+END_SRC
 
-** Auto-IDE
-
-#+BEGIN_SRC emacs-lisp
-  (defvar ign/ide--alist '())
-  (defun ign/ide-add (mode hydra)
-    (push `(,mode . ,hydra) ign/ide--alist))
-  (defun ign/ide-resolve ()
-    (interactive)
-    (let ((hydra (alist-get major-mode ign/ide--alist)))
-      (if hydra
-          (funcall hydra)
-        (message "IDE not found for %s" major-mode))))
-#+END_SRC
-
 ** Languages
 *** LSP
 
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
+    :bind
+    (:map lsp-mode-map
+          ("M-," . lsp-find-definition)
+          ("C-c t" . lsp-find-type-definition)
+          ("C-c e" . lsp-rename)
+          ("C-c f" . lsp-format-buffer))
     :custom
     (lsp-prefer-flymake nil)
     (lsp-enable-snippet nil))
 
   (use-package lsp-ui
     :after lsp-mode
+    :bind
+    (:map lsp-mode-map
+          ("M-." . lsp-ui-peek-find-references)
+          ("C-c j" . lsp-ui-imenu)
+          ("C-c l" . lsp-ui-flycheck-list))
     :hook
     (lsp-mode . lsp-ui-mode))
 
@@ -847,18 +692,6 @@ Add lexical binding support
     (company-lsp-cache-candidates t)
     (company-lsp-enable-snippets nil)
     (company-lsp-enable-recompletion t))
-
-  (pretty-hydra-define hydra-lsp (:exit t :color amaranth :title " LSP")
-    ("Find"
-     (("." lsp-ui-peek-find-references "find references")
-      ("," lsp-find-definition "find definition")
-      ("t" lsp-find-type-definition "find type definition"))
-     "Refactor"
-     (("e" lsp-rename "rename symbol at point")
-      ("f" lsp-format-buffer "format buffer"))
-     "Show"
-     (("j" lsp-ui-imenu "symbol table")
-      ("l" lsp-ui-flycheck-list "error list"))))
 #+END_SRC
 
 *** C/C++
@@ -877,10 +710,33 @@ Add lexical binding support
     :hook
     ((c-mode c++-mode) . lsp)
     :custom
-    (ccls-executable "~/ccls/Release/ccls")
-    :config
-    (ign/ide-add 'c-mode #'hydra-lsp/body)
-    (ign/ide-add 'c++-mode #'hydra-lsp/body))
+    (ccls-executable "~/ccls/Release/ccls"))
+#+END_SRC
+
+*** Clojure
+
+#+BEGIN_SRC emacs-lisp
+  (use-package clojure-mode)
+
+  (use-package cider
+    :custom
+    (cider-repl-pop-to-buffer-on-connect nil)
+    (cider-repl-display-in-current-window nil)
+    (cider-font-lock-dynamically t))
+
+  (use-package elein)
+#+END_SRC
+
+*** Common Lisp
+
+#+BEGIN_SRC emacs-lisp
+  (use-package slime
+    :bind
+    (:map slime-repl-mode-map
+          ("C-l" . slime-repl-clear-buffer))
+    :custom
+    (inferior-lisp-program "sbcl")
+    (slime-contribs '(slime-fancy)))
 #+END_SRC
 
 *** Jupyter
@@ -908,9 +764,7 @@ Add lexical binding support
      ("\\.eliomi?\\'" . tuareg-mode))
     :custom
     (tuareg-match-patterns-aligned t)
-    (tuareg-indent-align-with-first-arg t)
-    :config
-    (ign/ide-add 'tuareg-mode #'hydra-lsp/body))
+    (tuareg-indent-align-with-first-arg t))
 #+END_SRC
 
 *** Python
@@ -922,9 +776,6 @@ Add lexical binding support
 
   (use-package python
     :ensure nil
-    :after lsp
-    :hook
-    (python-mode . lsp)
     :custom
     (python-indent 4)
     (python-shell-interpreter ign/python-executable)
@@ -932,9 +783,24 @@ Add lexical binding support
     (python-shell-interpreter-args "--simple-prompt -c exec('__import__(\\'readline\\')') -i")
     (python-fill-docstring-style 'pep-257)
     (gud-pdb-command-name (concat ign/python-executable " -m pdb"))
-    (py-split-window-on-execute t)
+    (py-split-window-on-execute t))
+
+  (use-package elpy
+    :after (company flycheck)
+    :hook
+    (python-mode . elpy-mode)
+    :bind
+    (:map python-mode-map
+          ("C-c C-c" . elpy-shell-send-top-statement))
+    :custom
+    (elpy-rpc-python-command ign/python-executable)
     :config
-    (ign/ide-add 'python-mode #'hydra-lsp/body))
+    (defalias 'elpy-format-code 'elpy-black-fix-code)
+    (delete 'elpy-module-highlight-indentation elpy-modules)
+    (delete 'elpy-module-flymake elpy-modules)
+    (delete 'elpy-module-company elpy-modules)
+    (add-to-list 'company-backends #'elpy-company-backend)
+    (elpy-enable))
 
   (use-package cython-mode)
   (use-package flycheck-cython)
@@ -958,14 +824,40 @@ Add lexical binding support
 
 #+BEGIN_SRC emacs-lisp
   (use-package avy
+    :bind
+    ("C-'" . avy-goto-char-timer)
     :custom
     (avy-keys '(?a ?o ?e ?u ?h ?t ?n ?s)))
+#+END_SRC
+
+* Bindings
+
+#+BEGIN_SRC emacs-lisp
+  (keyboard-translate ?\C-t ?\C-x)
+  (keyboard-translate ?\C-x ?\C-t)
+  (define-key key-translation-map (kbd "M-t") (kbd "M-x"))
+  (define-key key-translation-map (kbd "M-x") (kbd "M-t"))
+
+  (define-key comint-mode-map (kbd "C-l") #'comint-clear-buffer)
+
+  (use-package bind-key)
+  (bind-key* "C-k" #'ign/kill-line-or-region)
+  (bind-key* "C-c RET" #'ign/term-toggle)
+#+END_SRC
+
+** Which-key
+
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :config
+    (which-key-mode))
 #+END_SRC
 
 * Community
 ** Browser
 
 #+BEGIN_SRC emacs-lisp
+  (setq-default browse-url-generic-program "chromium")
   (setq-default browse-url-browser-function 'browse-url-chromium)
 #+END_SRC
 
