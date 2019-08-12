@@ -13,6 +13,7 @@
 - [[#appearance][Appearance]]
   - [[#font][Font]]
   - [[#theme][Theme]]
+  - [[#modeline][Modeline]]
 - [[#interface][Interface]]
   - [[#splash-screen][Splash Screen]]
   - [[#lines][Lines]]
@@ -106,11 +107,6 @@ Add lexical binding support
 * Functions
 
 #+BEGIN_SRC emacs-lisp
-  (defun ign/before (to-call-before f)
-    "Run TO-CALL-BEFORE then run F."
-    (funcall to-call-before)
-    (funcall f))
-
   (defun ign/after (to-call-after f)
     "Run F then run TO-CALL-AFTER."
     (funcall f)
@@ -163,11 +159,6 @@ Add lexical binding support
     (interactive)
     (revert-buffer :ignore-auto :noconfirm))
 
-  (defun ign/sh-run-safe (command &rest args)
-    (if (executable-find command)
-        (shell-command (string-join (nconc (list command) args) " "))
-      (message (concat "'" command "' not found found; please install"))))
-
   (defun ign/reload ()
     "Reload the configuration file."
     (interactive)
@@ -178,20 +169,6 @@ Add lexical binding support
     (interactive)
     (find-file ign/config-path))
 
-  (defun ign/toggle-mark ()
-    "Pop a mark if one doesn't exist already, deactivate it otherwise."
-    (interactive)
-    (if (region-active-p)
-        (deactivate-mark)
-      (push-mark nil nil t)))
-
-  (defun ign/toggle-mark-rectangle ()
-    "Pop a rectangle mark if one doesn't exist already, deactivate it otherwise."
-    (interactive)
-    (if (region-active-p)
-        (deactivate-mark)
-      (rectangle-mark-mode)))
-
   (defun ign/first-occurence (predicate list)
     "Return the first occurence in LIST which, when applied to PREDICATE returns t."
     (let ((head (car list))
@@ -200,18 +177,14 @@ Add lexical binding support
           head
         (ign/first-occurence predicate tail))))
 
-  (defun ign/last-occurence (predicate list)
-    "Return the last occurence in LIST which, when applied to PREDICATE returns t."
-    (ign/first-occurence predicate (reverse list)))
-
   (defmacro ign/find-executables (&rest list)
     "Return the first occurence in LIST whose value corresponds to an executable."
     (ign/first-occurence #'executable-find list))
 
   (defun ign/save-buffer (arg)
-    "Save the current buffer and remove trailing whitespace if called interactively."
+    "Save the current buffer and remove trailing whitespace unless called interactively."
     (interactive "p")
-    (when (= arg 1)
+    (when (/= arg 1)
       (delete-trailing-whitespace))
     (save-buffer))
 
@@ -222,13 +195,21 @@ Add lexical binding support
         (call-interactively #'kill-region)
       (kill-visual-line (if (= arg 1) nil arg))))
 
-  (defun -ign/set (pairs)
-    "Dispatch a list of dotted PAIRS into a single list, used by IGN/SET."
-    (mapcan (lambda (p) (list (car p) (cdr p))) pairs))
+  (defun ign/bol (arg)
+    (interactive "p")
+    (if (/= arg 1)
+        (beginning-of-visual-line)
+      (back-to-indentation)))
 
-  (defmacro ign/set (&rest pairs)
-    "(ign/set (a . b) (c . d)) => (setq a b c d)"
-    `(lambda () (setq ,@(-ign/set pairs))))
+  (defun ign/eol (arg)
+    (interactive "p")
+    (if (/= arg 1)
+        (end-of-visual-line)
+      (progn
+        (move-end-of-line nil)
+        (re-search-backward "^\\|[^[:space:]]")
+        (if (not (looking-at-p "[[:space:]]"))
+            (right-char)))))
 #+END_SRC
 
 * Custom Variables
@@ -300,6 +281,24 @@ Add lexical binding support
     (solaire-mode-remap-modeline nil)
     :config
     (solaire-mode-swap-bg))
+#+END_SRC
+
+** Modeline
+
+#+BEGIN_SRC emacs-lisp
+  (line-number-mode t)
+  (column-number-mode t)
+
+  (use-package doom-modeline
+    :if (display-graphic-p)
+    :custom
+    (doom-modeline-python-executable ign/python-executable)
+    (doom-modeline-icon t)
+    (doom-modeline-major-mode-icon t)
+    (doom-modeline-version t)
+    (doom-modeline-buffer-file-name-style 'file-name)
+    :config
+    (doom-modeline-mode))
 #+END_SRC
 
 * Interface
@@ -605,6 +604,8 @@ Add lexical binding support
     :config
     (add-to-list 'flycheck-disabled-checkers 'python-flake8)
     (add-to-list 'flycheck-disabled-checkers 'python-mypy)
+    (add-to-list 'flycheck-disabled-checkers 'python-pylint)
+    (add-to-list 'flycheck-disabled-checkers 'python-pycompile)
     (add-to-list 'flycheck-disabled-checkers 'c/c++-gcc)
     (add-to-list 'flycheck-disabled-checkers 'c/c++-clang)
     (add-to-list 'flycheck-disabled-checkers 'c/c++-cppcheck)
@@ -719,7 +720,12 @@ Add lexical binding support
   (use-package clojure-mode)
 
   (use-package cider
+    :bind
+    (:map cider-repl-mode-map
+          ("C-l" . cider-repl-clear-buffer))
     :custom
+    (cider-print-fn 'fipp)
+    (cider-repl-display-help-banner nil)
     (cider-repl-pop-to-buffer-on-connect nil)
     (cider-repl-display-in-current-window nil)
     (cider-font-lock-dynamically t))
@@ -776,6 +782,8 @@ Add lexical binding support
 
   (use-package python
     :ensure nil
+    :hook
+    (python-mode . lsp)
     :custom
     (python-indent 4)
     (python-shell-interpreter ign/python-executable)
@@ -784,23 +792,6 @@ Add lexical binding support
     (python-fill-docstring-style 'pep-257)
     (gud-pdb-command-name (concat ign/python-executable " -m pdb"))
     (py-split-window-on-execute t))
-
-  (use-package elpy
-    :after (company flycheck)
-    :hook
-    (python-mode . elpy-mode)
-    :bind
-    (:map python-mode-map
-          ("C-c C-c" . elpy-shell-send-top-statement))
-    :custom
-    (elpy-rpc-python-command ign/python-executable)
-    :config
-    (defalias 'elpy-format-code 'elpy-black-fix-code)
-    (delete 'elpy-module-highlight-indentation elpy-modules)
-    (delete 'elpy-module-flymake elpy-modules)
-    (delete 'elpy-module-company elpy-modules)
-    (add-to-list 'company-backends #'elpy-company-backend)
-    (elpy-enable))
 
   (use-package cython-mode)
   (use-package flycheck-cython)
@@ -817,7 +808,19 @@ Add lexical binding support
 
   (use-package expand-region
     :defer t
-    :commands er/expand-region)
+    :commands er/expand-region
+    :bind
+    ("C-=" . er/expand-region))
+
+  (use-package multiple-cursors
+    :bind
+    ("C-." . mc/mark-next-like-this)
+    ("C-," . mc/mark-previous-like-this)
+    ("C->" . mc/skip-to-next-like-this)
+    ("C-<" . mc/skip-to-previous-like-this)
+    ("C-c C-." . mc/mark-all-like-this)
+    ("C-x SPC" . mc/edit-lines)
+  )
 #+END_SRC
 
 * Navigation
@@ -841,8 +844,11 @@ Add lexical binding support
   (define-key comint-mode-map (kbd "C-l") #'comint-clear-buffer)
 
   (use-package bind-key)
+  (bind-key* "C-x C-s" #'ign/save-buffer)
+  (bind-key* "C-a" #'ign/bol)
+  (bind-key* "C-e" #'ign/eol)
   (bind-key* "C-k" #'ign/kill-line-or-region)
-  (bind-key* "C-c RET" #'ign/term-toggle)
+  (bind-key* "C-c DEL" #'ign/term-toggle)
 #+END_SRC
 
 ** Which-key
@@ -871,6 +877,7 @@ Add lexical binding support
     :config
     (elcord-mode))
 #+END_SRC
+
 ** Key Frequency
 
 #+BEGIN_SRC emacs-lisp
