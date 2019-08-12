@@ -197,13 +197,13 @@ Add lexical binding support
 
   (defun ign/bol (arg)
     (interactive "p")
-    (if (/= arg 1)
+    (if (= arg 1)
         (beginning-of-visual-line)
       (back-to-indentation)))
 
   (defun ign/eol (arg)
     (interactive "p")
-    (if (/= arg 1)
+    (if (= arg 1)
         (end-of-visual-line)
       (progn
         (move-end-of-line nil)
