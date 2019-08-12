@@ -26,6 +26,8 @@
 - [[#completion-frontend][Completion Frontend]]
   - [[#ivy][Ivy]]
 - [[#org][Org]]
+- [[#editing][Editing]]
+- [[#navigation][Navigation]]
 - [[#programming-related][Programming Related]]
   - [[#git][Git]]
   - [[#tramp][TRAMP]]
@@ -33,8 +35,6 @@
   - [[#checkerslinters][Checkers/Linters]]
   - [[#project-management][Project Management]]
   - [[#languages][Languages]]
-- [[#editing][Editing]]
-- [[#navigation][Navigation]]
 - [[#bindings][Bindings]]
   - [[#which-key][Which-key]]
 - [[#community][Community]]
@@ -442,8 +442,8 @@ Add lexical binding support
     ([switch-to-buffer] . ivy-switch-buffer)
     (:map ivy-minibuffer-map
           ("<return>" . ivy-alt-done)
-          ("C-s" . ivy-next-line)
-          ("C-r" . ivy-previous-line))
+          ("C-r" . ivy-previous-line)
+          ("C-s" . ivy-next-line))
     :custom-face
     (ivy-current-match ((t (:background "#3d4451"))))
     :custom
@@ -469,7 +469,10 @@ Add lexical binding support
     :after ivy
     :bind
     ("C-r" . swiper-isearch-backward)
-    ("C-s" . swiper-isearch))
+    ("C-s" . swiper-isearch)
+    (:map swiper-isearch-map
+          ;; Required, bugged by default
+          ("M-n" . ivy-next-history-element)))
 
   ;; This will make counsel-M-x sort candidates by frequency
   (use-package smex)
@@ -513,6 +516,44 @@ Add lexical binding support
     (org-mode . org-bullets-mode))
 
   (use-package px)
+#+END_SRC
+
+* Editing
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default require-final-newline t)
+  (global-subword-mode t)
+  (delete-selection-mode t)
+
+  (global-set-key [remap fill-paragraph] #'ign/fill-or-unfill)
+
+  (use-package expand-region
+    :defer t
+    :commands er/expand-region
+    :bind
+    ("C-=" . er/expand-region))
+
+  (use-package multiple-cursors
+    :bind
+    ("C-." . mc/mark-next-like-this)
+    ("C-," . mc/mark-previous-like-this)
+    ("C->" . mc/skip-to-next-like-this)
+    ("C-<" . mc/skip-to-previous-like-this)
+    ("C-c C-." . mc/mark-all-like-this)
+    ("C-x SPC" . mc/edit-lines))
+
+  (use-package aggressive-indent
+    :defer t)
+#+END_SRC
+
+* Navigation
+
+#+BEGIN_SRC emacs-lisp
+  (use-package avy
+    :bind
+    ("C-'" . avy-goto-char-timer)
+    :custom
+    (avy-keys '(?a ?o ?e ?u ?h ?t ?n ?s)))
 #+END_SRC
 
 * Programming Related
@@ -602,10 +643,6 @@ Add lexical binding support
     (flycheck-python-pylint-executable ign/python-executable)
     (flycheck-python-pycompile-executable ign/python-executable)
     :config
-    (add-to-list 'flycheck-disabled-checkers 'python-flake8)
-    (add-to-list 'flycheck-disabled-checkers 'python-mypy)
-    (add-to-list 'flycheck-disabled-checkers 'python-pylint)
-    (add-to-list 'flycheck-disabled-checkers 'python-pycompile)
     (add-to-list 'flycheck-disabled-checkers 'c/c++-gcc)
     (add-to-list 'flycheck-disabled-checkers 'c/c++-clang)
     (add-to-list 'flycheck-disabled-checkers 'c/c++-cppcheck)
@@ -712,12 +749,19 @@ Add lexical binding support
     ((c-mode c++-mode) . lsp)
     :custom
     (ccls-executable "~/ccls/Release/ccls"))
+
+  (use-package company-c-headers
+    :after company
+    :config
+    (add-to-list 'company-backends 'company-c-headers))
 #+END_SRC
 
 *** Clojure
 
 #+BEGIN_SRC emacs-lisp
-  (use-package clojure-mode)
+  (use-package clojure-mode
+    :hook
+    (clojure-mode . aggressive-indent-mode))
 
   (use-package cider
     :bind
@@ -737,6 +781,8 @@ Add lexical binding support
 
 #+BEGIN_SRC emacs-lisp
   (use-package slime
+    :hook
+    (slime-lisp-mode . aggressive-indent-mode)
     :bind
     (:map slime-repl-mode-map
           ("C-l" . slime-repl-clear-buffer))
@@ -759,18 +805,18 @@ Add lexical binding support
 *** OCaml
 
 #+BEGIN_SRC emacs-lisp
-  (use-package tuareg
-    :hook
-    (tuareg-mode . lsp)
-    :mode
-    (("\\.ml[ip]?\\'" . tuareg-mode)
-     ("\\.mly\\'" . tuareg-menhir-mode)
-     ("[./]opam_?\\'" . tuareg-opam-mode)
-     ("\\(?:\\`\\|/\\)jbuild\\(?:\\.inc\\)?\\'" . tuareg-jbuild-mode)
-     ("\\.eliomi?\\'" . tuareg-mode))
-    :custom
-    (tuareg-match-patterns-aligned t)
-    (tuareg-indent-align-with-first-arg t))
+(use-package tuareg
+  :hook
+  (tuareg-mode . lsp)
+  :mode
+  (("\\.ml[ip]?\\'" . tuareg-mode)
+   ("\\.mly\\'" . tuareg-menhir-mode)
+   ("[./]opam_?\\'" . tuareg-opam-mode)
+   ("\\(?:\\`\\|/\\)jbuild\\(?:\\.inc\\)?\\'" . tuareg-jbuild-mode)
+   ("\\.eliomi?\\'" . tuareg-mode))
+  :custom
+  (tuareg-match-patterns-aligned t)
+  (tuareg-indent-align-with-first-arg t))
 #+END_SRC
 
 *** Python
@@ -782,8 +828,6 @@ Add lexical binding support
 
   (use-package python
     :ensure nil
-    :hook
-    (python-mode . lsp)
     :custom
     (python-indent 4)
     (python-shell-interpreter ign/python-executable)
@@ -793,44 +837,25 @@ Add lexical binding support
     (gud-pdb-command-name (concat ign/python-executable " -m pdb"))
     (py-split-window-on-execute t))
 
+  (use-package elpy
+    :after (company flycheck)
+    :hook
+    (python-mode . elpy-mode)
+    :bind
+    (:map python-mode-map
+          ("C-c C-c" . elpy-shell-send-top-statement))
+    :custom
+    (elpy-rpc-python-command ign/python-executable)
+    :config
+    (defalias 'elpy-format-code 'elpy-black-fix-code)
+    (delete 'elpy-module-highlight-indentation elpy-modules)
+    (delete 'elpy-module-flymake elpy-modules)
+    (delete 'elpy-module-company elpy-modules)
+    (add-to-list 'company-backends #'elpy-company-backend)
+    (elpy-enable))
+
   (use-package cython-mode)
   (use-package flycheck-cython)
-#+END_SRC
-
-* Editing
-
-#+BEGIN_SRC emacs-lisp
-  (setq-default require-final-newline t)
-  (global-subword-mode t)
-  (delete-selection-mode t)
-
-  (global-set-key [remap fill-paragraph] #'ign/fill-or-unfill)
-
-  (use-package expand-region
-    :defer t
-    :commands er/expand-region
-    :bind
-    ("C-=" . er/expand-region))
-
-  (use-package multiple-cursors
-    :bind
-    ("C-." . mc/mark-next-like-this)
-    ("C-," . mc/mark-previous-like-this)
-    ("C->" . mc/skip-to-next-like-this)
-    ("C-<" . mc/skip-to-previous-like-this)
-    ("C-c C-." . mc/mark-all-like-this)
-    ("C-x SPC" . mc/edit-lines)
-  )
-#+END_SRC
-
-* Navigation
-
-#+BEGIN_SRC emacs-lisp
-  (use-package avy
-    :bind
-    ("C-'" . avy-goto-char-timer)
-    :custom
-    (avy-keys '(?a ?o ?e ?u ?h ?t ?n ?s)))
 #+END_SRC
 
 * Bindings
