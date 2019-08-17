@@ -560,6 +560,7 @@ Add lexical binding support
     ("C-=" . er/expand-region))
 
   (use-package multiple-cursors
+    :defer t
     :bind
     ("C-." . mc/mark-next-like-this)
     ("C-," . mc/mark-previous-like-this)
