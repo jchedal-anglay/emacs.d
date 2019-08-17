@@ -676,7 +676,6 @@ Add lexical binding support
     (flycheck-check-syntax-automatically '(mode-enabled save))
     :custom
     (flycheck-python-pylint-executable ign/python-executable)
-    (flycheck-python-pycompile-executable ign/python-executable)
     :config
     (add-to-list 'flycheck-disabled-checkers 'python-flake8)
     (add-to-list 'flycheck-disabled-checkers 'python-mypy)
@@ -895,7 +894,11 @@ Add lexical binding support
     ;; Required for MacOS, prevents newlines from being displayed as ^G
     (python-shell-interpreter-args (if ign/is-a-mac "-c exec('__import__(\\'readline\\')') -i" "-i"))
     (python-fill-docstring-style 'pep-257)
-    (py-split-window-on-execute t))
+    (py-split-window-on-execute t)
+    (lsp-pyls-plugins-mccabe-enabled nil)
+    (lsp-pyls-plugins-pycodestyle-enabled nil)
+    (lsp-pyls-plugins-pydocstyle-enabled nil)
+    (lsp-pyls-plugins-pyflakes-enabled nil))
 
   (use-package cython-mode)
   (use-package flycheck-cython)
