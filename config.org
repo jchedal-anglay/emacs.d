@@ -570,6 +570,15 @@ Add lexical binding support
 
   (use-package aggressive-indent
     :defer t)
+
+  (use-package yasnippet
+    :defer t
+    :bind
+    (:map yas-minor-mode-map
+          ("C-M-/" . yas-expand)
+          ("TAB" . nil)))
+
+  (use-package yasnippet-snippets)
 #+END_SRC
 
 * Navigation
