@@ -297,7 +297,7 @@ Add lexical binding support
     (doom-modeline-version t)
     (doom-modeline-buffer-file-name-style 'file-name)
     :config
-    (doom-modeline-mode))
+    (doom-modeline-mode t))
 #+END_SRC
 
 * Interface
@@ -457,7 +457,7 @@ Add lexical binding support
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
     :config
-    (which-key-mode))
+    (which-key-mode t))
 #+END_SRC
 
 * Completion Frontend
@@ -484,12 +484,12 @@ Add lexical binding support
      '((t . ivy--regex-plus)))
     (ivy-initial-inputs-alist nil)
     :config
-    (ivy-mode))
+    (ivy-mode t))
 
   (use-package counsel
     :after ivy
     :config
-    (counsel-mode))
+    (counsel-mode t))
 
   (use-package swiper
     :after ivy
@@ -684,7 +684,7 @@ Add lexical binding support
     (add-to-list 'flycheck-disabled-checkers 'c/c++-gcc)
     (add-to-list 'flycheck-disabled-checkers 'c/c++-clang)
     (add-to-list 'flycheck-disabled-checkers 'c/c++-cppcheck)
-    (global-flycheck-mode)
+    (global-flycheck-mode t)
     ;; Bad flycheck design, override the default fringe without having to redefine entire checker levels
     (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
       [#b00000000
@@ -765,7 +765,7 @@ Add lexical binding support
 
   (use-package dap-mode
     :hook
-    (lsp-mode . (lambda () (dap-mode) (dap-ui-mode)))
+    (lsp-mode . (lambda () (dap-mode t) (dap-ui-mode t)))
     :config
     (use-package dap-hydra
       :ensure nil
@@ -926,7 +926,7 @@ Add lexical binding support
     :custom
     (elcord-use-major-mode-as-main-icon t)
     :config
-    (elcord-mode))
+    (elcord-mode t))
 #+END_SRC
 
 ** Key Frequency
@@ -934,5 +934,5 @@ Add lexical binding support
 #+BEGIN_SRC emacs-lisp
   (use-package keyfreq
     :config
-    (keyfreq-mode))
+    (keyfreq-mode t))
 #+END_SRC
