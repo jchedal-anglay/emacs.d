@@ -269,7 +269,7 @@ Add lexical binding support
     (doom-vibrant-brighter-modeline t)
     :config
     (doom-themes-org-config)
-    (load-theme 'doom-one t))
+    (load-theme 'doom-dracula t))
 
   (use-package solaire-mode
     :disabled
