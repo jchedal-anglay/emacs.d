@@ -783,18 +783,17 @@ Add lexical binding support
   (use-package cc-mode
     :ensure nil
     :hook
-    (c-mode . (lambda () (setq indent-tabs-mode t)))
+    ((c-mode c++-mode) . lsp)
     :custom
     (c-default-style "linux")
     (c-basic-offset 4))
 
   (use-package ccls
-    :after (lsp-mode dap-mode)
+    :after lsp-mode
     :hook
-    ((c-mode c++-mode) . lsp)
+    (c-mode . (lambda () (setq indent-tabs-mode t)))
     :custom
-    (ccls-executable "~/ccls/Release/ccls")
-    (require 'dap-lldb))
+    (ccls-executable "~/ccls/Release/ccls"))
 
   (use-package company-c-headers
     :after company
@@ -874,9 +873,7 @@ Add lexical binding support
 
   (use-package python
     :ensure nil
-    :after (lsp-mode dap-mode)
-    :preface
-    (require 'dap-python)
+    :after lsp-mode
     :hook
     (python-mode . lsp)
     :custom
@@ -891,6 +888,10 @@ Add lexical binding support
     (lsp-pyls-plugins-pycodestyle-enabled nil)
     (lsp-pyls-plugins-pydocstyle-enabled nil)
     (lsp-pyls-plugins-pyflakes-enabled nil))
+
+  (use-package dap-python
+    :ensure nil
+    :after dap-mode)
 
   (use-package cython-mode)
   (use-package flycheck-cython)
