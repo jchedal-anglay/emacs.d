@@ -345,15 +345,6 @@ Add lexical binding support
 
   (when (display-graphic-p)
     (add-hook 'prog-mode-hook #'hl-line-mode))
-
-  (use-package highlight-indent-guides
-    :disabled
-    :hook
-    (focus-in . (lambda () (setq highlight-indent-guides-character (-> (buffer-name) all-the-icons-icon-for-file string-to-char))))
-    (prog-mode . highlight-indent-guides-mode)
-    (prog-mode . (lambda () (setq highlight-indent-guides-character (-> (buffer-name) all-the-icons-icon-for-file string-to-char))))
-    :custom
-    (highlight-indent-guides-method 'character))
 #+END_SRC
 
 ** Line numbers
