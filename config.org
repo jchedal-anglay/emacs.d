@@ -3,7 +3,6 @@
 - [[#initialization][Initialization]]
 - [[#packages][Packages]]
 - [[#encoding][Encoding]]
-- [[#dependencies][Dependencies]]
 - [[#functions][Functions]]
 - [[#custom-variables][Custom Variables]]
 - [[#system][System]]
@@ -27,7 +26,6 @@
   - [[#which-key][Which-key]]
 - [[#completion-frontend][Completion Frontend]]
   - [[#ivy][Ivy]]
-- [[#org][Org]]
 - [[#editing][Editing]]
 - [[#navigation][Navigation]]
 - [[#programming-related][Programming Related]]
@@ -37,6 +35,8 @@
   - [[#checkerslinters][Checkers/Linters]]
   - [[#project-management][Project Management]]
   - [[#languages][Languages]]
+- [[#miscelaneous][Miscelaneous]]
+  - [[#org][Org]]
 - [[#community][Community]]
   - [[#browser][Browser]]
   - [[#discord][Discord]]
@@ -96,14 +96,6 @@ Add lexical binding support
   (prefer-coding-system 'utf-8)
 #+END_SRC
 
-* Dependencies
-
-#+BEGIN_SRC emacs-lisp
-  (use-package popwin
-    :defer t
-    :commands popwin:display-buffer-1)
-#+END_SRC
-
 * Functions
 
 #+BEGIN_SRC emacs-lisp
@@ -126,23 +118,6 @@ Add lexical binding support
     "Delete the current window and balance the windows."
     (interactive)
     (ign/after #'balance-windows #'delete-window))
-
-  (defun ign/popwin-term (name)
-    "Pop a newly created terminal at the bottom of the frame, make its buffer name NAME."
-    (popwin:display-buffer-1
-     (or (get-buffer name)
-         (save-window-excursion
-           (multi-term)))
-     :default-config-keywords '(:height 15 :position :bottom :noselect nil :stick t))
-    (rename-buffer name))
-
-  (cl-defun ign/term-toggle (&optional (name "*term*"))
-    "Create or destroy a popped up terminal based on whether or not it exists."
-    (interactive)
-    (cond
-     ((get-buffer-window name) (kill-buffer name))
-     ((get-buffer name) (progn (kill-buffer name) (ign/term-toggle)))
-     (t (ign/popwin-term name))))
 
   (defun ign/fill-or-unfill ()
     "Fill or unfill based on the previous command."
@@ -264,22 +239,9 @@ Add lexical binding support
   (use-package doom-themes
     :custom-face
     (font-lock-function ((t (:foreground "#e06c75"))))
-    :custom
-    (doom-vibrant-brighter-comments t)
-    (doom-vibrant-brighter-modeline t)
     :config
     (doom-themes-org-config)
     (load-theme 'doom-dracula t))
-
-  (use-package solaire-mode
-    :disabled
-    :defer t
-    :hook
-    (prog-mode . turn-on-solaire-mode)
-    :custom
-    (solaire-mode-remap-modeline nil)
-    :config
-    (solaire-mode-swap-bg))
 #+END_SRC
 
 ** Modeline
@@ -402,6 +364,17 @@ Add lexical binding support
   (use-package multi-term
     :custom
     (multi-term-program (ign/find-executables "zsh" "bash" "sh")))
+
+  (use-package popwin)
+
+  (use-package term-toggle
+    :after popwin
+    :load-path "site-lisp/term-toggle"
+    :custom
+    (term-toggle-pos :bottom)
+    (term-toggle-size 20)
+    :bind
+    ("C-c DEL" . term-toggle))
 #+END_SRC
 
 ** Parentheses
@@ -412,14 +385,10 @@ Add lexical binding support
     :hook
     (prog-mode . rainbow-delimiters-mode))
 
-  (use-package smartparens
-    :defer t
+  (use-package elec-pair
+    :ensure nil
     :hook
-    (prog-mode . smartparens-mode)
-    :custom
-    (sp-escape-quotes-after-insert nil)
-    :config
-    (require 'smartparens-config))
+    (prog-mode . electric-pair-mode))
 
   (show-paren-mode t)
 #+END_SRC
@@ -431,6 +400,8 @@ Add lexical binding support
   (keyboard-translate ?\C-x ?\C-t)
   (define-key key-translation-map (kbd "M-t") (kbd "M-x"))
   (define-key key-translation-map (kbd "M-x") (kbd "M-t"))
+  (define-key key-translation-map (kbd "C-M-t") (kbd "C-M-x"))
+  (define-key key-translation-map (kbd "C-M-x") (kbd "C-M-t"))
 
   (define-key comint-mode-map (kbd "C-l") #'comint-clear-buffer)
 
@@ -439,7 +410,6 @@ Add lexical binding support
   (bind-key* "C-a" #'ign/bol)
   (bind-key* "C-e" #'ign/eol)
   (bind-key* "C-k" #'ign/kill-line-or-region)
-  (bind-key* "C-c DEL" #'ign/term-toggle)
   (use-package hydra)
 #+END_SRC
 
@@ -493,46 +463,6 @@ Add lexical binding support
 
   ;; This will make counsel-M-x sort candidates by frequency
   (use-package smex)
-#+END_SRC
-
-* Org
-
-#+BEGIN_SRC emacs-lisp
-  (use-package org
-    :ensure nil
-    :mode
-    ("\\.org\\'" . org-mode)
-    :hook
-    (org-babel-after-execute . org-redisplay-inline-images)
-    :custom
-    (org-image-actual-width 480)
-    (org-src-fontify-natively t)
-    (org-src-tab-acts-natively t)
-    (org-pretty-entities t)
-    (org-hide-emphasis-markers t)
-    (org-startup-with-inline-images t)
-    (org-babel-python-command "python3 -i")
-    (org-format-latex-options (plist-put org-format-latex-options :scale 1.4))
-    :config
-    (add-to-list 'org-structure-template-alist
-                 '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((python . t)
-       (ocaml . t)
-       (gnuplot . t))))
-
-  (use-package toc-org
-    :after org
-    :hook
-    (org-mode . toc-org-enable))
-
-  (use-package org-bullets
-    :after org
-    :hook
-    (org-mode . org-bullets-mode))
-
-  (use-package px)
 #+END_SRC
 
 * Editing
@@ -635,18 +565,6 @@ Add lexical binding support
           ("M-p" . nil)
           ("C-n" . company-select-next)
           ("C-p" . company-select-previous))
-    :custom-face
-    (company-tooltip ((t (:foreground "#abb2bf" :background "#30343c"))))
-    (company-tooltip-annotation ((t (:foreground "#abb2bf" :background "#30343c"))))
-    (company-tooltip-selection ((t (:foreground "#abb2bf" :background "#393f49"))))
-    (company-tooltip-mouse ((t (:background "#30343c"))))
-    (company-tooltip-common ((t (:foreground "#abb2bf" :background "#30343c"))))
-    (company-tooltip-common-selection ((t (:foreground "#abb2bf" :background "#393f49"))))
-    (company-preview ((t (:background "#30343c"))))
-    (company-preview-common ((t (:foreground "#abb2bf" :background "#30343c"))))
-    (company-scrollbar-fg ((t (:background "#30343c"))))
-    (company-scrollbar-bg ((t (:background "#30343c"))))
-    (company-template-field ((t (:foreground "#282c34" :background "#c678dd"))))
     :custom
     (company-require-match 'never)
     (company-dabbrev-downcase nil)
@@ -897,10 +815,51 @@ Add lexical binding support
   (use-package flycheck-cython)
 #+END_SRC
 
-*** R
+*** R & Julia
 
 #+BEGIN_SRC emacs-lisp
   (use-package ess)
+#+END_SRC
+
+* Miscelaneous
+** Org
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+    :ensure nil
+    :mode
+    ("\\.org\\'" . org-mode)
+    :hook
+    (org-babel-after-execute . org-redisplay-inline-images)
+    :custom
+    (org-image-actual-width 480)
+    (org-src-fontify-natively t)
+    (org-src-tab-acts-natively t)
+    (org-pretty-entities t)
+    (org-hide-emphasis-markers t)
+    (org-startup-with-inline-images t)
+    (org-babel-python-command "python3 -i")
+    (org-format-latex-options (plist-put org-format-latex-options :scale 1.4))
+    :config
+    (add-to-list 'org-structure-template-alist
+                 '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC"))
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((python . t)
+       (ocaml . t)
+       (gnuplot . t))))
+
+  (use-package toc-org
+    :after org
+    :hook
+    (org-mode . toc-org-enable))
+
+  (use-package org-bullets
+    :after org
+    :hook
+    (org-mode . org-bullets-mode))
+
+  (use-package px)
 #+END_SRC
 
 * Community
