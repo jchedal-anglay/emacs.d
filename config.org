@@ -372,7 +372,9 @@ Add lexical binding support
     :load-path "site-lisp/term-toggle"
     :custom
     (term-toggle-pos :bottom)
-    (term-toggle-size 20)
+    (term-toggle-size 15)
+    (term-toggle-function #'multi-term)
+    (term-toggle-args '())
     :bind
     ("C-c DEL" . term-toggle))
 #+END_SRC
