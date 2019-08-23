@@ -822,7 +822,7 @@ Add lexical binding support
   (use-package ess)
 #+END_SRC
 
-* Miscelaneous
+* Writing/Documentation
 ** Org
 
 #+BEGIN_SRC emacs-lisp
