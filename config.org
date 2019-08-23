@@ -478,7 +478,6 @@ Add lexical binding support
 
   (use-package expand-region
     :defer t
-    :commands er/expand-region
     :bind
     ("C-=" . er/expand-region))
 
