@@ -241,7 +241,7 @@ Add lexical binding support
     (font-lock-function ((t (:foreground "#e06c75"))))
     :config
     (doom-themes-org-config)
-    (load-theme 'doom-dracula t))
+    (load-theme 'doom-one t))
 #+END_SRC
 
 ** Modeline
