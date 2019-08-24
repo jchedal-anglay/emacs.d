@@ -3,6 +3,7 @@
 ;; Copyright (C) 2019  Julien Chedal-Anglay
 
 ;; Author: Julien Chedal-Anglay <chedala.julien@gmail.com>
+;; Package-Requires: ((popwin "1.0.0"))
 ;; Keywords: terminals, frames
 
 ;; This program is free software; you can redistribute it and/or modify
