@@ -375,7 +375,7 @@ Add lexical binding support
     (term-toggle-function #'multi-term)
     (term-toggle-args '())
     :bind
-    ("C-c DEL" . term-toggle))
+    ("C-c t" . term-toggle))
 #+END_SRC
 
 ** Parentheses
