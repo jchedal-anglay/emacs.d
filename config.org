@@ -35,7 +35,7 @@
   - [[#checkerslinters][Checkers/Linters]]
   - [[#project-management][Project Management]]
   - [[#languages][Languages]]
-- [[#miscelaneous][Miscelaneous]]
+- [[#writingdocumentation][Writing/Documentation]]
   - [[#org][Org]]
 - [[#community][Community]]
   - [[#browser][Browser]]
@@ -432,8 +432,6 @@ Add lexical binding support
           ("<return>" . ivy-alt-done)
           ("C-r" . ivy-previous-line)
           ("C-s" . ivy-next-line))
-    :custom-face
-    (ivy-current-match ((t (:background "#3d4451"))))
     :custom
     (ivy-use-virtual-buffers t)
     (ivy-count-format "%d/%d ")
@@ -511,6 +509,10 @@ Add lexical binding support
     ("C-'" . avy-goto-char-timer)
     :custom
     (avy-keys '(?a ?o ?e ?u ?h ?t ?n ?s)))
+
+  (use-package imenu-list
+    :bind
+    ("C-c j" . imenu-list-smart-toggle))
 #+END_SRC
 
 * Programming Related
@@ -662,18 +664,22 @@ Add lexical binding support
     (lsp-enable-snippet nil))
 
   (use-package lsp-ui
-    :after lsp-mode
+    :after (doom-themes hl-line imenu-list lsp-mode)
     :bind
     (:map lsp-mode-map
           ("M-." . lsp-ui-peek-find-references)
-          ("C-c j" . lsp-ui-imenu)
+          ([remap imenu-list-smart-toggle] . lsp-ui-imenu)
           ("C-c l" . lsp-ui-flycheck-list))
     :hook
     (lsp-mode . lsp-ui-mode)
     :custom
-    (lsp-ui-doc-enable nil))
+    (lsp-ui-doc-enable t)
+    (lsp-ui-doc-border (face-foreground 'default))
+    :config
+    (set-face-background 'lsp-ui-doc-background (face-background 'hl-line)))
 
   (use-package dap-mode
+    :after hydra
     :hook
     (lsp-mode . (lambda () (dap-mode t) (dap-ui-mode t)))
     :config
@@ -712,6 +718,10 @@ Add lexical binding support
     (c-mode . (lambda () (setq indent-tabs-mode t)))
     :custom
     (ccls-executable "~/ccls/Release/ccls"))
+
+  (use-package dap-gdb-lldb
+    :ensure nil
+    :after dap-mode)
 
   (use-package company-c-headers
     :after company
@@ -797,7 +807,6 @@ Add lexical binding support
     :custom
     (python-indent 4)
     (python-shell-interpreter ign/python-executable)
-    (dap-python-executable ign/python-executable)
     ;; Required for MacOS, prevents newlines from being displayed as ^G
     (python-shell-interpreter-args (if ign/is-a-mac "-c exec('__import__(\\'readline\\')') -i" "-i"))
     (python-fill-docstring-style 'pep-257)
@@ -807,9 +816,27 @@ Add lexical binding support
     (lsp-pyls-plugins-pydocstyle-enabled nil)
     (lsp-pyls-plugins-pyflakes-enabled nil))
 
+  (use-package elpy
+    :after python
+    :hook
+    (python-mode . elpy-mode)
+    :bind
+    (:map python-mode-map
+          ("C-c C-c" . elpy-shell-send-top-statement)
+          ([remap lsp-rename] . elpy-multiedit-python-symbol-at-point)
+          ([remap lsp-format-buffer] . elpy-format-code))
+    :custom
+    (elpy-rpc-python-command ign/python-executable)
+    :config
+    (defalias 'elpy-format-code 'elpy-black-fix-code)
+    (setq-default elpy-modules ())
+    (elpy-enable))
+
   (use-package dap-python
     :ensure nil
-    :after dap-mode)
+    :after dap-mode
+    :custom
+    (dap-python-executable ign/python-executable))
 
   (use-package cython-mode)
   (use-package flycheck-cython)
