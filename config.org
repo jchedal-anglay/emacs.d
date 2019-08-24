@@ -237,11 +237,10 @@ Add lexical binding support
 
 #+BEGIN_SRC emacs-lisp
   (use-package doom-themes
-    :custom-face
-    (font-lock-function ((t (:foreground "#e06c75"))))
     :config
     (doom-themes-org-config)
-    (load-theme 'doom-one t))
+    (load-theme 'doom-solarized-light t)
+    (set-face-attribute 'org-level-1 nil :background (face-background 'default) :height 1.0))
 #+END_SRC
 
 ** Modeline
