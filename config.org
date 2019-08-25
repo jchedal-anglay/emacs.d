@@ -663,7 +663,8 @@ Add lexical binding support
     (lsp-enable-snippet nil))
 
   (use-package lsp-ui
-    :after (doom-themes hl-line imenu-list lsp-mode)
+    :after
+    (doom-themes hl-line imenu-list lsp-mode)
     :bind
     (:map lsp-mode-map
           ("M-." . lsp-ui-peek-find-references)
@@ -692,7 +693,8 @@ Add lexical binding support
         ("d" dap-debug "Start debug session"))))
 
   (use-package company-lsp
-    :after (company lsp-mode)
+    :after
+    (company lsp-mode)
     :custom
     (company-lsp-async t)
     (company-lsp-cache-candidates t)
