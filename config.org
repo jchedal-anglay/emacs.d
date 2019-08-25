@@ -636,7 +636,6 @@ Add lexical binding support
     (projectile-mode t))
 
   (use-package counsel-projectile
-    :disabled
     :after
     (counsel projectile)
     :config
