@@ -1,7 +1,7 @@
 * Table of Contents                                                     :TOC:
-- [[#backups][Backups]]
 - [[#initialization][Initialization]]
 - [[#packages][Packages]]
+- [[#backups][Backups]]
 - [[#encoding][Encoding]]
 - [[#functions][Functions]]
 - [[#custom-variables][Custom Variables]]
@@ -37,19 +37,11 @@
   - [[#languages][Languages]]
 - [[#writingdocumentation][Writing/Documentation]]
   - [[#org][Org]]
+  - [[#latex][LaTeX]]
 - [[#community][Community]]
   - [[#browser][Browser]]
   - [[#discord][Discord]]
   - [[#key-frequency][Key Frequency]]
-
-* Backups
-
-#+BEGIN_SRC emacs-lisp
-  (setq-default backup-inhibited t
-                auto-save-default nil
-                create-lockfiles nil
-                make-backup-files nil)
-#+END_SRC
 
 * Initialization
 
@@ -60,6 +52,7 @@ Add lexical binding support
 
 * Packages
 
+Set up package.el and use-package for later use, disable implicit lazy-loading
 #+BEGIN_SRC emacs-lisp
   (require 'package)
 
@@ -84,6 +77,16 @@ Add lexical binding support
   ;; Useful to speed up start-up time
   (setq gc-cons-threshold most-positive-fixnum)
   (add-hook 'after-init-hook (lambda () (setq gc-cons-threshold 800000)))
+#+END_SRC
+
+* Backups
+
+I don't want any kind of backup, this is mostly due to saving being compulsory to me.
+#+BEGIN_SRC emacs-lisp
+  (setq-default backup-inhibited t
+                auto-save-default nil
+                create-lockfiles nil
+                make-backup-files nil)
 #+END_SRC
 
 * Encoding
@@ -188,6 +191,7 @@ Add lexical binding support
 #+END_SRC
 
 * Custom Variables
+
 #+BEGIN_SRC emacs-lisp
   (defconst custom-file "/dev/zero")
   (defconst ign/config-path (concat user-emacs-directory "config.org"))
@@ -198,6 +202,7 @@ Add lexical binding support
 * System
 ** Shell Path
 
+This was originally used for MacOS only, but ended being useful for various tools that require on a shell to run
 #+BEGIN_SRC emacs-lisp
   (use-package exec-path-from-shell
     :config
@@ -228,7 +233,10 @@ Add lexical binding support
 
 #+BEGIN_SRC emacs-lisp
   (set-frame-font (if ign/is-a-mac "Menlo-18" "SourceCodePro-12") nil t)
+#+END_SRC
 
+Fancy icons from font-awesome, material-icons, ...
+#+BEGIN_SRC emacs-lisp
   (use-package all-the-icons
     :if (display-graphic-p))
 #+END_SRC
@@ -310,6 +318,7 @@ Add lexical binding support
 
 ** Line numbers
 
+Use linum for versions <26, otherwise use the cleaner and faster builtin line-number package
 #+BEGIN_SRC emacs-lisp
   (use-package linum
     :ensure nil
@@ -335,6 +344,7 @@ Add lexical binding support
 
 ** Scrolling
 
+Makes scrolling slightly smoother
 #+BEGIN_SRC emacs-lisp
   (setq-default scroll-margin 0
                 scroll-conservatively 10000
@@ -344,6 +354,7 @@ Add lexical binding support
 
 ** Confirmation messages
 
+Disable yes-or-no-p, I like to live dangerously
 #+BEGIN_SRC emacs-lisp
   (defalias 'yes-or-no-p (lambda (&rest _) t))
   (setq-default confirm-kill-emacs nil)
@@ -359,6 +370,7 @@ Add lexical binding support
 
 ** Terminal
 
+Uses the term-toggle package in =site-lisp/term-toggle=
 #+BEGIN_SRC emacs-lisp
   (use-package multi-term
     :custom
@@ -396,6 +408,7 @@ Add lexical binding support
 
 * Bindings
 
+Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use a dvorak layout, and X is very annoying to reach
 #+BEGIN_SRC emacs-lisp
   (keyboard-translate ?\C-t ?\C-x)
   (keyboard-translate ?\C-x ?\C-t)
@@ -424,6 +437,7 @@ Add lexical binding support
 
 * Completion Frontend
 ** Ivy
+
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
     :bind
@@ -888,6 +902,12 @@ Add lexical binding support
     (org-mode . org-bullets-mode))
 
   (use-package px)
+#+END_SRC
+
+** LaTeX
+
+#+BEGIN_SRC emacs-lisp
+
 #+END_SRC
 
 * Community
