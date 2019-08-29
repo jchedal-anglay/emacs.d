@@ -664,6 +664,7 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 ** Languages
 *** LSP
 
+We set the LSP configuration that will be used for many other languages
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
     :bind
@@ -718,6 +719,11 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 
 *** C/C++
 
+For now, use ccls, clangd may be a better option
+Requires:
+- clang
+- lldb OR gdb
+- [[https://github.com/MaskRay/ccls][ccls]]
 #+BEGIN_SRC emacs-lisp
   (use-package cc-mode
     :ensure nil
@@ -746,6 +752,8 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 
 *** Clojure
 
+Requires:
+- Leiningen
 #+BEGIN_SRC emacs-lisp
   (use-package clojure-mode
     :hook
@@ -767,6 +775,8 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 
 *** Common Lisp
 
+Requires:
+- sbcl
 #+BEGIN_SRC emacs-lisp
   (use-package slime
     :hook
@@ -781,6 +791,9 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 
 *** Jupyter
 
+Requires:
+- python3
+- Jupyter
 #+BEGIN_SRC emacs-lisp
   (use-package ein
     :mode
@@ -792,6 +805,9 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 
 *** OCaml
 
+Requires
+- ocaml
+- [[https://github.com/freebroccolo/ocaml-language-server][ocaml-language-server]]
 #+BEGIN_SRC emacs-lisp
 (use-package tuareg
   :hook
@@ -809,6 +825,11 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 
 *** Python
 
+Elpy is used for refactoring function
+Requires:
+- python3
+- [[https://github.com/palantir/python-language-server][pyls]]
+- cython
 #+BEGIN_SRC emacs-lisp
   (use-package pip-requirements
     :mode
@@ -859,6 +880,9 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 
 *** R & Julia
 
+Requires:
+- Julia
+- R
 #+BEGIN_SRC emacs-lisp
   (use-package ess)
 #+END_SRC
