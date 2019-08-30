@@ -36,8 +36,8 @@
   - [[#project-management][Project Management]]
   - [[#languages][Languages]]
 - [[#writingdocumentation][Writing/Documentation]]
+  - [[#french][French]]
   - [[#org][Org]]
-  - [[#latex][LaTeX]]
 - [[#community][Community]]
   - [[#browser][Browser]]
   - [[#discord][Discord]]
@@ -425,6 +425,11 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
   (bind-key* "C-e" #'ign/eol)
   (bind-key* "C-k" #'ign/kill-line-or-region)
   (use-package hydra)
+  (use-package key-chord
+    :custom
+    (key-chord-two-keys-delay 0.03)
+    :config
+    (key-chord-mode t))
 #+END_SRC
 
 ** Which-key
@@ -888,6 +893,31 @@ Requires:
 #+END_SRC
 
 * Writing/Documentation
+** French
+
+#+BEGIN_SRC emacs-lisp
+(key-chord-define-global "eu" (lambda () (interactive) (insert "é")))
+(key-chord-define-global "EU" (lambda () (interactive) (insert "É")))
+
+(key-chord-define-global "ah" (lambda () (interactive) (insert "à")))
+(key-chord-define-global "eh" (lambda () (interactive) (insert "è")))
+(key-chord-define-global "uh" (lambda () (interactive) (insert "ù")))
+(key-chord-define-global "AH" (lambda () (interactive) (insert "À")))
+(key-chord-define-global "EH" (lambda () (interactive) (insert "È")))
+(key-chord-define-global "UH" (lambda () (interactive) (insert "Ù")))
+
+(key-chord-define-global "at" (lambda () (interactive) (insert "â")))
+(key-chord-define-global "et" (lambda () (interactive) (insert "ê")))
+(key-chord-define-global "it" (lambda () (interactive) (insert "î")))
+(key-chord-define-global "ot" (lambda () (interactive) (insert "ô")))
+(key-chord-define-global "ut" (lambda () (interactive) (insert "û")))
+(key-chord-define-global "AT" (lambda () (interactive) (insert "Â")))
+(key-chord-define-global "ET" (lambda () (interactive) (insert "Ê")))
+(key-chord-define-global "IT" (lambda () (interactive) (insert "Î")))
+(key-chord-define-global "OT" (lambda () (interactive) (insert "Ô")))
+(key-chord-define-global "UT" (lambda () (interactive) (insert "Û")))
+#+END_SRC
+
 ** Org
 
 #+BEGIN_SRC emacs-lisp
@@ -926,12 +956,6 @@ Requires:
     (org-mode . org-bullets-mode))
 
   (use-package px)
-#+END_SRC
-
-** LaTeX
-
-#+BEGIN_SRC emacs-lisp
-
 #+END_SRC
 
 * Community
