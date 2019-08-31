@@ -725,8 +725,8 @@ We set the LSP configuration that will be used for many other languages
 
 For now, use ccls, clangd may be a better option
 Requires:
-- clang
-- lldb OR gdb
+- [[https://clang.llvm.org/][clang]]
+- [[https://lldb.llvm.org/][lldb]]
 - [[https://github.com/MaskRay/ccls][ccls]]
 #+BEGIN_SRC emacs-lisp
   (use-package cc-mode
@@ -757,7 +757,7 @@ Requires:
 *** Clojure
 
 Requires:
-- Leiningen
+- [[https://leiningen.org/][Leiningen]]
 #+BEGIN_SRC emacs-lisp
   (use-package clojure-mode
     :hook
@@ -780,7 +780,7 @@ Requires:
 *** Common Lisp
 
 Requires:
-- sbcl
+- [[http://www.sbcl.org/][sbcl]]
 #+BEGIN_SRC emacs-lisp
   (use-package slime
     :hook
@@ -796,8 +796,8 @@ Requires:
 *** Jupyter
 
 Requires:
-- python3
-- Jupyter
+- [[https://www.python.org/][Python3]]
+- [[https://jupyter.org/][Jupyter]]
 #+BEGIN_SRC emacs-lisp
   (use-package ein
     :mode
@@ -810,7 +810,7 @@ Requires:
 *** OCaml
 
 Requires
-- ocaml
+- [[https://ocaml.org/][ocaml]]
 - [[https://github.com/freebroccolo/ocaml-language-server][ocaml-language-server]]
 #+BEGIN_SRC emacs-lisp
 (use-package tuareg
@@ -831,9 +831,9 @@ Requires
 
 Elpy is used for refactoring function
 Requires:
-- python3
+- [[https://www.python.org/][Python3]]
 - [[https://github.com/palantir/python-language-server][pyls]]
-- cython
+- [[https://cython.org/][Cython]]
 #+BEGIN_SRC emacs-lisp
   (use-package pip-requirements
     :mode
@@ -885,8 +885,8 @@ Requires:
 *** R & Julia
 
 Requires:
-- Julia
-- R
+- [[https://julialang.org/][Julia]]
+- [[https://www.r-project.org/][R]]
 #+BEGIN_SRC emacs-lisp
   (use-package ess)
 #+END_SRC
