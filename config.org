@@ -724,6 +724,7 @@ We set the LSP configuration that will be used for many other languages
 *** C/C++
 
 For now, use ccls, clangd may be a better option
+
 Requires:
 - [[https://clang.llvm.org/][clang]]
 - [[https://lldb.llvm.org/][lldb]]
@@ -830,6 +831,7 @@ Requires
 *** Python
 
 Elpy is used for refactoring function
+
 Requires:
 - [[https://www.python.org/][Python3]]
 - [[https://github.com/palantir/python-language-server][pyls]]
