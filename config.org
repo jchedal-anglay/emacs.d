@@ -192,10 +192,12 @@ I don't want any kind of backup, this is mostly due to saving being compulsory t
 * Custom Variables
 
 #+BEGIN_SRC emacs-lisp
-  (defconst custom-file "/dev/zero")
   (defconst ign/config-path (concat user-emacs-directory "config.org"))
-  (defconst ign/is-a-mac (memq window-system '(mac ns)))
+  (defconst ign/os (or (alist-get system-type '((gnu . *nix) (gnu/linux . *nix) (gnu/kfreebsd . *nix) (darwin . macos) (ms-dos . win) (windows-nt . win) (cygwin . win))) '*nix))
   (defconst ign/python-executable "python3")
+  (defconst ign/use-pyls-p t)
+  (when (eq ign/os '*nix)
+    (setq-default custom-file "/dev/zero"))
 #+END_SRC
 
 * System
@@ -231,7 +233,11 @@ This was originally used for MacOS only, but ended being useful for various tool
 ** Font
 
 #+BEGIN_SRC emacs-lisp
-  (set-frame-font (if ign/is-a-mac "Menlo-18" "SourceCodePro-12") nil t)
+  (set-frame-font
+   (pcase ign/os
+     ('*nix "SourceCodePro")
+     ('macos "Menlo")
+     (_ "Consolas")))
 #+END_SRC
 
 Fancy icons from font-awesome, material-icons, ...
@@ -542,9 +548,6 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     :bind
     ("C-c g" . magit))
 
-  (use-package forge
-    :after magit)
-
   (use-package gitignore-mode
     :mode "\\.gitignore\\'")
 
@@ -850,13 +853,9 @@ Requires:
     (python-indent 4)
     (python-shell-interpreter ign/python-executable)
     ;; Required for MacOS, prevents newlines from being displayed as ^G
-    (python-shell-interpreter-args (if ign/is-a-mac "-c exec('__import__(\\'readline\\')') -i" "-i"))
+    (python-shell-interpreter-args (if (eq ign/os 'macos) "-c exec('__import__(\\'readline\\')') -i" "-i"))
     (python-fill-docstring-style 'pep-257)
-    (py-split-window-on-execute t)
-    (lsp-pyls-plugins-mccabe-enabled nil)
-    (lsp-pyls-plugins-pycodestyle-enabled nil)
-    (lsp-pyls-plugins-pydocstyle-enabled nil)
-    (lsp-pyls-plugins-pyflakes-enabled nil))
+    (py-split-window-on-execute t))
 
   (use-package elpy
     :after python
@@ -871,12 +870,25 @@ Requires:
     (elpy-rpc-python-command ign/python-executable)
     :config
     (defalias 'elpy-format-code 'elpy-black-fix-code)
-    (setq-default elpy-modules ())
-    (elpy-enable))
+    (elpy-enable)
+    (setq elpy-modules (delete 'elpy-module-flymake elpy-modules))
+    (setq elpy-modules (delete 'elpy-module-highlight-indentation elpy-modules))
+    (setq elpy-modules (delete 'elpy-module-django elpy-modules)))
+
+  (use-package lsp-pyls
+    :ensure nil
+    :if ign/use-pyls-p
+    :after (lsp-mode elpy)
+    :custom
+    (elpy-modules ())
+    (lsp-pyls-plugins-mccabe-enabled nil)
+    (lsp-pyls-plugins-pycodestyle-enabled nil)
+    (lsp-pyls-plugins-pydocstyle-enabled nil)
+    (lsp-pyls-plugins-pyflakes-enabled nil))
 
   (use-package dap-python
     :ensure nil
-    :after dap-mode
+    :after (lsp-pyls dap-mode)
     :custom
     (dap-python-executable ign/python-executable))
 
