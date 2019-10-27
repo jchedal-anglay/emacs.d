@@ -829,7 +829,6 @@ Requires
 Requires:
 - [[https://www.python.org/][Python3]]
 - [[https://github.com/palantir/python-language-server][pyls]]
-- [[https://cython.org/][Cython]]
 #+BEGIN_SRC emacs-lisp
   (use-package pip-requirements
     :mode
