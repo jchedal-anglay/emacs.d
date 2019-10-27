@@ -195,8 +195,7 @@ I don't want any kind of backup, this is mostly due to saving being compulsory t
   (defconst ign/config-path (concat user-emacs-directory "config.org"))
   (defconst ign/os (or (alist-get system-type '((gnu . *nix) (gnu/linux . *nix) (gnu/kfreebsd . *nix) (darwin . macos) (ms-dos . win) (windows-nt . win) (cygwin . win))) '*nix))
   (defconst ign/python-executable "python3")
-  (defconst ign/use-pyls-p t)
-  (defconst ign/use-all-the-icons-p nil)
+  (defconst ign/use-all-the-icons-p t)
   (when (eq ign/os '*nix)
     (setq-default custom-file "/dev/zero"))
 #+END_SRC
@@ -236,7 +235,7 @@ This was originally used for MacOS only, but ended being useful for various tool
 #+BEGIN_SRC emacs-lisp
   (set-frame-font
    (pcase ign/os
-     ('*nix "SourceCodePro")
+     ('*nix "Inconsolata")
      ('macos "Menlo")
      (_ "Consolas")))
 #+END_SRC
@@ -253,7 +252,7 @@ Fancy icons from font-awesome, material-icons, ...
   (use-package doom-themes
     :config
     (doom-themes-org-config)
-    (load-theme 'doom-solarized-light t)
+    (load-theme 'doom-one t)
     (set-face-attribute 'org-level-1 nil :background (face-background 'default) :height 1.0))
 #+END_SRC
 
@@ -467,7 +466,6 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     (ivy-action-wrap t)
     (ivy-re-builders-alist
      '((t . ivy--regex-plus)))
-    (ivy-initial-inputs-alist nil)
     :config
     (ivy-mode t))
 
@@ -529,12 +527,6 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 * Navigation
 
 #+BEGIN_SRC emacs-lisp
-  (use-package avy
-    :bind
-    ("C-'" . avy-goto-char-timer)
-    :custom
-    (avy-keys '(?a ?o ?e ?u ?h ?t ?n ?s)))
-
   (use-package imenu-list
     :bind
     ("C-c j" . imenu-list-smart-toggle))
@@ -595,6 +587,7 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     (company-tooltip-align-annotations t)
     (company-idle-delay 128)
     (company-minimum-prefix-length 128)
+    (company-backends nil)
     :config
     (global-company-mode t))
 #+END_SRC
@@ -609,15 +602,15 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     (flycheck-error ((t (:underline (:style line :color "#FF5C33")))))
     (flycheck-check-syntax-automatically '(mode-enabled save))
     :custom
-    (flycheck-python-pylint-executable ign/python-executable)
+    (flycheck-checkers nil)
     :config
-    (add-to-list 'flycheck-disabled-checkers 'python-flake8)
-    (add-to-list 'flycheck-disabled-checkers 'python-mypy)
-    (add-to-list 'flycheck-disabled-checkers 'python-pylint)
-    (add-to-list 'flycheck-disabled-checkers 'python-pycompile)
-    (add-to-list 'flycheck-disabled-checkers 'c/c++-gcc)
-    (add-to-list 'flycheck-disabled-checkers 'c/c++-clang)
-    (add-to-list 'flycheck-disabled-checkers 'c/c++-cppcheck)
+    ;; (add-to-list 'flycheck-disabled-checkers 'python-flake8)
+    ;; (add-to-list 'flycheck-disabled-checkers 'python-mypy)
+    ;; (add-to-list 'flycheck-disabled-checkers 'python-pylint)
+    ;; (add-to-list 'flycheck-disabled-checkers 'python-pycompile)
+    ;; (add-to-list 'flycheck-disabled-checkers 'c/c++-gcc)
+    ;; (add-to-list 'flycheck-disabled-checkers 'c/c++-clang)
+    ;; (add-to-list 'flycheck-disabled-checkers 'c/c++-cppcheck)
     (global-flycheck-mode t)
     ;; Bad flycheck design, override the default fringe without having to redefine entire checker levels
     (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
@@ -675,6 +668,7 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 We set the LSP configuration that will be used for many other languages
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
+    :after company
     :bind
     (:map lsp-mode-map
           ("M-," . lsp-find-definition)
@@ -682,27 +676,33 @@ We set the LSP configuration that will be used for many other languages
           ("C-c e" . lsp-rename)
           ("C-c f" . lsp-format-buffer))
     :custom
+    (lsp-auto-guess-root nil)
     (lsp-prefer-flymake nil)
-    (lsp-enable-snippet nil))
+    (lsp-enable-snippet nil)
+    :config
+    (add-to-list 'company-backends 'company-lsp))
 
   (use-package lsp-ui
     :after
     (doom-themes hl-line imenu-list lsp-mode)
     :bind
     (:map lsp-mode-map
-          ("M-." . lsp-ui-peek-find-references)
+          ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
+          ([remap xref-find-references] . lsp-ui-peek-find-references)
           ([remap imenu-list-smart-toggle] . lsp-ui-imenu)
-          ("C-c l" . lsp-ui-flycheck-list))
+          ([remap flycheck-list-errors] . lsp-ui-flycheck-list))
     :hook
     (lsp-mode . lsp-ui-mode)
     :custom
     (lsp-ui-doc-enable t)
     (lsp-ui-doc-border (face-foreground 'default))
+    (lsp-ui-doc-include-signature t)
+    (lsp-ui-peek-always-show t)
     :config
     (set-face-background 'lsp-ui-doc-background (face-background 'hl-line)))
 
   (use-package dap-mode
-    :after hydra
+    :after (lsp-mode hydra)
     :hook
     (lsp-mode . (lambda () (dap-mode t) (dap-ui-mode t)))
     :config
@@ -732,7 +732,6 @@ For now, use ccls, clangd may be a better option
 Requires:
 - [[https://clang.llvm.org/][clang]]
 - [[https://lldb.llvm.org/][lldb]]
-- [[https://github.com/MaskRay/ccls][ccls]]
 #+BEGIN_SRC emacs-lisp
   (use-package cc-mode
     :ensure nil
@@ -741,13 +740,6 @@ Requires:
     :custom
     (c-default-style "linux")
     (c-basic-offset 4))
-
-  (use-package ccls
-    :after lsp-mode
-    :hook
-    (c-mode . (lambda () (setq indent-tabs-mode t)))
-    :custom
-    (ccls-executable "~/ccls/Release/ccls"))
 
   (use-package dap-gdb-lldb
     :ensure nil
@@ -816,7 +808,7 @@ Requires:
 
 Requires
 - [[https://ocaml.org/][ocaml]]
-- [[https://github.com/freebroccolo/ocaml-language-server][ocaml-language-server]]
+- [[https://github.com/ocaml/merlin][ocamlmerlin]]
 #+BEGIN_SRC emacs-lisp
 (use-package tuareg
   :hook
@@ -833,8 +825,6 @@ Requires
 #+END_SRC
 
 *** Python
-
-Elpy is used for refactoring function
 
 Requires:
 - [[https://www.python.org/][Python3]]
@@ -858,30 +848,10 @@ Requires:
     (python-fill-docstring-style 'pep-257)
     (py-split-window-on-execute t))
 
-  (use-package elpy
-    :after python
-    :hook
-    (python-mode . elpy-mode)
-    :bind
-    (:map python-mode-map
-          ("C-c C-c" . elpy-shell-send-top-statement)
-          ([remap lsp-rename] . elpy-multiedit-python-symbol-at-point)
-          ([remap lsp-format-buffer] . elpy-format-code))
-    :custom
-    (elpy-rpc-python-command ign/python-executable)
-    :config
-    (defalias 'elpy-format-code 'elpy-black-fix-code)
-    (elpy-enable)
-    (setq elpy-modules (delete 'elpy-module-flymake elpy-modules))
-    (setq elpy-modules (delete 'elpy-module-highlight-indentation elpy-modules))
-    (setq elpy-modules (delete 'elpy-module-django elpy-modules)))
-
   (use-package lsp-pyls
     :ensure nil
-    :if ign/use-pyls-p
-    :after (lsp-mode elpy)
+    :after lsp-mode
     :custom
-    (elpy-modules ())
     (lsp-pyls-plugins-mccabe-enabled nil)
     (lsp-pyls-plugins-pycodestyle-enabled nil)
     (lsp-pyls-plugins-pydocstyle-enabled nil)
@@ -892,9 +862,6 @@ Requires:
     :after (lsp-pyls dap-mode)
     :custom
     (dap-python-executable ign/python-executable))
-
-  (use-package cython-mode)
-  (use-package flycheck-cython)
 #+END_SRC
 
 *** R & Julia
@@ -951,7 +918,7 @@ Requires:
 ** Browser
 
 #+BEGIN_SRC emacs-lisp
-  (setq-default browse-url-generic-program "chromium")
+  (setq-default browse-url-generic-program "chrome")
   (setq-default browse-url-browser-function 'browse-url-chromium)
 #+END_SRC
 
