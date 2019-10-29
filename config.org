@@ -671,8 +671,7 @@ We set the LSP configuration that will be used for many other languages
     :after company
     :bind
     (:map lsp-mode-map
-          ("M-," . lsp-find-definition)
-          ("C-c t" . lsp-find-type-definition)
+          ([remap xref-find-definitions] . lsp-find-definition)
           ("C-c e" . lsp-rename)
           ("C-c f" . lsp-format-buffer))
     :custom
@@ -687,7 +686,6 @@ We set the LSP configuration that will be used for many other languages
     (doom-themes hl-line imenu-list lsp-mode)
     :bind
     (:map lsp-mode-map
-          ([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
           ([remap xref-find-references] . lsp-ui-peek-find-references)
           ([remap imenu-list-smart-toggle] . lsp-ui-imenu)
           ([remap flycheck-list-errors] . lsp-ui-flycheck-list))
@@ -837,8 +835,6 @@ Requires:
   (use-package python
     :ensure nil
     :after lsp-mode
-    :hook
-    (python-mode . lsp)
     :custom
     (python-indent 4)
     (python-shell-interpreter ign/python-executable)
@@ -847,14 +843,32 @@ Requires:
     (python-fill-docstring-style 'pep-257)
     (py-split-window-on-execute t))
 
+  (use-package elpy
+    :after (python lsp-mode lsp-pyls)
+    :hook
+    (python-mode . elpy-mode)
+    :bind
+    (:map python-mode-map
+          ([remap lsp-rename] . elpy-multiedit-python-symbol-at-point)
+          ([remap lsp-format-buffer] . elpy-format-code))
+    :custom
+    (elpy-modules nil)
+    (elpy-rpc-python-command ign/python-executable))
+
+  (use-package sphinx-doc
+    :after python
+    :hook (python-mode . sphinx-doc))
+
   (use-package lsp-pyls
     :ensure nil
     :after lsp-mode
+    :hook
+    (python-mode . lsp)
     :custom
     (lsp-pyls-plugins-mccabe-enabled nil)
     (lsp-pyls-plugins-pycodestyle-enabled nil)
-    (lsp-pyls-plugins-pydocstyle-enabled nil)
-    (lsp-pyls-plugins-pyflakes-enabled nil))
+    (lsp-pyls-plugins-pydocstyle-enabled t)
+    (lsp-pyls-plugins-pyflakes-enabled t))
 
   (use-package dap-python
     :ensure nil
