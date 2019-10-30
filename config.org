@@ -538,6 +538,8 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :defer t
+    :custom
+    (vc-handled-backends nil)
     :bind
     ("C-c g" . magit))
 
