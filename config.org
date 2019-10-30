@@ -864,6 +864,9 @@ Requires:
   (use-package sphinx-doc
     :after python
     :hook (python-mode . sphinx-doc))
+  (use-package isortify
+    :hook
+    (python-mode . isortify-mode))
 
   (use-package lsp-pyls
     :ensure nil
