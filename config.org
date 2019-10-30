@@ -383,10 +383,6 @@ Disable yes-or-no-p, I like to live dangerously
 
 Uses the term-toggle package in =site-lisp/term-toggle=
 #+BEGIN_SRC emacs-lisp
-  (use-package multi-term
-    :custom
-    (multi-term-program (ign/find-executables "zsh" "bash" "sh")))
-
   (use-package popwin)
 
   (use-package term-toggle
@@ -395,8 +391,6 @@ Uses the term-toggle package in =site-lisp/term-toggle=
     :custom
     (term-toggle-pos :bottom)
     (term-toggle-size 15)
-    (term-toggle-function #'multi-term)
-    (term-toggle-args '())
     :bind
     ("C-c t" . term-toggle))
 #+END_SRC
