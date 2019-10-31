@@ -705,16 +705,16 @@ We set the LSP configuration that will be used for many other languages
   (use-package dap-mode
     :after (lsp-mode hydra)
     :hook
-    (lsp-mode . (lambda () (dap-mode t) (dap-ui-mode t)))
+    (lsp-mode . (lambda () (dap-mode t) (dap-ui-mode t))))
+
+  (use-package dap-hydra
+    :ensure nil
+    :bind
+    (:map lsp-mode-map
+          ("C-c d" . dap-hydra))
     :config
-    (use-package dap-hydra
-      :ensure nil
-      :bind
-      (:map dap-mode-map
-            ("C-c d" . dap-hydra))
-      :config
-      (defhydra+ dap-hydra (:exit nil :foreign-keys run)
-        ("d" dap-debug "Start debug session"))))
+    (defhydra+ dap-hydra (:exit nil :foreign-keys run)
+      ("d" dap-debug "Start debug session")))
 
   (use-package company-lsp
     :after
