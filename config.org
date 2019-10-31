@@ -703,7 +703,8 @@ We set the LSP configuration that will be used for many other languages
     (set-face-background 'lsp-ui-doc-background (face-background 'hl-line)))
 
   (use-package dap-mode
-    :after (lsp-mode hydra)
+    :after
+    (lsp-mode hydra)
     :hook
     (lsp-mode . (lambda () (dap-mode t) (dap-ui-mode t))))
 
@@ -847,7 +848,8 @@ Requires:
     (py-split-window-on-execute t))
 
   (use-package elpy
-    :after (python lsp-mode lsp-pyls)
+    :after
+    (python lsp-mode lsp-pyls)
     :hook
     (python-mode . elpy-mode)
     :bind
@@ -880,7 +882,8 @@ Requires:
 
   (use-package dap-python
     :ensure nil
-    :after (lsp-pyls dap-mode)
+    :after
+    (lsp-pyls dap-mode)
     :custom
     (dap-python-executable ign/python-executable))
 #+END_SRC
