@@ -245,7 +245,7 @@ This was originally used for MacOS only, but ended being useful for various tool
   (set-frame-font
    (pcase ign/os
      ('*nix "Inconsolata")
-     ('macos "Menlo")
+     ('macos "Menlo-20")
      (_ "Consolas")))
 #+END_SRC
 
