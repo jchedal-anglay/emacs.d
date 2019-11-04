@@ -79,8 +79,9 @@ Set up package.el and use-package for later use, disable implicit lazy-loading
   (setq-default byte-compile-warnings nil)
 
   ;; Useful to speed up start-up time
-  (setq gc-cons-threshold most-positive-fixnum)
-  (add-hook 'after-init-hook (lambda () (setq gc-cons-threshold 800000)))
+  (eval-when-compile
+    (setq-local gc-cons-threshold most-positive-fixnum)
+    (setq-local gc-cons-percentage 0.6))
 #+END_SRC
 
 * Backups
