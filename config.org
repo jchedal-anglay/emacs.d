@@ -27,7 +27,6 @@
 - [[#completion-frontend][Completion Frontend]]
   - [[#ivy][Ivy]]
 - [[#editing][Editing]]
-- [[#navigation][Navigation]]
 - [[#programming-related][Programming Related]]
   - [[#git][Git]]
   - [[#tramp][TRAMP]]
@@ -525,14 +524,6 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
           ("TAB" . nil)))
 
   (use-package yasnippet-snippets)
-#+END_SRC
-
-* Navigation
-
-#+BEGIN_SRC emacs-lisp
-  (use-package imenu-list
-    :bind
-    ("C-c j" . imenu-list-smart-toggle))
 #+END_SRC
 
 * Programming Related
