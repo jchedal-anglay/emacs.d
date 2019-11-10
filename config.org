@@ -835,19 +835,13 @@ Requires:
     (python-fill-docstring-style 'pep-257)
     (py-split-window-on-execute t))
 
-  (use-package elpy
-    :after
-    (python lsp-mode lsp-pyls)
+  (use-package pyvenv
     :hook
-    (python-mode . elpy-mode)
-    :bind
-    (:map python-mode-map
-          ([remap elpy-shell-send-region-or-buffer] . elpy-shell-send-statement-and-go)
-          ([remap lsp-rename] . elpy-multiedit-python-symbol-at-point)
-          ([remap lsp-format-buffer] . elpy-format-code))
+    (python-mode . pyvenv-mode)
     :custom
-    (elpy-modules '(elpy-module-sane-defaults elpy-module-pyvenv))
-    (elpy-rpc-python-command ign/python-executable))
+    (pyvenv-post-activate-hooks '((lambda ()
+                                    (flycheck-reset-enabled-checker 'python-flake8)
+                                    (flycheck-reset-enabled-checker 'python-mypy)))))
 
   (use-package sphinx-doc
     :after python
