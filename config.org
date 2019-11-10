@@ -683,6 +683,7 @@ We set the LSP configuration that will be used for many other languages
     (lsp-auto-guess-root nil)
     (lsp-prefer-flymake nil)
     (lsp-enable-snippet nil)
+    (lsp-auto-configure nil)
     :config
     (add-to-list 'company-backends 'company-lsp))
 
@@ -700,7 +701,7 @@ We set the LSP configuration that will be used for many other languages
     (lsp-ui-doc-enable t)
     (lsp-ui-doc-border (face-foreground 'default))
     (lsp-ui-doc-include-signature t)
-    (lsp-ui-flycheck-enable t)
+    (lsp-ui-flycheck-enable nil)
     (lsp-ui-peek-always-show t)
     :config
     (set-face-background 'lsp-ui-doc-background (face-background 'hl-line)))
