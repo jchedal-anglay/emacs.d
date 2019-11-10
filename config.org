@@ -598,15 +598,8 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     (flycheck-error ((t (:underline (:style line :color "#FF5C33")))))
     (flycheck-check-syntax-automatically '(mode-enabled save))
     :custom
-    (flycheck-checkers nil)
+    (flycheck-checkers '(python-flake8 python-mypy python-pycompile c/c++-clang c/c++-cppcheck))
     :config
-    ;; (add-to-list 'flycheck-disabled-checkers 'python-flake8)
-    ;; (add-to-list 'flycheck-disabled-checkers 'python-mypy)
-    ;; (add-to-list 'flycheck-disabled-checkers 'python-pylint)
-    ;; (add-to-list 'flycheck-disabled-checkers 'python-pycompile)
-    ;; (add-to-list 'flycheck-disabled-checkers 'c/c++-gcc)
-    ;; (add-to-list 'flycheck-disabled-checkers 'c/c++-clang)
-    ;; (add-to-list 'flycheck-disabled-checkers 'c/c++-cppcheck)
     (global-flycheck-mode t)
     ;; Bad flycheck design, override the default fringe without having to redefine entire checker levels
     (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
@@ -833,7 +826,7 @@ Requires:
 
   (use-package python
     :ensure nil
-    :after lsp-mode
+    :after (flycheck lsp-mode)
     :custom
     (python-indent 4)
     (python-shell-interpreter ign/python-executable)
@@ -849,31 +842,25 @@ Requires:
     (python-mode . elpy-mode)
     :bind
     (:map python-mode-map
+          ([remap elpy-shell-send-region-or-buffer] . elpy-shell-send-statement-and-go)
           ([remap lsp-rename] . elpy-multiedit-python-symbol-at-point)
           ([remap lsp-format-buffer] . elpy-format-code))
     :custom
-    (elpy-modules nil)
+    (elpy-modules '(elpy-module-sane-defaults elpy-module-pyvenv))
     (elpy-rpc-python-command ign/python-executable))
 
   (use-package sphinx-doc
     :after python
     :hook
-    (python-mode . sphinx-doc))
+    (python-mode . sphinx-doc-mode))
 
-  (use-package isortify
-    :hook
-    (python-mode . isortify-mode))
+  (use-package isortify)
 
   (use-package lsp-pyls
     :ensure nil
     :after lsp-mode
     :hook
-    (python-mode . lsp)
-    :custom
-    (lsp-pyls-plugins-mccabe-enabled nil)
-    (lsp-pyls-plugins-pycodestyle-enabled nil)
-    (lsp-pyls-plugins-pydocstyle-enabled t)
-    (lsp-pyls-plugins-pyflakes-enabled t))
+    (python-mode . lsp))
 
   (use-package dap-python
     :ensure nil
