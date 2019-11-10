@@ -199,7 +199,8 @@ I don't want any kind of backup, this is mostly due to saving being compulsory t
 #+BEGIN_SRC emacs-lisp
   (defconst ign/config-path (concat user-emacs-directory "config.org"))
   (defconst ign/os (or (alist-get system-type '((gnu . *nix) (gnu/linux . *nix) (gnu/kfreebsd . *nix) (darwin . macos) (ms-dos . win) (windows-nt . win) (cygwin . win))) '*nix))
-  (defconst ign/python-executable "python3")
+  (defconst ign/python-executable "python")
+  (defconst ign/python-interactive "ipython")
   (defconst ign/use-all-the-icons-p (memq ign/os '(*nix macos)))
   (when (memq ign/os '(*nix macos))
     (setq-default custom-file "/dev/zero"))
@@ -271,7 +272,7 @@ Fancy icons from font-awesome, material-icons, ...
   (use-package doom-modeline
     :if (display-graphic-p)
     :custom
-    (doom-modeline-python-executable ign/python-executable)
+    (doom-modeline-python-executable ign/python-interactive)
     (doom-modeline-icon ign/use-all-the-icons-p)
     (doom-modeline-major-mode-icon ign/use-all-the-icons-p)
     (doom-modeline-version t)
@@ -829,9 +830,9 @@ Requires:
     :after (flycheck lsp-mode)
     :custom
     (python-indent 4)
-    (python-shell-interpreter ign/python-executable)
+    (python-shell-interpreter ign/python-interactive)
     ;; Required for MacOS, prevents newlines from being displayed as ^G
-    (python-shell-interpreter-args (if (eq ign/os 'macos) "-c exec('__import__(\\'readline\\')') -i" "-i"))
+    (python-shell-interpreter-args (if (eq ign/os 'macos) "-c exec('__import__(\\'readline\\')') -i --simple-prompt" "-i --simple-prompt"))
     (python-fill-docstring-style 'pep-257)
     (py-split-window-on-execute t))
 
