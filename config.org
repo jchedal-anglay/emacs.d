@@ -672,6 +672,10 @@ We set the LSP configuration that will be used for many other languages
     :config
     (add-to-list 'company-backends 'company-lsp))
 
+  (use-package lsp-clients
+    :after lsp-mode
+    :ensure nil)
+
   (use-package lsp-ui
     :after
     (doom-themes hl-line imenu-list lsp-mode)
