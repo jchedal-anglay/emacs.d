@@ -924,7 +924,7 @@ Requires:
 
 #+BEGIN_SRC emacs-lisp
   (setq-default browse-url-generic-program "chrome")
-  (setq-default browse-url-browser-function 'browse-url-chromium)
+  (setq-default browse-url-browser-function 'browse-url-chrome)
 #+END_SRC
 
 ** Discord
