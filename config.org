@@ -644,12 +644,7 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     :after
     (counsel projectile)
     :config
-    (counsel-projectile-mode t)
-    (defalias 'projectile-switch-to-buffer 'counsel-projectile-switch-to-buffer)
-    (defalias 'projectile-find-dir 'counsel-projectile-find-dir)
-    (defalias 'projectile-find-file 'counsel-projectile-find-file)
-    (defalias 'projectile-grep 'counsel-projectile-grep)
-    (defalias 'projectile-switch-project 'counsel-projectile-switch-project))
+    (counsel-projectile-mode t))
 #+END_SRC
 
 ** Languages
