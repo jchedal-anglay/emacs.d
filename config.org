@@ -488,6 +488,28 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
           ;; Required, bugged by default
           ("M-n" . ivy-next-history-element)))
 
+  (use-package ivy-rich
+    :after (ivy counsel swiper)
+    :custom
+    (ivy-rich-parse-remote-buffer nil)
+    :config
+    (ivy-rich-mode t)
+    (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line))
+
+  (use-package ivy-posframe
+    :custom
+    (ivy-posframe-parameters '((left-fringe . 5) (right-fringe . 5)))
+    (ivy-posframe-height-alist '((counsel-find-file . 20)
+                                 (t . 10)))
+    (ivy-posframe-display-functions-alist '((counsel-M-x . ivy-posframe-display-at-frame-center)
+                                            (counsel-find-file . ivy-posframe-display-at-frame-center)
+                                            (counsel-projectile-find-file . ivy-posframe-display-at-frame-center)
+                                            (t . nil)))
+    ;; :custom-face
+    ;; (ivy-posframe-border ((t (:background "#6272a4"))))
+    :config
+    (ivy-posframe-mode 1))
+
   ;; This will make counsel-M-x sort candidates by frequency
   (use-package smex)
 #+END_SRC
