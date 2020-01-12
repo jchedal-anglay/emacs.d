@@ -37,7 +37,6 @@
 - [[#writingdocumentation][Writing/Documentation]]
   - [[#org][Org]]
 - [[#community][Community]]
-  - [[#browser][Browser]]
   - [[#discord][Discord]]
   - [[#key-frequency][Key Frequency]]
 
@@ -915,13 +914,6 @@ Requires:
 #+END_SRC
 
 * Community
-** Browser
-
-#+BEGIN_SRC emacs-lisp
-  (setq-default browse-url-generic-program "chrome")
-  (setq-default browse-url-browser-function 'browse-url-chrome)
-#+END_SRC
-
 ** Discord
 
 #+BEGIN_SRC emacs-lisp
