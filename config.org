@@ -56,13 +56,16 @@ Set up package.el and use-package for later use, disable implicit lazy-loading
   ;; Hotfix, requires in emacs 26.1 due to bug #34341
   ;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=34341
   (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+
   (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
   (when (file-directory-p (concat user-emacs-directory "elpa-mirror"))
       (setq-default package-archives `(("melpa" . ,(concat user-emacs-directory "elpa-mirror/melpa"))
                                        ("gnu" . ,(concat user-emacs-directory "elpa-mirror/gnu"))
                                        ("org" . ,(concat user-emacs-directory "elpa-mirror/org"))
                                        ("melpa-stable" . ,(concat user-emacs-directory "elpa-mirror/stable-melpa")))))
-  (package-initialize)
+
+  (when (< emacs-major-version 27)
+    (package-initialize))
 
   (unless (package-installed-p 'use-package)
     (package-refresh-contents)
