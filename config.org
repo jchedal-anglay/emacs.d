@@ -43,14 +43,14 @@
 * Initialization
 
 Add lexical binding support
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 ;; -*- lexical-binding: t -*-
-#+END_SRC
+#+end_src
 
 * Packages
 
 Set up package.el and use-package for later use, disable implicit lazy-loading
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (require 'package)
 
   ;; Hotfix, requires in emacs 26.1 due to bug #34341
@@ -83,31 +83,31 @@ Set up package.el and use-package for later use, disable implicit lazy-loading
   (eval-when-compile
     (setq-local gc-cons-threshold most-positive-fixnum)
     (setq-local gc-cons-percentage 0.6))
-#+END_SRC
+#+end_src
 
 * Backups
 
 I don't want any kind of backup, this is mostly due to saving being compulsory to me.
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq-default backup-inhibited t
                 auto-save-default nil
                 create-lockfiles nil
                 make-backup-files nil)
-#+END_SRC
+#+end_src
 
 * Encoding
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq-default locale-coding-system 'utf-8)
   (set-terminal-coding-system 'utf-8)
   (set-keyboard-coding-system 'utf-8)
   (set-selection-coding-system 'utf-8)
   (prefer-coding-system 'utf-8)
-#+END_SRC
+#+end_src
 
 * Functions
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun ign/after (to-call-after f)
     "Run F then run TO-CALL-AFTER."
     (funcall f)
@@ -194,11 +194,11 @@ I don't want any kind of backup, this is mostly due to saving being compulsory t
         (re-search-backward "^\\|[^[:space:]]")
         (if (not (looking-at-p "[[:space:]]"))
             (right-char)))))
-#+END_SRC
+#+end_src
 
 * Custom Variables
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defconst ign/config-path (concat user-emacs-directory "config.org"))
   (defconst ign/os (or (alist-get system-type '((gnu . *nix) (gnu/linux . *nix) (gnu/kfreebsd . *nix) (darwin . macos) (ms-dos . win) (windows-nt . win) (cygwin . win))) '*nix))
   (defconst ign/python-executable "python")
@@ -206,13 +206,13 @@ I don't want any kind of backup, this is mostly due to saving being compulsory t
   (defconst ign/use-all-the-icons-p (memq ign/os '(*nix macos)))
   (when (memq ign/os '(*nix macos))
     (setq-default custom-file "/dev/zero"))
-#+END_SRC
+#+end_src
 
 * System
 ** Shell Path
 
 This was originally used for MacOS only, but ended being useful for various tools that require on a shell to run
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package exec-path-from-shell
     :if (memq ign/os '(*nix macos))
     :config
@@ -220,54 +220,54 @@ This was originally used for MacOS only, but ended being useful for various tool
 
   (when (memq ign/os '(macos))
     (setq mac-command-modifier 'meta))
-#+END_SRC
+#+end_src
 
 ** Version-specific
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when (>= emacs-major-version 26)
     (setq-default confirm-kill-processes nil))
-#+END_SRC
+#+end_src
 
 * GUI
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (when (display-graphic-p)
     (menu-bar-mode 0)
     (toggle-scroll-bar 0)
     (tool-bar-mode 0))
-#+END_SRC
+#+end_src
 
 * Appearance
 ** Font
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (set-frame-font
    (pcase ign/os
      ('*nix "Inconsolata")
      ('macos "Menlo-20")
      (_ "Consolas")))
-#+END_SRC
+#+end_src
 
 Fancy icons from font-awesome, material-icons, ...
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package all-the-icons
     :if (and ign/use-all-the-icons-p (display-graphic-p)))
-#+END_SRC
+#+end_src
 
 ** Theme
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package doom-themes
     :config
     (doom-themes-org-config)
     (load-theme 'doom-one t)
     (set-face-attribute 'org-level-1 nil :background (face-background 'default) :height 1.0))
-#+END_SRC
+#+end_src
 
 ** Modeline
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (line-number-mode t)
   (column-number-mode t)
 
@@ -281,12 +281,12 @@ Fancy icons from font-awesome, material-icons, ...
     (doom-modeline-buffer-file-name-style 'file-name)
     :config
     (doom-modeline-mode t))
-#+END_SRC
+#+end_src
 
 * Interface
 ** Splash Screen
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package dashboard
     :if (display-graphic-p)
     :bind
@@ -316,11 +316,11 @@ Fancy icons from font-awesome, material-icons, ...
     (dashboard-center-content t)
     :config
     (dashboard-setup-startup-hook))
-#+END_SRC
+#+end_src
 
 ** Lines
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq-default transient-mark-mode t
                 visual-line-mode t
                 indent-tabs-mode nil
@@ -328,12 +328,12 @@ Fancy icons from font-awesome, material-icons, ...
 
   (when (display-graphic-p)
     (add-hook 'prog-mode-hook #'hl-line-mode))
-#+END_SRC
+#+end_src
 
 ** Line numbers
 
 Use linum for versions <26, otherwise use the cleaner and faster builtin line-number package
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package linum
     :ensure nil
     :if (< emacs-major-version 26)
@@ -354,38 +354,38 @@ Use linum for versions <26, otherwise use the cleaner and faster builtin line-nu
     (display-line-numbers-current-absolute t)
     (display-line-numbers-width 2)
     (display-line-numbers-widen t))
-#+END_SRC
+#+end_src
 
 ** Scrolling
 
 Makes scrolling slightly smoother
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq-default scroll-margin 0
                 scroll-conservatively 10000
                 scroll-preserve-screen-position t
                 mouse-wheel-progressive-speed nil)
-#+END_SRC
+#+end_src
 
 ** Confirmation messages
 
 Disable yes-or-no-p, I like to live dangerously
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defalias 'yes-or-no-p (lambda (&rest _) t))
   (setq-default confirm-kill-emacs nil)
-#+END_SRC
+#+end_src
 
 ** Bells
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq-default visible-bell nil
                 audible-bell nil
                 ring-bell-function 'ignore)
-#+END_SRC
+#+end_src
 
 ** Terminal
 
 Uses the term-toggle package in =site-lisp/term-toggle=
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package popwin)
 
   (use-package term-toggle
@@ -396,11 +396,11 @@ Uses the term-toggle package in =site-lisp/term-toggle=
     (term-toggle-size 15)
     :bind
     ("C-c t" . term-toggle))
-#+END_SRC
+#+end_src
 
 ** Parentheses
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package rainbow-delimiters
     :defer t
     :hook
@@ -412,12 +412,12 @@ Uses the term-toggle package in =site-lisp/term-toggle=
     (prog-mode . electric-pair-mode))
 
   (show-paren-mode t)
-#+END_SRC
+#+end_src
 
 * Bindings
 
 Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use a dvorak layout, and X is very annoying to reach
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (keyboard-translate ?\C-t ?\C-x)
   (keyboard-translate ?\C-x ?\C-t)
   (define-key key-translation-map (kbd "M-t") (kbd "M-x"))
@@ -439,20 +439,20 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     (key-chord-two-keys-delay 0.03)
     :config
     (key-chord-mode t))
-#+END_SRC
+#+end_src
 
 ** Which-key
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package which-key
     :config
     (which-key-mode t))
-#+END_SRC
+#+end_src
 
 * Completion Frontend
 ** Ivy
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package ivy
     :bind
     ([switch-to-buffer] . ivy-switch-buffer)
@@ -512,11 +512,11 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 
   ;; This will make counsel-M-x sort candidates by frequency
   (use-package smex)
-#+END_SRC
+#+end_src
 
 * Editing
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (setq-default require-final-newline t)
   (global-subword-mode t)
   (delete-selection-mode t)
@@ -549,12 +549,12 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
           ("TAB" . nil)))
 
   (use-package yasnippet-snippets)
-#+END_SRC
+#+end_src
 
 * Programming Related
 ** Git
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package magit
     :defer t
     :custom
@@ -567,11 +567,11 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 
   (use-package gitconfig-mode
     :mode "\\.gitconfig\\'")
-#+END_SRC
+#+end_src
 
 ** TRAMP
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package tramp
     :ensure nil
     :custom
@@ -588,11 +588,11 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
                                    ("-o" "UserKnownHostsFile=/dev/null")
                                    ("-o" "StrictHostKeyChecking=no")))
                    (tramp-default-port 22))))
-#+END_SRC
+#+end_src
 
 ** Auto-Completion
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package company
     :bind
     ("M-/" . company-complete)
@@ -611,11 +611,11 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     (company-backends nil)
     :config
     (global-company-mode t))
-#+END_SRC
+#+end_src
 
 ** Checkers/Linters
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package flycheck
     :custom-face
     (flycheck-info ((t (:underline (:style line :color "#80FF80")))))
@@ -645,11 +645,11 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
        #b00000000
        #b00000000
        #b00000000]))
-#+END_SRC
+#+end_src
 
 ** Project Management
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package projectile
     :bind
     (:map projectile-mode-map
@@ -669,13 +669,13 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     (counsel projectile)
     :config
     (counsel-projectile-mode t))
-#+END_SRC
+#+end_src
 
 ** Languages
 *** LSP
 
 We set the LSP configuration that will be used for many other languages
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package lsp-mode
     :after company
     :bind
@@ -737,7 +737,7 @@ We set the LSP configuration that will be used for many other languages
     (company-lsp-cache-candidates t)
     (company-lsp-enable-snippets nil)
     (company-lsp-enable-recompletion t))
-#+END_SRC
+#+end_src
 
 *** C/C++
 
@@ -746,7 +746,7 @@ For now, use ccls, clangd may be a better option
 Requires:
 - [[https://clang.llvm.org/][clang]]
 - [[https://lldb.llvm.org/][lldb]]
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package cc-mode
     :ensure nil
     :hook
@@ -763,13 +763,13 @@ Requires:
     :after company
     :config
     (add-to-list 'company-backends 'company-c-headers))
-#+END_SRC
+#+end_src
 
 *** Clojure
 
 Requires:
 - [[https://leiningen.org/][Leiningen]]
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package clojure-mode
     :hook
     (clojure-mode . aggressive-indent-mode))
@@ -786,13 +786,13 @@ Requires:
     (cider-font-lock-dynamically t))
 
   (use-package elein)
-#+END_SRC
+#+end_src
 
 *** Common Lisp
 
 Requires:
 - [[http://www.sbcl.org/][sbcl]]
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package slime
     :hook
     (slime-lisp-mode . aggressive-indent-mode)
@@ -802,28 +802,28 @@ Requires:
     :custom
     (inferior-lisp-program "sbcl")
     (slime-contribs '(slime-fancy)))
-#+END_SRC
+#+end_src
 
 *** Jupyter
 
 Requires:
 - [[https://www.python.org/][Python3]]
 - [[https://jupyter.org/][Jupyter]]
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package ein
     :mode
     (".*\\.ipynb\\'" . ein:ipynb-mode)
     :custom
     (ein:completion-backend 'ein:use-company-jedi-backends)
     (ein:use-auto-complete-superpack t))
-#+END_SRC
+#+end_src
 
 *** OCaml
 
 Requires
 - [[https://ocaml.org/][ocaml]]
 - [[https://github.com/ocaml/merlin][ocamlmerlin]]
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (use-package tuareg
   :hook
   (tuareg-mode . lsp)
@@ -836,14 +836,14 @@ Requires
   :custom
   (tuareg-match-patterns-aligned t)
   (tuareg-indent-align-with-first-arg t))
-#+END_SRC
+#+end_src
 
 *** Python
 
 Requires:
 - [[https://www.python.org/][Python3]]
 - [[https://github.com/palantir/python-language-server][pyls]]
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package pip-requirements
     :mode
     ("requirements\\.txt" . pip-requirements-mode))
@@ -886,21 +886,21 @@ Requires:
     (lsp-pyls dap-mode)
     :custom
     (dap-python-executable ign/python-executable))
-#+END_SRC
+#+end_src
 
 *** R & Julia
 
 Requires:
 - [[https://julialang.org/][Julia]]
 - [[https://www.r-project.org/][R]]
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package ess)
-#+END_SRC
+#+end_src
 
 * Writing/Documentation
 ** Org
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package org
     :ensure nil
     :mode
@@ -936,24 +936,24 @@ Requires:
     (org-mode . org-bullets-mode))
 
   (use-package px)
-#+END_SRC
+#+end_src
 
 * Community
 ** Discord
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package elcord
     :if (executable-find "discord")
     :custom
     (elcord-use-major-mode-as-main-icon t)
     :config
     (elcord-mode t))
-#+END_SRC
+#+end_src
 
 ** Key Frequency
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package keyfreq
     :config
     (keyfreq-mode t))
-#+END_SRC
+#+end_src
