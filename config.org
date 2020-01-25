@@ -202,7 +202,7 @@ I don't want any kind of backup, this is mostly due to saving being compulsory t
   (defconst ign/config-path (concat user-emacs-directory "config.org"))
   (defconst ign/os (or (alist-get system-type '((gnu . *nix) (gnu/linux . *nix) (gnu/kfreebsd . *nix) (darwin . macos) (ms-dos . win) (windows-nt . win) (cygwin . win))) '*nix))
   (defconst ign/python-executable "python")
-  (defconst ign/python-interactive "ipython")
+  (defconst ign/python-interactive "python")
   (defconst ign/use-all-the-icons-p (memq ign/os '(*nix macos)))
   (when (memq ign/os '(*nix macos))
     (setq-default custom-file "/dev/zero"))
@@ -623,7 +623,7 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     (flycheck-error ((t (:underline (:style line :color "#FF5C33")))))
     (flycheck-check-syntax-automatically '(mode-enabled save))
     :custom
-    (flycheck-checkers '(python-flake8 python-mypy python-pycompile c/c++-clang c/c++-cppcheck))
+    (flycheck-checkers nil)
     :config
     (global-flycheck-mode t)
     ;; Bad flycheck design, override the default fringe without having to redefine entire checker levels
@@ -677,7 +677,7 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 We set the LSP configuration that will be used for many other languages
 #+begin_src emacs-lisp
   (use-package lsp-mode
-    :after company
+    :after company-lsp
     :bind
     (:map lsp-mode-map
           ([remap xref-find-definitions] . lsp-find-definition)
@@ -697,11 +697,10 @@ We set the LSP configuration that will be used for many other languages
 
   (use-package lsp-ui
     :after
-    (doom-themes hl-line imenu-list lsp-mode)
+    (doom-themes hl-line lsp-mode)
     :bind
     (:map lsp-mode-map
           ([remap xref-find-references] . lsp-ui-peek-find-references)
-          ([remap imenu-list-smart-toggle] . lsp-ui-imenu)
           ([remap flycheck-list-errors] . lsp-ui-flycheck-list))
     :hook
     (lsp-mode . lsp-ui-mode)
@@ -857,15 +856,21 @@ Requires:
     ;; Required for MacOS, prevents newlines from being displayed as ^G
     (python-shell-interpreter-args (if (eq ign/os 'macos) "-c exec('__import__(\\'readline\\')') -i --simple-prompt" "-i --simple-prompt"))
     (python-fill-docstring-style 'pep-257)
-    (py-split-window-on-execute t))
+    (py-split-window-on-execute t)
+    :config
+    (add-to-list 'flycheck-checkers 'python-flake8)
+    (add-to-list 'flycheck-checkers 'python-mypy))
 
   (use-package pyvenv
+    :after
+    (flycheck lsp-mode)
     :hook
     (python-mode . pyvenv-mode)
     :custom
     (pyvenv-post-activate-hooks '((lambda ()
                                     (flycheck-reset-enabled-checker 'python-flake8)
-                                    (flycheck-reset-enabled-checker 'python-mypy)))))
+                                    (flycheck-reset-enabled-checker 'python-mypy)
+                                    (lsp)))))
 
   (use-package sphinx-doc
     :after python
@@ -873,12 +878,6 @@ Requires:
     (python-mode . sphinx-doc-mode))
 
   (use-package isortify)
-
-  (use-package lsp-pyls
-    :ensure nil
-    :after lsp-mode
-    :hook
-    (python-mode . lsp))
 
   (use-package dap-python
     :ensure nil
