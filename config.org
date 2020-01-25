@@ -80,6 +80,7 @@ Set up package.el and use-package for later use, disable implicit lazy-loading
   (setq-default byte-compile-warnings nil)
 
   ;; Useful to speed up start-up time
+  ;; TODO: emacs27, move to early-init.el
   (eval-when-compile
     (setq-local gc-cons-threshold most-positive-fixnum)
     (setq-local gc-cons-percentage 0.6))
@@ -739,8 +740,6 @@ We set the LSP configuration that will be used for many other languages
 #+end_src
 
 *** C/C++
-
-For now, use ccls, clangd may be a better option
 
 Requires:
 - [[https://clang.llvm.org/][clang]]
