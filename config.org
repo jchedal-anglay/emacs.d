@@ -678,7 +678,6 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 We set the LSP configuration that will be used for many other languages
 #+begin_src emacs-lisp
   (use-package lsp-mode
-    :after company-lsp
     :bind
     (:map lsp-mode-map
           ([remap xref-find-definitions] . lsp-find-definition)
@@ -688,9 +687,7 @@ We set the LSP configuration that will be used for many other languages
     (lsp-auto-guess-root nil)
     (lsp-prefer-flymake nil)
     (lsp-enable-snippet nil)
-    (lsp-auto-configure nil)
-    :config
-    (add-to-list 'company-backends 'company-lsp))
+    (lsp-auto-configure nil))
 
   (use-package lsp-clients
     :after lsp-mode
@@ -733,10 +730,10 @@ We set the LSP configuration that will be used for many other languages
     :after
     (company lsp-mode)
     :custom
-    (company-lsp-async t)
     (company-lsp-cache-candidates t)
-    (company-lsp-enable-snippets nil)
-    (company-lsp-enable-recompletion t))
+    (company-lsp-enable-snippet nil)
+    :config
+    (add-to-list 'company-backends 'company-lsp))
 #+end_src
 
 *** C/C++
