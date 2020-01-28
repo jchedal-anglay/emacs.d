@@ -20,7 +20,6 @@
   - [[#scrolling][Scrolling]]
   - [[#confirmation-messages][Confirmation messages]]
   - [[#bells][Bells]]
-  - [[#terminal][Terminal]]
   - [[#parentheses][Parentheses]]
 - [[#bindings][Bindings]]
   - [[#which-key][Which-key]]
@@ -381,22 +380,6 @@ Disable yes-or-no-p, I like to live dangerously
   (setq-default visible-bell nil
                 audible-bell nil
                 ring-bell-function 'ignore)
-#+end_src
-
-** Terminal
-
-Uses the term-toggle package in =site-lisp/term-toggle=
-#+begin_src emacs-lisp
-  (use-package popwin)
-
-  (use-package term-toggle
-    :after popwin
-    :load-path "site-lisp/term-toggle"
-    :custom
-    (term-toggle-pos :bottom)
-    (term-toggle-size 15)
-    :bind
-    ("C-c t" . term-toggle))
 #+end_src
 
 ** Parentheses
