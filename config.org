@@ -418,11 +418,6 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
   (bind-key* "C-k" #'ign/kill-line-or-region)
   (bind-key* "M-o" #'other-window)
   (use-package hydra)
-  (use-package key-chord
-    :custom
-    (key-chord-two-keys-delay 0.03)
-    :config
-    (key-chord-mode t))
 #+end_src
 
 ** Which-key
