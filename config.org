@@ -60,8 +60,8 @@ Set up package.el and use-package for later use, disable implicit lazy-loading
   (when (file-directory-p (concat user-emacs-directory "elpa-mirror"))
       (setq-default package-archives `(("melpa" . ,(concat user-emacs-directory "elpa-mirror/melpa"))
                                        ("gnu" . ,(concat user-emacs-directory "elpa-mirror/gnu"))
-                                       ("org" . ,(concat user-emacs-directory "elpa-mirror/org"))
-                                       ("melpa-stable" . ,(concat user-emacs-directory "elpa-mirror/stable-melpa")))))
+                                       ("org" . ,(concat user-emacs-directory "elpa-mirror/org")))))
+
 
   (when (< emacs-major-version 27)
     (package-initialize))
