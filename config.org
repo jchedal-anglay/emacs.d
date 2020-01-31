@@ -35,6 +35,8 @@
   - [[#languages][Languages]]
 - [[#writingdocumentation][Writing/Documentation]]
   - [[#org][Org]]
+  - [[#tex][TeX]]
+  - [[#pdf][PDF]]
 - [[#community][Community]]
   - [[#discord][Discord]]
   - [[#key-frequency][Key Frequency]]
@@ -913,6 +915,55 @@ Requires:
     (org-mode . org-bullets-mode))
 
   (use-package px)
+#+end_src
+
+** TeX
+
+#+begin_src emacs-lisp
+  (use-package auctex-latexmk
+    :custom
+    (auctex-latexmk-inherit-TeX-PDF-mode t)
+    :config
+    (auctex-latexmk-setup))
+
+  (use-package reftex
+    :hook
+    (LaTeX-mode . reftex-mode)
+    :custom
+    (reftex-plug-into-AUCTeX t)
+    (reftex-cite-prompt-optional-args t))
+
+  (use-package company-auctex
+    :config
+    (company-auctex-init))
+
+  (use-package tex
+    :after pdf-tools
+    :ensure auctex
+    :mode ("\\.tex\\'" . latex-mode)
+    :custom
+    (TeX-source-correlate-mode t)
+    (TeX-source-correlate-method 'synctex)
+    (TeX-auto-save t)
+    (TeX-parse-self t)
+    (TeX-master "paper.tex")
+    (TeX-view-program-selection '((output-pdf "PDF Tools")) TeX-source-correlate-start-server t)
+    :config
+    (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer))
+#+end_src
+
+** PDF
+
+Run ~M-x pdf-tools-install~ the first time
+#+begin_src emacs-lisp
+  (use-package pdf-tools
+    :bind
+    (:map pdf-view-mode-map
+          ("C-s" . isearch-forward)
+          ("C-r" . isearch-backward))
+    :custom
+    (pdf-view-display-size 'fit-page)
+    (pdf-annot-activate-created-annotations t))
 #+end_src
 
 * Community
