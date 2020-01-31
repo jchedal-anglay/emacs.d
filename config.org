@@ -281,6 +281,10 @@ Fancy icons from font-awesome, material-icons, ...
     (doom-modeline-buffer-file-name-style 'file-name)
     :config
     (doom-modeline-mode t))
+
+  (use-package hide-mode-line
+    :hook
+    ((comint-mode help-mode minimap-mode) . hide-mode-line-mode))
 #+end_src
 
 * Interface
