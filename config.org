@@ -75,6 +75,8 @@ Set up package.el and use-package for later use, disable implicit lazy-loading
   (eval-when-compile
     (require 'use-package))
 
+  (use-package use-package-chords)
+
   (setq-default use-package-always-defer nil)
   (setq-default use-package-always-demand t)
   (setq-default use-package-always-ensure t)
@@ -426,6 +428,30 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     (bind-key* "M-o" #'other-window))
 
   (use-package hydra)
+
+  (use-package key-chord
+    :custom
+    (key-chord-two-keys-delay 0.03)
+    :config
+    (key-chord-mode t))
+
+  (use-package god-mode
+    :after (key-chord which-key)
+    :chords
+    (("th" . god-mode-all))
+    :custom
+    (god-mod-alist '((nil . "C-") ("SPC" . "M-")))
+    (god-literal-key "u")
+    :config
+    (cl-defun ign//swap-x-t ((key))
+      "Swap ?x and ?t KEY arguments for god-mode."
+      (pcase key
+        (?x `(?t))
+        (?t `(?x))
+        (_ `(,key))))
+    (advice-add 'god-mode-sanitized-key-string :filter-args #'ign//swap-x-t)
+    (which-key-enable-god-mode-support))
+
 #+end_src
 
 ** Which-key
