@@ -417,12 +417,14 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 
   (define-key comint-mode-map (kbd "C-l") #'comint-clear-buffer)
 
-  (use-package bind-key)
-  (bind-key* "C-x C-s" #'ign/save-buffer)
-  (bind-key* "C-a" #'ign/bol)
-  (bind-key* "C-e" #'ign/eol)
-  (bind-key* "C-k" #'ign/kill-line-or-region)
-  (bind-key* "M-o" #'other-window)
+  (use-package bind-key
+    :config
+    (bind-key* "C-x C-s" #'ign/save-buffer)
+    (bind-key* "C-a" #'ign/bol)
+    (bind-key* "C-e" #'ign/eol)
+    (bind-key* "C-k" #'ign/kill-line-or-region)
+    (bind-key* "M-o" #'other-window))
+
   (use-package hydra)
 #+end_src
 
