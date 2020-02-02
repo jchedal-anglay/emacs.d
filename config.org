@@ -87,6 +87,8 @@ Set up package.el and use-package for later use, disable implicit lazy-loading
   (eval-when-compile
     (setq-local gc-cons-threshold most-positive-fixnum)
     (setq-local gc-cons-percentage 0.6))
+
+  (use-package try)
 #+end_src
 
 * Backups
