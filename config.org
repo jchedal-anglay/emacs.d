@@ -317,11 +317,11 @@ Fancy icons from font-awesome, material-icons, ...
     (dashboard-set-init-info t)
     (dashboard-set-navigator t)
     (dashboard-navigator-buttons
-     `((("" "Github" "Github"
+     `((("" "" "Github"
          (lambda (&rest _) (browse-url-generic "https://github.com/Lgneous")))
-        ("" "Configuration" "Configuration"
+        ("" "" "Configuration"
          (lambda (&rest _) (ign/edit-config)))
-        ("" "Reload" "Restart emacs"
+        ("" "" "Restart emacs"
          (lambda (&rest _) (ign/reload))))))
     (dashboard-center-content t)
     :config
