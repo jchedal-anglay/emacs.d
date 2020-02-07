@@ -436,23 +436,6 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     (key-chord-two-keys-delay 0.03)
     :config
     (key-chord-mode t))
-
-  (use-package god-mode
-    :after (key-chord which-key)
-    :chords
-    (("th" . god-mode-all))
-    :custom
-    (god-mod-alist '((nil . "C-") ("'" . "M-")))
-    (god-literal-key "SPC")
-    :config
-    (cl-defun ign/god-mode-key-map ((key))
-      (pcase key
-        (?x '(?t))
-        (?t '(?x))
-        (_ `(,key))))
-    (advice-add 'god-mode-sanitized-key-string :filter-args #'ign/god-mode-key-map)
-    (which-key-enable-god-mode-support))
-
 #+end_src
 
 ** Which-key
