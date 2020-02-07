@@ -442,14 +442,14 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     :chords
     (("th" . god-mode-all))
     :custom
-    (god-mod-alist '((nil . "C-") ("SPC" . "M-")))
-    (god-literal-key "u")
+    (god-mod-alist '((nil . "C-")))
+    (god-literal-key "SPC")
     :config
     (cl-defun ign//swap-x-t ((key))
       "Swap ?x and ?t KEY arguments for god-mode."
       (pcase key
-        (?x `(?t))
-        (?t `(?x))
+        (?x '(?t))
+        (?t '(?x))
         (_ `(,key))))
     (advice-add 'god-mode-sanitized-key-string :filter-args #'ign//swap-x-t)
     (which-key-enable-god-mode-support))
