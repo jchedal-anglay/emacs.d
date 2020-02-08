@@ -570,10 +570,14 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 ** Git
 
 #+begin_src emacs-lisp
+  (use-package vc-hooks
+    :ensure nil
+    :custom
+    (vc-handled-backends nil))
+
   (use-package magit
     :defer t
     :custom
-    (vc-handled-backends nil)
     :bind
     ("C-c g" . magit))
 
