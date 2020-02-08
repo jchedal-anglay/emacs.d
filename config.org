@@ -21,6 +21,7 @@
   - [[#confirmation-messages][Confirmation messages]]
   - [[#bells][Bells]]
   - [[#parentheses][Parentheses]]
+  - [[#windows][Windows]]
 - [[#bindings][Bindings]]
   - [[#discoverability][Discoverability]]
 - [[#completion-frontend][Completion Frontend]]
@@ -413,6 +414,13 @@ Disable yes-or-no-p, I like to live dangerously
     (prog-mode . electric-pair-mode))
 
   (show-paren-mode t)
+#+end_src
+
+** Windows
+
+#+begin_src emacs-lisp
+  (setq split-width-threshold 0)
+  (setq split-height-threshold nil)
 #+end_src
 
 * Bindings
