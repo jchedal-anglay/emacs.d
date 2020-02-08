@@ -549,6 +549,13 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     ("C-c C-." . mc/mark-all-like-this)
     ("C-x SPC" . mc/edit-lines))
 
+  (use-package avy
+    :defer t
+    :bind
+    ("C-s" . avy-goto-char-timer)
+    :custom
+    (avy-keys '(?a ?o ?e ?u ?h ?t ?n ?s)))
+
   (use-package aggressive-indent
     :defer t)
 
