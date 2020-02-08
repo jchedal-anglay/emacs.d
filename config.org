@@ -471,9 +471,7 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     :bind
     ([switch-to-buffer] . ivy-switch-buffer)
     (:map ivy-minibuffer-map
-          ("<return>" . ivy-alt-done)
-          ("C-r" . ivy-previous-line)
-          ("C-s" . ivy-next-line))
+          ("<return>" . ivy-alt-done))
     :custom
     (ivy-use-virtual-buffers t)
     (ivy-count-format "%d/%d ")
@@ -496,8 +494,7 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
   (use-package swiper
     :after ivy
     :bind
-    ("C-r" . swiper-isearch-backward)
-    ("C-s" . swiper-isearch)
+    ("C-r" . swiper-isearch)
     (:map swiper-isearch-map
           ;; Required, bugged by default
           ("M-n" . ivy-next-history-element)))
