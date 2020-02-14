@@ -80,6 +80,8 @@ Set up package.el and use-package for later use, disable implicit lazy-loading
   (setq-default use-package-always-defer nil)
   (setq-default use-package-always-demand t)
   (setq-default use-package-always-ensure t)
+  (setq-default use-package-verbose t)
+  (setq-default use-package-compute-statistics t)
   (setq-default byte-compile-warnings nil)
 
   ;; Useful to speed up start-up time
@@ -88,7 +90,8 @@ Set up package.el and use-package for later use, disable implicit lazy-loading
     (setq-local gc-cons-threshold most-positive-fixnum)
     (setq-local gc-cons-percentage 0.6))
 
-  (use-package try)
+  (use-package try
+    :defer t)
 #+end_src
 
 * Backups
@@ -289,6 +292,7 @@ Fancy icons from font-awesome, material-icons, ...
     (doom-modeline-mode t))
 
   (use-package hide-mode-line
+    :defer t
     :hook
     ((comint-mode help-mode minimap-mode) . hide-mode-line-mode))
 #+end_src
@@ -346,6 +350,7 @@ Use linum for versions <26, otherwise use the cleaner and faster builtin line-nu
 #+begin_src emacs-lisp
   (use-package linum
     :ensure nil
+    :defer t
     :if (< emacs-major-version 26)
     :hook
     (prog-mode . linum-mode)
@@ -356,6 +361,7 @@ Use linum for versions <26, otherwise use the cleaner and faster builtin line-nu
 
   (use-package display-line-numbers
     :ensure nil
+    :defer t
     :if (>= emacs-major-version 26)
     :hook
     (prog-mode . display-line-numbers-mode)
@@ -402,6 +408,7 @@ Disable yes-or-no-p, I like to live dangerously
 
   (use-package elec-pair
     :ensure nil
+    :defer t
     :hook
     (prog-mode . electric-pair-mode))
 
@@ -422,6 +429,7 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
   (define-key comint-mode-map (kbd "C-l") #'comint-clear-buffer)
 
   (use-package bind-key
+    :defer t
     :config
     (bind-key* "C-x C-s" #'ign/save-buffer)
     (bind-key* "C-a" #'ign/bol)
@@ -432,6 +440,7 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
   (use-package hydra)
 
   (use-package key-chord
+    :defer t
     :custom
     (key-chord-two-keys-delay 0.03)
     :config
@@ -545,7 +554,8 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
           ("C-M-/" . yas-expand)
           ("TAB" . nil)))
 
-  (use-package yasnippet-snippets)
+  (use-package yasnippet-snippets
+    :after yasnippet)
 #+end_src
 
 * Programming Related
@@ -560,9 +570,11 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     ("C-c g" . magit))
 
   (use-package gitignore-mode
+    :defer t
     :mode "\\.gitignore\\'")
 
   (use-package gitconfig-mode
+    :defer t
     :mode "\\.gitconfig\\'")
 #+end_src
 
@@ -571,6 +583,7 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 #+begin_src emacs-lisp
   (use-package tramp
     :ensure nil
+    :defer t
     :custom
     (password-cache-expiry nil)
     :config
@@ -591,6 +604,7 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 
 #+begin_src emacs-lisp
   (use-package company
+    :defer t
     :bind
     ("M-/" . company-complete)
     (:map company-active-map
@@ -648,6 +662,7 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 
 #+begin_src emacs-lisp
   (use-package projectile
+    :defer t
     :bind
     (:map projectile-mode-map
           ("C-c p" . projectile-command-map))
@@ -715,6 +730,7 @@ We set the LSP configuration that will be used for many other languages
 
   (use-package dap-hydra
     :ensure nil
+    :defer t
     :bind
     (:map lsp-mode-map
           ("C-c d" . dap-hydra))
@@ -740,6 +756,7 @@ Requires:
 #+begin_src emacs-lisp
   (use-package cc-mode
     :ensure nil
+    :defer t
     :hook
     ((c-mode c++-mode) . lsp)
     :custom
@@ -762,10 +779,12 @@ Requires:
 - [[https://leiningen.org/][Leiningen]]
 #+begin_src emacs-lisp
   (use-package clojure-mode
+    :defer t
     :hook
     (clojure-mode . aggressive-indent-mode))
 
   (use-package cider
+    :defer t
     :bind
     (:map cider-repl-mode-map
           ("C-l" . cider-repl-clear-buffer))
@@ -952,7 +971,8 @@ Requires:
   (use-package tex
     :after pdf-tools
     :ensure auctex
-    :mode ("\\.tex\\'" . latex-mode)
+    :mode
+    ("\\.tex\\'" . latex-mode)
     :custom
     (TeX-source-correlate-mode t)
     (TeX-source-correlate-method 'synctex)
@@ -968,7 +988,10 @@ Requires:
 Run ~M-x pdf-tools-install~ the first time
 #+begin_src emacs-lisp
   (use-package pdf-tools
+    :defer t
     :if (equal ign/os '*nix)
+    :mode
+    ("\\.pdf\\'" . pdf-view-mode)
     :bind
     (:map pdf-view-mode-map
           ("C-s" . isearch-forward)
