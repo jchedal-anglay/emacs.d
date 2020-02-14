@@ -968,6 +968,7 @@ Requires:
 Run ~M-x pdf-tools-install~ the first time
 #+begin_src emacs-lisp
   (use-package pdf-tools
+    :if (equal ign/os '*nix)
     :bind
     (:map pdf-view-mode-map
           ("C-s" . isearch-forward)
