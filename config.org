@@ -1035,5 +1035,6 @@ Run ~M-x pdf-tools-install~ the first time
 #+begin_src emacs-lisp
   (use-package keyfreq
     :config
+    (keyfreq-autosave-mode t)
     (keyfreq-mode t))
 #+end_src
