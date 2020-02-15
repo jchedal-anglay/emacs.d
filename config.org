@@ -866,6 +866,8 @@ Requires:
 
   (use-package python
     :ensure nil
+    :hook
+    (python-mode . lsp)
     :custom
     (python-indent 4)
     (python-shell-interpreter ign/python-interactive)
