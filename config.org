@@ -435,7 +435,6 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
   (define-key comint-mode-map (kbd "C-l") #'comint-clear-buffer)
 
   (use-package bind-key
-    :defer t
     :config
     (bind-key* [remap save-buffer] #'ign/save-buffer)
     (bind-key* [remap kill-line] #'ign/kill-line-or-region)
@@ -643,6 +642,7 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 
 #+begin_src emacs-lisp
   (use-package flycheck
+    :defer t
     :hook
     (prog-mode . flycheck-mode)
     :custom-face
@@ -704,6 +704,7 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 We set the LSP configuration that will be used for many other languages
 #+begin_src emacs-lisp
   (use-package lsp-mode
+    :defer t
     :bind
     (:map lsp-mode-map
           ([remap xref-find-definitions] . lsp-find-definition)
@@ -800,6 +801,7 @@ Requires:
 - [[http://www.sbcl.org/][sbcl]]
 #+begin_src emacs-lisp
   (use-package slime
+    :defer t
     :hook
     (slime-lisp-mode . aggressive-indent-mode)
     :bind
@@ -817,6 +819,7 @@ Requires:
 - [[https://jupyter.org/][Jupyter]]
 #+begin_src emacs-lisp
   (use-package ein
+    :defer t
     :mode
     (".*\\.ipynb\\'" . ein:ipynb-mode)
     :custom
@@ -831,6 +834,7 @@ Requires
 - [[https://github.com/ocaml/merlin][ocamlmerlin]]
 #+begin_src emacs-lisp
   (use-package tuareg
+    :defer t
     :hook
     (tuareg-mode . lsp)
     :mode
@@ -851,11 +855,13 @@ Requires:
 - [[https://github.com/palantir/python-language-server][pyls]]
 #+begin_src emacs-lisp
   (use-package pip-requirements
+    :defer t
     :mode
     ("requirements\\.txt" . pip-requirements-mode))
 
   (use-package python
     :ensure nil
+    :defer t
     :hook
     (python-mode . lsp)
     :custom
@@ -887,6 +893,7 @@ Requires:
 - [[https://www.r-project.org/][R]]
 #+begin_src emacs-lisp
   (use-package ess
+    :defer t
     :mode
     ("\\.jl\\'" . ess-julia-mode)
     ("\\.[rR]\\'" . ess-r-mode))
@@ -898,6 +905,7 @@ Requires:
 #+begin_src emacs-lisp
   (use-package org
     :ensure nil
+    :defer t
     :mode
     ("\\.org\\'" . org-mode)
     :hook
