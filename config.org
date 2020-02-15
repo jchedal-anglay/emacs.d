@@ -892,7 +892,10 @@ Requires:
 - [[https://julialang.org/][Julia]]
 - [[https://www.r-project.org/][R]]
 #+begin_src emacs-lisp
-  (use-package ess)
+  (use-package ess
+    :mode
+    ("\\.jl\\'" . ess-julia-mode)
+    ("\\.[rR]\\'" . ess-r-mode))
 #+end_src
 
 * Writing/Documentation
