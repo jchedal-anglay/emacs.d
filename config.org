@@ -651,6 +651,8 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 
 #+begin_src emacs-lisp
   (use-package flycheck
+    :hook
+    (prog-mode . flycheck-mode)
     :custom-face
     (flycheck-info ((t (:underline (:style line :color "#80FF80")))))
     (flycheck-warning ((t (:underline (:style line :color "#FF9933")))))
@@ -659,7 +661,6 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     :custom
     (flycheck-checkers nil)
     :config
-    (global-flycheck-mode t)
     ;; Bad flycheck design, override the default fringe without having to redefine entire checker levels
     (define-fringe-bitmap 'flycheck-fringe-bitmap-double-arrow
       [#b00000000
@@ -739,7 +740,7 @@ We set the LSP configuration that will be used for many other languages
     (lsp-ui-doc-enable t)
     (lsp-ui-doc-border (face-foreground 'default))
     (lsp-ui-doc-include-signature t)
-    (lsp-ui-flycheck-enable nil)
+    (lsp-ui-flycheck-enable t)
     (lsp-ui-peek-always-show t)
     :config
     (set-face-background 'lsp-ui-doc-background (face-background 'hl-line)))
