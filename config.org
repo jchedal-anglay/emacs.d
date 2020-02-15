@@ -469,7 +469,7 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 #+begin_src emacs-lisp
   (use-package ivy
     :bind
-    ([switch-to-buffer] . ivy-switch-buffer)
+    ([remap switch-to-buffer] . ivy-switch-buffer)
     (:map ivy-minibuffer-map
           ("<return>" . ivy-alt-done))
     :custom
@@ -500,7 +500,8 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
           ("M-n" . ivy-next-history-element)))
 
   (use-package ivy-rich
-    :after (ivy counsel swiper)
+    :after
+    (ivy counsel swiper)
     :custom
     (ivy-rich-parse-remote-buffer nil)
     :config
@@ -837,18 +838,18 @@ Requires
 - [[https://ocaml.org/][ocaml]]
 - [[https://github.com/ocaml/merlin][ocamlmerlin]]
 #+begin_src emacs-lisp
-(use-package tuareg
-  :hook
-  (tuareg-mode . lsp)
-  :mode
-  (("\\.ml[ip]?\\'" . tuareg-mode)
-   ("\\.mly\\'" . tuareg-menhir-mode)
-   ("[./]opam_?\\'" . tuareg-opam-mode)
-   ("\\(?:\\`\\|/\\)jbuild\\(?:\\.inc\\)?\\'" . tuareg-jbuild-mode)
-   ("\\.eliomi?\\'" . tuareg-mode))
-  :custom
-  (tuareg-match-patterns-aligned t)
-  (tuareg-indent-align-with-first-arg t))
+  (use-package tuareg
+    :hook
+    (tuareg-mode . lsp)
+    :mode
+    (("\\.ml[ip]?\\'" . tuareg-mode)
+     ("\\.mly\\'" . tuareg-menhir-mode)
+     ("[./]opam_?\\'" . tuareg-opam-mode)
+     ("\\(?:\\`\\|/\\)jbuild\\(?:\\.inc\\)?\\'" . tuareg-jbuild-mode)
+     ("\\.eliomi?\\'" . tuareg-mode))
+    :custom
+    (tuareg-match-patterns-aligned t)
+    (tuareg-indent-align-with-first-arg t))
 #+end_src
 
 *** Python
@@ -976,7 +977,7 @@ Run ~M-x pdf-tools-install~ the first time
 #+begin_src emacs-lisp
   (use-package pdf-tools
     :defer t
-    :if (equal ign/os '*nix)
+    :if (eq ign/os '*nix)
     :mode
     ("\\.pdf\\'" . pdf-view-mode)
     :bind
