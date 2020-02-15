@@ -76,8 +76,6 @@ Set up package.el and use-package for later use, disable implicit lazy-loading
   (eval-when-compile
     (require 'use-package))
 
-  (use-package use-package-chords)
-
   (setq-default use-package-always-defer nil)
   (setq-default use-package-always-demand t)
   (setq-default use-package-always-ensure t)
@@ -444,15 +442,6 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     (bind-key* "C-a"  #'ign/bol)
     (bind-key* "C-e"  #'ign/eol)
     (bind-key* "M-o" #'other-window))
-
-  (use-package hydra)
-
-  (use-package key-chord
-    :defer t
-    :custom
-    (key-chord-two-keys-delay 0.03)
-    :config
-    (key-chord-mode t))
 #+end_src
 
 ** Discoverability
