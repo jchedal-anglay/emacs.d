@@ -284,7 +284,7 @@ Fancy icons from font-awesome, material-icons, ...
   (use-package doom-modeline
     :if (display-graphic-p)
     :custom
-    (doom-modeline-python-executable ign/python-interactive)
+    (doom-modeline-env-python-executable ign/python-executable)
     (doom-modeline-icon ign/use-all-the-icons-p)
     (doom-modeline-major-mode-icon ign/use-all-the-icons-p)
     (doom-modeline-version t)
@@ -862,36 +862,26 @@ Requires:
 
   (use-package python
     :ensure nil
-    :after (flycheck lsp-mode)
     :custom
     (python-indent 4)
     (python-shell-interpreter ign/python-interactive)
     ;; Required for MacOS, prevents newlines from being displayed as ^G
-    (python-shell-interpreter-args (if (eq ign/os 'macos) "-c exec('__import__(\\'readline\\')') -i --simple-prompt" "-i --simple-prompt"))
+    (python-shell-interpreter-args (if (eq ign/os 'macos) "-c exec('__import__(\\'readline\\')') -i" "-i"))
     (python-fill-docstring-style 'pep-257)
-    (py-split-window-on-execute t)
-    :config
-    (add-to-list 'flycheck-checkers 'python-flake8)
-    (add-to-list 'flycheck-checkers 'python-mypy))
+    (py-split-window-on-execute t))
 
   (use-package pyvenv
-    :after
-    (flycheck lsp-mode)
+    :after python
     :hook
-    (python-mode . pyvenv-mode)
-    :custom
-    (pyvenv-post-activate-hooks '((lambda ()
-                                    (flycheck-reset-enabled-checker 'python-flake8)
-                                    (flycheck-reset-enabled-checker 'python-mypy)
-                                    (lsp)))))
+    (python-mode . pyvenv-mode))
 
   (use-package sphinx-doc
     :after python
     :hook
     (python-mode . sphinx-doc-mode))
 
-  (use-package isortify)
-
+  (use-package isortify
+    :after python)
 #+end_src
 
 *** R & Julia
