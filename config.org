@@ -509,6 +509,7 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line))
 
   (use-package ivy-posframe
+    :after ivy
     :custom
     (ivy-posframe-parameters '((left-fringe . 5) (right-fringe . 5)))
     (ivy-posframe-height-alist '((counsel-find-file . 20)
@@ -799,7 +800,8 @@ Requires:
     (cider-repl-display-in-current-window nil)
     (cider-font-lock-dynamically t))
 
-  (use-package elein)
+  (use-package elein
+    :after clojure-mode)
 #+end_src
 
 *** Common Lisp
@@ -936,7 +938,8 @@ Requires:
     :hook
     (org-mode . org-bullets-mode))
 
-  (use-package px)
+  (use-package px
+    :after org)
 #+end_src
 
 ** TeX
