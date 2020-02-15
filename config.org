@@ -349,17 +349,6 @@ Fancy icons from font-awesome, material-icons, ...
 
 Use linum for versions <26, otherwise use the cleaner and faster builtin line-number package
 #+begin_src emacs-lisp
-  (use-package linum
-    :ensure nil
-    :defer t
-    :if (< emacs-major-version 26)
-    :hook
-    (prog-mode . linum-mode)
-    :custom
-    (linum-format " %d ")
-    :config
-    (set-face-underline 'linum nil))
-
   (use-package display-line-numbers
     :ensure nil
     :defer t
@@ -371,6 +360,17 @@ Use linum for versions <26, otherwise use the cleaner and faster builtin line-nu
     (display-line-numbers-current-absolute t)
     (display-line-numbers-width 2)
     (display-line-numbers-widen t))
+
+  (use-package linum
+    :ensure nil
+    :defer t
+    :unless (featurep 'display-line-numbers)
+    :hook
+    (prog-mode . linum-mode)
+    :custom
+    (linum-format " %d ")
+    :config
+    (set-face-underline 'linum nil))
 #+end_src
 
 ** Scrolling
@@ -680,9 +680,8 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 #+begin_src emacs-lisp
   (use-package projectile
     :defer t
-    :bind
-    (:map projectile-mode-map
-          ("C-c p" . projectile-command-map))
+    :bind-keymap
+    ("C-c p" . projectile-command-map)
     :custom
     (projectile-project-search-path '("~/Projects/"))
     (projectile-indexing-method (if (eq ign/os 'win) 'native 'alien))
@@ -718,8 +717,8 @@ We set the LSP configuration that will be used for many other languages
     (lsp-auto-configure nil))
 
   (use-package lsp-clients
-    :after lsp-mode
-    :ensure nil)
+    :ensure nil
+    :after lsp-mode)
 
   (use-package lsp-ui
     :after
@@ -986,8 +985,8 @@ Requires:
     (company-auctex-init))
 
   (use-package tex
-    :after pdf-tools
     :ensure auctex
+    :after pdf-tools
     :mode
     ("\\.tex\\'" . latex-mode)
     :custom
