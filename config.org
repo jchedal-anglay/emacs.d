@@ -576,17 +576,18 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 ** Git
 
 #+begin_src emacs-lisp
-  (use-package vc-hooks
-    :ensure nil
-    :custom
-    (vc-handled-backends nil))
-
   (use-package magit
     :defer t
     :custom
     (magit-display-buffer-function 'magit-display-buffer-fullframe-status-topleft-v1)
     :bind
     ("C-c g" . magit))
+
+  (use-package vc-hooks
+    :ensure nil
+    :after magit
+    :custom
+    (vc-handled-backends nil))
 
   (use-package transient
     :defer t
