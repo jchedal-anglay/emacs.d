@@ -744,22 +744,6 @@ We set the LSP configuration that will be used for many other languages
     :config
     (set-face-background 'lsp-ui-doc-background (face-background 'hl-line)))
 
-  (use-package dap-mode
-    :after
-    (lsp-mode hydra)
-    :hook
-    (lsp-mode . (lambda () (dap-mode t) (dap-ui-mode t))))
-
-  (use-package dap-hydra
-    :ensure nil
-    :defer t
-    :bind
-    (:map lsp-mode-map
-          ("C-c d" . dap-hydra))
-    :config
-    (defhydra+ dap-hydra (:exit nil :foreign-keys run)
-      ("d" dap-debug "Start debug session")))
-
   (use-package company-lsp
     :after
     (company lsp-mode)
@@ -784,10 +768,6 @@ Requires:
     :custom
     (c-default-style "linux")
     (c-basic-offset 4))
-
-  (use-package dap-gdb-lldb
-    :ensure nil
-    :after dap-mode)
 
   (use-package company-c-headers
     :after company
@@ -912,12 +892,6 @@ Requires:
 
   (use-package isortify)
 
-  (use-package dap-python
-    :ensure nil
-    :after
-    (lsp-pyls dap-mode)
-    :custom
-    (dap-python-executable ign/python-executable))
 #+end_src
 
 *** R & Julia
