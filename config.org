@@ -939,26 +939,9 @@ Requires:
 ** TeX
 
 #+begin_src emacs-lisp
-  (use-package auctex-latexmk
-    :custom
-    (auctex-latexmk-inherit-TeX-PDF-mode t)
-    :config
-    (auctex-latexmk-setup))
-
-  (use-package reftex
-    :hook
-    (LaTeX-mode . reftex-mode)
-    :custom
-    (reftex-plug-into-AUCTeX t)
-    (reftex-cite-prompt-optional-args t))
-
-  (use-package company-auctex
-    :config
-    (company-auctex-init))
-
   (use-package tex
     :ensure auctex
-    :after pdf-tools
+    :defer t
     :mode
     ("\\.tex\\'" . latex-mode)
     :custom
@@ -969,6 +952,27 @@ Requires:
     (TeX-view-program-selection '((output-pdf "PDF Tools")) TeX-source-correlate-start-server t)
     :config
     (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer))
+
+  (use-package auctex-latexmk
+    :after tex
+    :custom
+    (auctex-latexmk-inherit-TeX-PDF-mode t)
+    :config
+    (auctex-latexmk-setup))
+
+  (use-package reftex
+    :after tex
+    :hook
+    (LaTeX-mode . reftex-mode)
+    :custom
+    (reftex-plug-into-AUCTeX t)
+    (reftex-cite-prompt-optional-args t))
+
+  (use-package company-auctex
+    :after
+    (tex company)
+    :config
+    (company-auctex-init))
 #+end_src
 
 ** PDF
@@ -977,6 +981,7 @@ Run ~M-x pdf-tools-install~ the first time
 #+begin_src emacs-lisp
   (use-package pdf-tools
     :defer t
+    :after tex
     :if (eq ign/os '*nix)
     :mode
     ("\\.pdf\\'" . pdf-view-mode)
