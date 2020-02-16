@@ -362,7 +362,7 @@ Use linum for versions <26, otherwise use the cleaner and faster builtin line-nu
   (use-package linum
     :ensure nil
     :defer t
-    :unless (featurep 'display-line-numbers)
+    :unless (>= emacs-major-version 26)
     :hook
     (prog-mode . linum-mode)
     :custom
