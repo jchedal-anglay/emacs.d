@@ -571,6 +571,14 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     :bind
     ("C-c g" . magit))
 
+  (use-package diff-hl
+    :if (display-graphic-p)
+    :hook
+    (magit-post-refresh . diff-hl-magit-post-refresh)
+    :config
+    (global-diff-hl-mode)
+    (diff-hl-margin-mode))
+
   (use-package vc-hooks
     :ensure nil
     :after magit
