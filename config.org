@@ -117,26 +117,6 @@ I don't want any kind of backup, this is mostly due to saving being compulsory t
 * Functions
 
 #+begin_src emacs-lisp
-  (defun ign/after (to-call-after f)
-    "Run F then run TO-CALL-AFTER."
-    (funcall f)
-    (funcall to-call-after))
-
-  (defun ign/split-window-right ()
-    "Create a new window split to the right and balance the windows."
-    (interactive)
-    (ign/after #'balance-windows #'split-window-right))
-
-  (defun ign/split-window-below ()
-    "Create a new window split below and balance the windows."
-    (interactive)
-    (ign/after #'balance-windows #'split-window-below))
-
-  (defun ign/delete-window ()
-    "Delete the current window and balance the windows."
-    (interactive)
-    (ign/after #'balance-windows #'delete-window))
-
   (defun ign/fill-or-unfill ()
     "Fill or unfill based on the previous command."
     (interactive)
@@ -147,11 +127,6 @@ I don't want any kind of backup, this is mostly due to saving being compulsory t
              fill-column)))
       (call-interactively #'fill-paragraph)))
 
-  (defun ign/refresh-buffer ()
-    "Refresh the current buffer."
-    (interactive)
-    (revert-buffer :ignore-auto :noconfirm))
-
   (defun ign/reload ()
     "Reload the configuration file."
     (interactive)
@@ -161,18 +136,6 @@ I don't want any kind of backup, this is mostly due to saving being compulsory t
     "Open the configuration file in the current buffer."
     (interactive)
     (find-file ign/config-path))
-
-  (defun ign/first-occurence (predicate list)
-    "Return the first occurence in LIST which, when applied to PREDICATE returns t."
-    (let ((head (car list))
-          (tail (cdr list)))
-      (if (or (not head) (funcall predicate head))
-          head
-        (ign/first-occurence predicate tail))))
-
-  (defmacro ign/find-executables (&rest list)
-    "Return the first occurence in LIST whose value corresponds to an executable."
-    (ign/first-occurence #'executable-find list))
 
   (defun ign/save-buffer (arg)
     "Save the current buffer and remove trailing whitespace unless called interactively."
