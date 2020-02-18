@@ -22,6 +22,7 @@
   - [[#bells][Bells]]
   - [[#parentheses][Parentheses]]
   - [[#windows][Windows]]
+  - [[#buffers][Buffers]]
 - [[#bindings][Bindings]]
   - [[#discoverability][Discoverability]]
 - [[#completion-frontend][Completion Frontend]]
@@ -419,6 +420,16 @@ Disable yes-or-no-p, I like to live dangerously
 #+begin_src emacs-lisp
   (setq split-width-threshold 0)
   (setq split-height-threshold nil)
+#+end_src
+
+** Buffers
+
+#+begin_src emacs-lisp
+  (use-package ibuffer
+    :ensure nil
+    :defer t
+    :bind
+    ("C-x C-b" . ibuffer))
 #+end_src
 
 * Bindings
