@@ -210,6 +210,7 @@ I don't want any kind of backup, this is mostly due to saving being compulsory t
 #+begin_src emacs-lisp
   (defconst ign/config-path (concat user-emacs-directory "config.org"))
   (defconst ign/os (or (alist-get system-type '((gnu . *nix) (gnu/linux . *nix) (gnu/kfreebsd . *nix) (darwin . macos) (ms-dos . win) (windows-nt . win) (cygwin . win))) '*nix))
+  (defconst ign/project-path "~/Projects")
   (defconst ign/python-executable "python")
   (defconst ign/python-interactive "python")
   (defconst ign/use-all-the-icons-p (memq ign/os '(*nix macos)))
@@ -693,7 +694,7 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     :bind-keymap
     ("C-c p" . projectile-command-map)
     :custom
-    (projectile-project-search-path '("~/Projects/"))
+    (projectile-project-search-path `(,ign/project-path))
     (projectile-indexing-method (if (eq ign/os 'win) 'native 'alien))
     (projectile-sort-order 'access-time)
     (projectile-enable-caching t)
