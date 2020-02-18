@@ -31,6 +31,7 @@
 - [[#programming-related][Programming Related]]
   - [[#git][Git]]
   - [[#tramp][TRAMP]]
+  - [[#terminals--comint][Terminals & Comint]]
   - [[#auto-completion][Auto-Completion]]
   - [[#checkerslinters][Checkers/Linters]]
   - [[#project-management][Project Management]]
@@ -257,8 +258,9 @@ Fancy icons from font-awesome, material-icons, ...
 
   (use-package hide-mode-line
     :defer t
+    :after comint
     :hook
-    ((comint-mode help-mode minimap-mode) . hide-mode-line-mode))
+    ((comint-mode help-mode) . hide-mode-line-mode))
 #+end_src
 
 * Interface
@@ -406,8 +408,6 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
   (define-key key-translation-map (kbd "M-x") (kbd "M-t"))
   (define-key key-translation-map (kbd "C-M-t") (kbd "C-M-x"))
   (define-key key-translation-map (kbd "C-M-x") (kbd "C-M-t"))
-
-  (define-key comint-mode-map (kbd "C-l") #'comint-clear-buffer)
 
   (use-package bind-key
     :config
@@ -587,6 +587,16 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
                                    ("-o" "UserKnownHostsFile=/dev/null")
                                    ("-o" "StrictHostKeyChecking=no")))
                    (tramp-default-port 22))))
+#+end_src
+
+** Terminals & Comint
+
+#+begin_src emacs-lisp
+  (use-package comint
+    :ensure nil
+    :bind
+    (:map comint-mode-map
+          ("C-l" . comint-clear-buffer)))
 #+end_src
 
 ** Auto-Completion
