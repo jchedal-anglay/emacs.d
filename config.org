@@ -539,16 +539,6 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 
   (use-package aggressive-indent
     :defer t)
-
-  (use-package yasnippet
-    :defer t
-    :bind
-    (:map yas-minor-mode-map
-          ("C-M-/" . yas-expand)
-          ("TAB" . nil)))
-
-  (use-package yasnippet-snippets
-    :after yasnippet)
 #+end_src
 
 * Programming Related
