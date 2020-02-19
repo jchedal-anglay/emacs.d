@@ -392,6 +392,8 @@ Disable yes-or-no-p, I like to live dangerously
 ** Buffers
 
 #+begin_src emacs-lisp
+  (setq-default uniquify-buffer-name-style 'post-forward-angle-brackets)
+
   (use-package ibuffer
     :ensure nil
     :defer t
