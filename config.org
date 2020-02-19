@@ -390,12 +390,16 @@ Disable yes-or-no-p, I like to live dangerously
 #+begin_src emacs-lisp
   (setq-default split-width-threshold 0)
   (setq-default split-height-threshold nil)
+
+  (global-set-key (kbd "M-o") #'other-window)
 #+end_src
 
 ** Buffers
 
 #+begin_src emacs-lisp
   (setq-default uniquify-buffer-name-style 'post-forward-angle-brackets)
+
+  (global-set-key [remap save-buffer] #'ign/save-buffer)
 
   (use-package ibuffer
     :ensure nil
@@ -414,12 +418,6 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
   (define-key key-translation-map (kbd "M-x") (kbd "M-t"))
   (define-key key-translation-map (kbd "C-M-t") (kbd "C-M-x"))
   (define-key key-translation-map (kbd "C-M-x") (kbd "C-M-t"))
-
-  (use-package bind-key
-    :config
-    (bind-key* [remap save-buffer] #'ign/save-buffer)
-    (bind-key* [remap kill-line] #'ign/kill-line-or-region)
-    (bind-key* "M-o" #'other-window))
 #+end_src
 
 ** Discoverability
@@ -502,6 +500,7 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
   (delete-selection-mode t)
 
   (global-set-key [remap fill-paragraph] #'ign/fill-or-unfill)
+  (global-set-key [remap kill-line] #'ign/kill-line-or-region)
 
   (use-package expand-region
     :defer t
