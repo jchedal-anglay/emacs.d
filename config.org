@@ -717,11 +717,15 @@ We set the LSP configuration that will be used for many other languages
     :hook
     (lsp-mode . lsp-ui-mode)
     :custom
-    (lsp-ui-doc-enable t)
+    ;; toggling features, susceptible to change
+    (lsp-ui-doc-enable nil)
+    (lsp-ui-flycheck-enable nil)
+    (lsp-ui-imenu-enable nil)
+    (lsp-ui-peek-enable nil)
+    (lsp-ui-sideline-enable nil)
+
     (lsp-ui-doc-border (face-foreground 'default))
     (lsp-ui-doc-include-signature t)
-    (lsp-ui-flycheck-enable t)
-    (lsp-ui-peek-always-show t)
     :config
     (set-face-background 'lsp-ui-doc-background (face-background 'hl-line)))
 
