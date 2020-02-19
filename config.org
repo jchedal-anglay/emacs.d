@@ -516,6 +516,13 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     :bind
     ("C-=" . er/expand-region))
 
+  (use-package hungry-delete
+    :defer t
+    :hook
+    (prog-mode . global-hungry-delete-mode)
+    :custom
+    (hungry-delete-chars-to-skip " \t\f\v"))
+
   (use-package multiple-cursors
     :defer t
     :bind
