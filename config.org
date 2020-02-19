@@ -156,22 +156,6 @@ I don't want any kind of backup, this is mostly due to saving being compulsory t
     (if (region-active-p)
         (call-interactively #'kill-region)
       (kill-visual-line (if (= arg 1) nil arg))))
-
-  (defun ign/bol (arg)
-    (interactive "p")
-    (if (= arg 1)
-        (beginning-of-visual-line)
-      (back-to-indentation)))
-
-  (defun ign/eol (arg)
-    (interactive "p")
-    (if (= arg 1)
-        (end-of-visual-line)
-      (progn
-        (move-end-of-line nil)
-        (re-search-backward "^\\|[^[:space:]]")
-        (if (not (looking-at-p "[[:space:]]"))
-            (right-char)))))
 #+end_src
 
 * Custom Variables
@@ -435,8 +419,6 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     :config
     (bind-key* [remap save-buffer] #'ign/save-buffer)
     (bind-key* [remap kill-line] #'ign/kill-line-or-region)
-    (bind-key* "C-a"  #'ign/bol)
-    (bind-key* "C-e"  #'ign/eol)
     (bind-key* "M-o" #'other-window))
 #+end_src
 
@@ -549,6 +531,12 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     ("C-s" . avy-goto-char-timer)
     :custom
     (avy-keys '(?a ?o ?e ?u ?h ?t ?n ?s)))
+
+  (use-package mwim
+    :defer t
+    :bind
+    ("C-a" . mwim-beginning-of-code-or-line)
+    ("C-e" . mwim-end-of-code-or-line))
 
   (use-package aggressive-indent
     :defer t)
