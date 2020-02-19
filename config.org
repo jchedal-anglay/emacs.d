@@ -21,6 +21,7 @@
   - [[#confirmation-messages][Confirmation messages]]
   - [[#bells][Bells]]
   - [[#parentheses][Parentheses]]
+  - [[#files][Files]]
   - [[#windows][Windows]]
   - [[#buffers][Buffers]]
 - [[#bindings][Bindings]]
@@ -388,6 +389,16 @@ Disable yes-or-no-p, I like to live dangerously
     (prog-mode . electric-pair-mode))
 
   (show-paren-mode t)
+#+end_src
+
+** Files
+
+#+begin_src emacs-lisp
+  (use-package dired
+    :ensure nil
+    :bind
+    (:map dired-mode-map
+          ("C-c" . wdired-change-to-wdired-mode)))
 #+end_src
 
 ** Windows
