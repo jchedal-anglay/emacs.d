@@ -534,8 +534,8 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
   (use-package mwim
     :defer t
     :bind
-    ("C-a" . mwim-beginning-of-code-or-line)
-    ("C-e" . mwim-end-of-code-or-line))
+    ("C-a" . mwim-beginning)
+    ("C-e" . mwim-end))
 
   (use-package aggressive-indent
     :defer t)
