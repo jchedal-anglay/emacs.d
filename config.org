@@ -406,6 +406,11 @@ Disable yes-or-no-p, I like to live dangerously
     :defer t
     :bind
     ("C-x C-b" . ibuffer))
+
+  (use-package hl-todo
+    :defer t
+    :hook
+    (prog-mode . hl-todo-mode))
 #+end_src
 
 * Bindings
