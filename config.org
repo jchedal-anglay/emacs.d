@@ -272,6 +272,11 @@ Fancy icons from font-awesome, material-icons, ...
 ** Splash Screen
 
 #+begin_src emacs-lisp
+  (setq-default inhibit-startup-screen t)
+  (setq-default inhibit-startup-message t)
+  (setq-default inhibit-startup-echo-area-message t)
+  (setq-default initial-scratch-message nil)
+
   (use-package dashboard
     :if (display-graphic-p)
     :bind
