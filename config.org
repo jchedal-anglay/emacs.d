@@ -177,12 +177,11 @@ I don't want any kind of backup, this is mostly due to saving being compulsory t
 
 #+begin_src emacs-lisp
   (defconst ign/config-path (concat user-emacs-directory "config.org"))
-  (defconst ign/os (or (alist-get system-type '((gnu . *nix) (gnu/linux . *nix) (gnu/kfreebsd . *nix) (darwin . macos) (ms-dos . win) (windows-nt . win) (cygwin . win))) '*nix))
   (defconst ign/project-path "~/Projects")
   (defconst ign/python-executable "python")
   (defconst ign/python-interactive "python")
-  (defconst ign/use-all-the-icons-p (memq ign/os '(*nix macos)))
-  (when (memq ign/os '(*nix macos))
+  (defconst ign/use-all-the-icons-p (memq system-type '(gnu/linux darwin)))
+  (when (memq system-type '(gnu/linux darwin))
     (setq-default custom-file "/dev/zero"))
 #+end_src
 
@@ -192,11 +191,11 @@ I don't want any kind of backup, this is mostly due to saving being compulsory t
 This was originally used for MacOS only, but ended being useful for various tools that require on a shell to run
 #+begin_src emacs-lisp
   (use-package exec-path-from-shell
-    :if (memq ign/os '(*nix macos))
+    :if (memq system-type '(gnu/linux darwin))
     :config
     (exec-path-from-shell-initialize))
 
-  (when (memq ign/os '(macos))
+  (when (eq system-type 'darwin)
     (setq mac-command-modifier 'meta))
 #+end_src
 
@@ -221,9 +220,9 @@ This was originally used for MacOS only, but ended being useful for various tool
 
 #+begin_src emacs-lisp
   (set-frame-font
-   (pcase ign/os
-     ('*nix "Inconsolata")
-     ('macos "Menlo-20")
+   (pcase system-type
+     ('gnu/linux "Inconsolata")
+     ('darwin "Menlo-20")
      (_ "Consolas")))
 #+end_src
 
@@ -687,7 +686,7 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     ("C-c p" . projectile-command-map)
     :custom
     (projectile-project-search-path `(,ign/project-path))
-    (projectile-indexing-method (if (eq ign/os 'win) 'native 'alien))
+    (projectile-indexing-method (if (memq system-type '(ms-dos windows-nt cygwin)) 'native 'alien))
     (projectile-sort-order 'access-time)
     (projectile-enable-caching t)
     (projectile-require-project-root t)
@@ -872,7 +871,7 @@ Requires:
     (python-indent 4)
     (python-shell-interpreter ign/python-interactive)
     ;; Required for MacOS, prevents newlines from being displayed as ^G
-    (python-shell-interpreter-args (if (eq ign/os 'macos) "-c exec('__import__(\\'readline\\')') -i" "-i"))
+    (python-shell-interpreter-args (if (eq system-type 'darwin) "-c exec('__import__(\\'readline\\')') -i" "-i"))
     (python-fill-docstring-style 'pep-257)
     (py-split-window-on-execute t))
 
@@ -982,7 +981,7 @@ Run ~M-x pdf-tools-install~ the first time
   (use-package pdf-tools
     :defer t
     :after tex
-    :if (eq ign/os '*nix)
+    :if (eq system-type 'gnu/linux)
     :mode
     ("\\.pdf\\'" . pdf-view-mode)
     :bind
