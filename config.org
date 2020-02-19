@@ -564,13 +564,9 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     :config
     (transient-bind-q-to-quit))
 
-  (use-package gitignore-mode
-    :defer t
-    :mode "\\.gitignore\\'")
-
-  (use-package gitconfig-mode
-    :defer t
-    :mode "\\.gitconfig\\'")
+  (use-package gitattributes-mode :defer t)
+  (use-package gitignore-mode :defer t)
+  (use-package gitconfig-mode :defer t)
 #+end_src
 
 ** TRAMP
