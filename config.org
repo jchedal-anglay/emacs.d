@@ -380,6 +380,7 @@ Disable yes-or-no-p, I like to live dangerously
 #+begin_src emacs-lisp
   (use-package dired
     :ensure nil
+    :defer t
     :bind
     (:map dired-mode-map
           ("C-c" . wdired-change-to-wdired-mode)))
@@ -471,7 +472,7 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
 
   (use-package ivy-rich
     :after
-    (ivy counsel swiper)
+    (counsel ivy swiper)
     :custom
     (ivy-rich-parse-remote-buffer nil)
     :config
@@ -709,7 +710,7 @@ We set the LSP configuration that will be used for many other languages
     :custom
     ;; toggling features, susceptible to change
     (lsp-ui-doc-enable nil)
-    (lsp-ui-flycheck-enable nil)
+    (lsp-ui-flycheck-enable t)
     (lsp-ui-imenu-enable nil)
     (lsp-ui-peek-enable nil)
     (lsp-ui-sideline-enable nil)
@@ -735,7 +736,8 @@ We set the LSP configuration that will be used for many other languages
   (use-package elisp-mode
     :ensure nil
     :defer t
-    :after (company flycheck)
+    :after
+    (company flycheck)
     :config
     (add-to-list 'company-backends 'company-elisp)
     (add-to-list 'flycheck-checkers 'emacs-lisp)
@@ -758,7 +760,8 @@ Requires:
     (c-basic-offset 4))
 
   (use-package company-c-headers
-    :after company
+    :after
+    (cc-mode company)
     :config
     (add-to-list 'company-backends 'company-c-headers))
 #+end_src
@@ -814,8 +817,6 @@ Requires:
 #+begin_src emacs-lisp
   (use-package ein
     :defer t
-    :mode
-    (".*\\.ipynb\\'" . ein:ipynb-mode)
     :custom
     (ein:completion-backend 'ein:use-company-jedi-backends)
     (ein:use-auto-complete-superpack t))
@@ -849,9 +850,7 @@ Requires:
 - [[https://github.com/palantir/python-language-server][pyls]]
 #+begin_src emacs-lisp
   (use-package pip-requirements
-    :defer t
-    :mode
-    ("requirements\\.txt" . pip-requirements-mode))
+    :defer t)
 
   (use-package python
     :ensure nil
@@ -899,8 +898,6 @@ Requires:
 #+begin_src emacs-lisp
   (use-package org
     :ensure nil
-    :mode
-    ("\\.org\\'" . org-mode)
     :hook
     (org-babel-after-execute . org-redisplay-inline-images)
     :custom
@@ -932,8 +929,6 @@ Requires:
   (use-package tex
     :ensure auctex
     :defer t
-    :mode
-    ("\\.tex\\'" . latex-mode)
     :custom
     (TeX-source-correlate-mode t)
     (TeX-source-correlate-method 'synctex)
@@ -960,7 +955,7 @@ Requires:
 
   (use-package company-auctex
     :after
-    (tex company)
+    (company tex)
     :config
     (company-auctex-init))
 #+end_src
@@ -973,8 +968,6 @@ Run ~M-x pdf-tools-install~ the first time
     :defer t
     :after tex
     :if (eq system-type 'gnu/linux)
-    :mode
-    ("\\.pdf\\'" . pdf-view-mode)
     :bind
     (:map pdf-view-mode-map
           ("C-s" . isearch-forward)
