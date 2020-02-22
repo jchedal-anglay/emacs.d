@@ -729,6 +729,19 @@ We set the LSP configuration that will be used for many other languages
     (add-to-list 'company-backends 'company-lsp))
 #+end_src
 
+*** Emacs Lisp
+
+#+begin_src emacs-lisp
+  (use-package elisp-mode
+    :ensure nil
+    :defer t
+    :after (company flycheck)
+    :config
+    (add-to-list 'company-backends 'company-elisp)
+    (add-to-list 'flycheck-checkers 'emacs-lisp)
+    (add-to-list 'flycheck-checkers 'emacs-lisp-checkdoc))
+#+end_src
+
 *** C/C++
 
 Requires:
