@@ -541,7 +541,9 @@ Replace M-x, C-x, C-M-x with M-t, C-t, C-M-t respectively, this is because I use
     :custom
     (magit-display-buffer-function 'magit-display-buffer-fullframe-status-topleft-v1)
     :bind
-    ("C-c g" . magit))
+    ("C-c g" . magit)
+    (:map magit-status-mode-map
+          ("q" . (lambda () (interactive) (magit-mode-bury-buffer 16)))))
 
   (use-package vc-hooks
     :ensure nil
