@@ -10,3 +10,5 @@
 (defvar igneous/dir user-emacs-directory)
 (defvar igneous/core-dir (expand-file-name "core" igneous/dir))
 (defvar igneous/modules-dir (expand-file-name  "modules" igneous/dir))
+
+(setq load-prefer-newer t)
