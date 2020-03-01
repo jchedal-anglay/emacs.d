@@ -6,3 +6,7 @@
 (setq gc-cons-percentage 0.6)
 (add-hook 'after-init-hook (lambda () (setq gc-cons-threshold (* 32 1000000)
                                             gc-cons-percentage 0.1)))
+
+(defvar igneous/dir user-emacs-directory)
+(defvar igneous/core-dir (expand-file-name "core" igneous/dir))
+(defvar igneous/modules-dir (expand-file-name  "modules" igneous/dir))
