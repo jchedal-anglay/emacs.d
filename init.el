@@ -16,3 +16,5 @@
 (add-to-list 'load-path igneous/core-dir)
 
 (setq load-prefer-newer t)
+
+(require 'core)
