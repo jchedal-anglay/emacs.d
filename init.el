@@ -13,4 +13,6 @@
 (defvar igneous/core-dir (expand-file-name "core" igneous/dir))
 (defvar igneous/modules-dir (expand-file-name  "modules" igneous/dir))
 
+(add-to-list 'load-path igneous/core-dir)
+
 (setq load-prefer-newer t)
