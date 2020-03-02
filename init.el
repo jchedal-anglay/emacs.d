@@ -18,3 +18,5 @@
 (setq load-prefer-newer t)
 
 (require 'core)
+
+(load!)

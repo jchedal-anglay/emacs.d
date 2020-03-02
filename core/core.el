@@ -4,7 +4,8 @@
 ;;; Code:
 
 (defvar igneous//core-modules
-  '(core-custom))
+  '(core-custom
+    core-lib))
 
 (dolist (core-module igneous//core-modules)
   (require core-module))
