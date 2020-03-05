@@ -5,7 +5,13 @@
 
 (defmacro load! (&rest modules)
   "Load the MODULES."
-  `(load-module ',modules))
+  `(load-modules ',modules))
+
+(defun feature-activated-p (category module feature)
+  "Return nil if the FEATURE in not activated in the right CATEGORY and MODULE, return its value otherwise."
+  (--some (and (-> it car (eq category))
+               (-> it cadr (eq module))
+               (->> it cddr (memq feature))) igneous--modules))
 
 (defun hierarchical-cons-to-pairs (predicate list default)
   "Return a list of pairs based on LIST where the left element is the last element which satisfies PREDICATE."
