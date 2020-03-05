@@ -9,14 +9,15 @@
 
 (defun hierarchical-cons-to-pairs (predicate list default)
   "Return a list of pairs based on LIST where the left element is the last element which satisfies PREDICATE."
-  (cond
-   ((null list)
-    nil)
-   ((funcall predicate (car list))
-    (hierarchical-cons-to-pairs predicate (cdr list) (car list)))
-   (t
-    (cons `(,default . ,(car list))
-          (hierarchical-cons-to-pairs predicate (cdr list) default)))))
+  (cond ((null list) nil)
+        ((funcall predicate (car list))
+         (hierarchical-cons-to-pairs predicate (cdr list)
+                                     (car list)))
+        ((consp (car list))
+         (cons `(,default . ,(car list))
+               (hierarchical-cons-to-pairs predicate (cdr list) default)))
+        (t (cons `(,default . (,(car list)))
+                 (hierarchical-cons-to-pairs predicate (cdr list) default)))))
 
 (defun load-modules (modules)
   "Load the MODULES, internals of `load!'."
