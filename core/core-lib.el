@@ -20,9 +20,8 @@
 
 (defun load-modules (modules)
   "Load the MODULES, internals of `load!'."
-  (setq igneous--modules modules)
-  (mapcar #'load-pair
-          (hierarchical-cons-to-pairs 'keywordp modules :.)))
+  (setq igneous--modules (hierarchical-cons-to-pairs 'keywordp modules :.))
+  (mapcar #'load-pair igneous--modules))
 
 (defun load-pair (pair)
   "Convert a PAIR (:category . 'module) to a string \"category/module\"."
