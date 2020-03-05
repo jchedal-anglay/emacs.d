@@ -26,6 +26,7 @@
 
 (defun igneous//load (modules)
   "Load the MODULES, internals of load!."
+  (setq igneous--modules modules)
   (mapcar #'igneous//load-pair
           (igneous//hierarchical-cons-to-pairs 'keywordp modules :.)))
 
