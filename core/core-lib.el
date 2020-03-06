@@ -28,15 +28,15 @@
 (defun igneous--load-modules (modules)
   "Load the MODULES, internals of `load!'."
   (setq igneous--modules (igneous--hierarchical-cons-to-pairs 'keywordp modules :.))
-  (mapcar #'igneous--load-pair igneous--modules))
+  (mapcar #'igneous--pair-to-string igneous--modules))
 
-(defun igneous--load-pair (pair)
-  "Convert a PAIR (:category . 'module) to a string \"category/module\"."
+(defun igneous--pair-to-string (pair)
+  "Convert a PAIR (:category . '(module features?)) to a string \"category/module\"."
   (pcase-let ((`(,category . ,module) pair))
     (-> category
         symbol-name
         (substring 1)
-        (concat "/" (symbol-name module))
+        (concat "/" (symbol-name (car module)))
         igneous--load-module)))
 
 (defun igneous--load-module (module-name)
