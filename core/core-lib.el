@@ -13,6 +13,17 @@
                (-> it cadr (eq module))
                (->> it cddr (memq feature))) igneous--modules))
 
+(defun igneous--current-module ()
+  "Return the current module."
+  (when (string-prefix-p igneous-modules-dir load-file-name)
+    (-> load-file-name f-split last car intern)))
+
+(defun igneous--current-category ()
+  "Return the current category."
+  (when (string-prefix-p igneous-modules-dir load-file-name)
+    (cl-flet ((add-prefix (string prefix) (concat prefix string)))
+      (-> load-file-name f-split (last 2) car (add-prefix ":") intern))))
+
 (defun igneous--hierarchical-cons-to-pairs (predicate list default)
   "Return a list of pairs based on LIST where the left element is the last element which satisfies PREDICATE."
   (cond ((null list) nil)
