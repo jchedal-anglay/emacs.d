@@ -4,7 +4,7 @@
 ;;; Code:
 
 (defvar igneous--modules nil
-  "List containing the loaded modules, filled by `igneous//load!'.
+  "List containing the loaded modules, filled by `load!'.
 Contains atom or cons where the head is the module and the rest are the features to enable for that module.")
 
 (provide 'core-custom)

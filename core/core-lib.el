@@ -5,44 +5,44 @@
 
 (defmacro load! (&rest modules)
   "Load the MODULES."
-  `(load-modules ',modules))
+  `(igneous--load-modules ',modules))
 
-(defun feature-activated-p (category module feature)
+(defun igneous--feature-activated-p (category module feature)
   "Return nil if the FEATURE in not activated in the right CATEGORY and MODULE, return its value otherwise."
   (--some (and (-> it car (eq category))
                (-> it cadr (eq module))
                (->> it cddr (memq feature))) igneous--modules))
 
-(defun hierarchical-cons-to-pairs (predicate list default)
+(defun igneous--hierarchical-cons-to-pairs (predicate list default)
   "Return a list of pairs based on LIST where the left element is the last element which satisfies PREDICATE."
   (cond ((null list) nil)
         ((funcall predicate (car list))
-         (hierarchical-cons-to-pairs predicate (cdr list)
+         (igneous--hierarchical-cons-to-pairs predicate (cdr list)
                                      (car list)))
         ((consp (car list))
          (cons `(,default . ,(car list))
-               (hierarchical-cons-to-pairs predicate (cdr list) default)))
+               (igneous--hierarchical-cons-to-pairs predicate (cdr list) default)))
         (t (cons `(,default . (,(car list)))
-                 (hierarchical-cons-to-pairs predicate (cdr list) default)))))
+                 (igneous--hierarchical-cons-to-pairs predicate (cdr list) default)))))
 
-(defun load-modules (modules)
+(defun igneous--load-modules (modules)
   "Load the MODULES, internals of `load!'."
-  (setq igneous--modules (hierarchical-cons-to-pairs 'keywordp modules :.))
-  (mapcar #'load-pair igneous--modules))
+  (setq igneous--modules (igneous--hierarchical-cons-to-pairs 'keywordp modules :.))
+  (mapcar #'igneous--load-pair igneous--modules))
 
-(defun load-pair (pair)
+(defun igneous--load-pair (pair)
   "Convert a PAIR (:category . 'module) to a string \"category/module\"."
   (pcase-let ((`(,category . ,module) pair))
     (-> category
         symbol-name
         (substring 1)
         (concat "/" (symbol-name module))
-        load-module)))
+        igneous--load-module)))
 
-(defun load-module (module-name)
-  "Load MODULE-NAME by looking in `igneous/modules-dir'."
+(defun igneous--load-module (module-name)
+  "Load MODULE-NAME by looking in `igneous-modules-dir'."
   (interactive "FEnter path to module starting from module directory: ")
-  (load (expand-file-name module-name igneous/modules-dir)))
+  (load (expand-file-name module-name igneous-modules-dir)))
 
 (provide 'core-lib)
 ;;; core-lib.el ends here
