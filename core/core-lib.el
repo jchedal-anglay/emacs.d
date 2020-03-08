@@ -7,6 +7,11 @@
   "Load the MODULES."
   `(igneous--load-modules ',modules))
 
+(defmacro with-feature! (feature &rest body)
+  "Execute BODY if FEATURE is activated."
+  `(when (igneous--feature-activated-p (igneous--current-category) (igneous--current-module) ,feature)
+     ,@body))
+
 (defun igneous--feature-activated-p (category module feature)
   "Return nil if the FEATURE in not activated in the right CATEGORY and MODULE, return its value otherwise."
   (--some (and (-> it car (eq category))
