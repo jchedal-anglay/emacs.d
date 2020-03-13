@@ -3,6 +3,10 @@
 ;; Defines functions and macros used throughout the configuration
 ;;; Code:
 
+(require 'cl-lib)
+(use-package dash)
+(use-package dash-functional)
+
 (defmacro load! (&rest modules)
   "Load the MODULES."
   `(igneous--load-modules ',modules))
