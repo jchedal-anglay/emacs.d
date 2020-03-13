@@ -13,13 +13,15 @@
 
 (defmacro with-feature! (feature &rest body)
   "Execute BODY if FEATURE is activated."
+  (declare (indent 1))
   `(when (igneous--feature-activated-p (igneous--current-category) (igneous--current-module) ,feature)
      ,@body))
 
 (defmacro with-os! (os &rest body)
   "Execute BODY if current os is OS."
+  (declare (indent 1))
   `(when (if (consp ',os) (memq system-type ',os) (eq system-type ',os))
-    ,@body))
+     ,@body))
 
 (defun igneous--feature-activated-p (category module feature)
   "Return nil if the FEATURE in not activated in the right CATEGORY and MODULE, return its value otherwise."
@@ -43,7 +45,7 @@
   (cond ((null list) nil)
         ((funcall predicate (car list))
          (igneous--hierarchical-cons-to-pairs predicate (cdr list)
-                                     (car list)))
+                                              (car list)))
         ((consp (car list))
          (cons `(,default . ,(car list))
                (igneous--hierarchical-cons-to-pairs predicate (cdr list) default)))
