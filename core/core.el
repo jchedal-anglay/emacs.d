@@ -6,7 +6,8 @@
 (defvar igneous--core-modules
   '(core-packages
     core-custom
-    core-lib))
+    core-lib
+    core-basics))
 
 (dolist (core-module igneous--core-modules)
   (require core-module))
