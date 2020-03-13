@@ -12,6 +12,11 @@
   `(when (igneous--feature-activated-p (igneous--current-category) (igneous--current-module) ,feature)
      ,@body))
 
+(defmacro with-os! (os &rest body)
+  "Execute BODY if current os is OS."
+  `(when (if (consp ',os) (memq system-type ',os) (eq system-type ',os))
+    ,@body))
+
 (defun igneous--feature-activated-p (category module feature)
   "Return nil if the FEATURE in not activated in the right CATEGORY and MODULE, return its value otherwise."
   (--some (and (-> it car (eq category))
