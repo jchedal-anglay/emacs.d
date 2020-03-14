@@ -17,7 +17,8 @@
 
 (add-to-list 'load-path igneous-core-dir)
 
-(setq load-prefer-newer t)
+(when (memq system-type '(gnu/linux darwin))
+  (setq custom-file "/dev/null"))
 
 (require 'core)
 
