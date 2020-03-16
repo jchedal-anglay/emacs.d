@@ -33,6 +33,16 @@
   "Return nil if the FEATURE is not activated in the right CATEGORY and MODULE, t otherwise."
   (memq feature (igneous--features category module)))
 
+(defun igneous--modules (category)
+  "Return the modules given a CATEGORY by looking in `igneous--modules'."
+  (->> igneous--modules
+       (--filter (eq (car it) category))
+       (-map #'cadr)))
+
+(defun igneous--module-activated-p (category module)
+  "Return nil if the MODULE is not activated in the right CATEGORY, t otherwise."
+  (memq module (igneous--modules category)))
+
 (defun igneous--current-module ()
   "Return the current module."
   (when (string-prefix-p igneous-modules-dir load-file-name)
