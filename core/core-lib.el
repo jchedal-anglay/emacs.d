@@ -23,11 +23,15 @@
   `(when (if (consp ',os) (memq system-type ',os) (eq system-type ',os))
      ,@body))
 
+(defun igneous--features (category module)
+  "Return the features given a CATEGORY and MODULE by looking in `igneous--modules'."
+  (->> igneous--modules
+       (--filter (and (-> it car (eq category)) (-> it cadr (eq module))))
+       cddar))
+
 (defun igneous--feature-activated-p (category module feature)
-  "Return nil if the FEATURE in not activated in the right CATEGORY and MODULE, return its value otherwise."
-  (--some (and (-> it car (eq category))
-               (-> it cadr (eq module))
-               (->> it cddr (memq feature))) igneous--modules))
+  "Return nil if the FEATURE is not activated in the right CATEGORY and MODULE, t otherwise."
+  (memq feature (igneous--features category module)))
 
 (defun igneous--current-module ()
   "Return the current module."
