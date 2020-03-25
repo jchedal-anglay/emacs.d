@@ -1,0 +1,6 @@
+(define-key key-translation-map (kbd "C-t") (kbd "C-x"))
+(define-key key-translation-map (kbd "C-x") (kbd "C-t"))
+(define-key key-translation-map (kbd "M-t") (kbd "M-x"))
+(define-key key-translation-map (kbd "M-x") (kbd "M-t"))
+(define-key key-translation-map (kbd "C-M-t") (kbd "C-M-x"))
+(define-key key-translation-map (kbd "C-M-x") (kbd "C-M-t"))
