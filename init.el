@@ -11,6 +11,9 @@
 (add-hook 'after-init-hook (lambda () (setq gc-cons-threshold (* 32 1000000)
                                             gc-cons-percentage 0.1)))
 
+(defvar igneous--file-name-handler-alist file-name-handler-alist)
+(setq file-name-handler-alist nil)
+
 (defvar igneous-dir user-emacs-directory)
 (defvar igneous-core-dir (expand-file-name "core" igneous-dir))
 (defvar igneous-modules-dir (expand-file-name  "modules" igneous-dir))
@@ -23,3 +26,5 @@
 (require 'core)
 
 (load!)
+
+(setq file-name-handler-alist igneous--file-name-handler-alist)
