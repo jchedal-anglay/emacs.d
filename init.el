@@ -25,6 +25,6 @@
 
 (require 'core)
 
-(load!)
+(load (expand-file-name "config" igneous-dir))
 
 (setq file-name-handler-alist igneous--file-name-handler-alist)
