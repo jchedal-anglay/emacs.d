@@ -6,6 +6,7 @@
 (require 'cl-lib)
 (use-package dash)
 (use-package dash-functional)
+(use-package f)
 
 (defmacro load! (&rest modules)
   "Load the MODULES."
@@ -14,7 +15,7 @@
 (defmacro with-feature! (feature &rest body)
   "Execute BODY if FEATURE is activated."
   (declare (indent 1))
-  `(when (igneous--feature-activated-p (igneous--current-category) (igneous--current-module) ,feature)
+  `(when (igneous--feature-activated-p (igneous--current-category) (igneous--current-module) ',feature)
      ,@body))
 
 (defmacro with-os! (os &rest body)
@@ -46,7 +47,7 @@
 (defun igneous--current-module ()
   "Return the current module."
   (when (string-prefix-p igneous-modules-dir load-file-name)
-    (-> load-file-name f-split last car intern)))
+    (-> load-file-name file-name-sans-extension f-split last car intern)))
 
 (defun igneous--current-category ()
   "Return the current category."
