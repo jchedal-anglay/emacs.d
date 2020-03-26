@@ -1,4 +1,4 @@
 (load! :ui
-       one-dark
+       (one-dark +variant)
        :editor
        dvorak)
