@@ -28,5 +28,5 @@
 
 (require 'core)
 
+(load (expand-file-name "modules" igneous-dir))
 (load (expand-file-name "config" igneous-dir))
-
