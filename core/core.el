@@ -7,7 +7,8 @@
   '(core-packages
     core-custom
     core-lib
-    core-basics))
+    core-basics
+    core-ui))
 
 (dolist (core-module igneous--core-modules)
   (require core-module))
