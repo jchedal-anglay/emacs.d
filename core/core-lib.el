@@ -49,6 +49,10 @@
   (when (string-prefix-p igneous-modules-dir load-file-name)
     (-> load-file-name file-name-sans-extension f-split last car intern)))
 
+(defun igneous--categories ()
+  "Return the categories by looking in `igneous-modules'."
+  (->> igneous--modules (-map #'car) delete-dups))
+
 (defun igneous--current-category ()
   "Return the current category."
   (when (string-prefix-p igneous-modules-dir load-file-name)
@@ -69,7 +73,8 @@
 
 (defun igneous--load-modules (modules)
   "Load the MODULES, internals of `load!'."
-  (setq igneous--modules (igneous--hierarchical-cons-to-pairs 'keywordp modules :.))
+  (dolist (pair (igneous--hierarchical-cons-to-pairs 'keywordp modules :.))
+    (add-to-list 'igneous--modules pair t))
   (mapcar #'igneous--load-pair igneous--modules))
 
 (defun igneous--load-pair (pair)
