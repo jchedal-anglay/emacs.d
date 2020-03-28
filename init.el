@@ -15,7 +15,8 @@
                              (setq gc-cons-threshold (* 32 1000000)
                                    gc-cons-percentage 0.1)
                              (dolist (handler igneous--file-name-handler-alist)
-                               (add-to-list 'file-name-handler-alist handler))))
+                               (add-to-list 'file-name-handler-alist handler))
+                             (makunbound 'igneous--file-name-handler-alist)))
 
 (defvar igneous-dir user-emacs-directory)
 (defvar igneous-core-dir (expand-file-name "core" igneous-dir))
