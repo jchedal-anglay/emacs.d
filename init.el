@@ -24,8 +24,7 @@
 
 (add-to-list 'load-path igneous-core-dir)
 
-(when (memq system-type '(gnu/linux darwin))
-  (setq custom-file "/dev/null"))
+(setq custom-file (if (memq system-type '(gnu/linux darwin)) "/dev/null" "NUL"))
 
 (require 'core)
 
