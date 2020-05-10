@@ -8,7 +8,8 @@
     core-custom
     core-lib
     core-basics
-    core-ui))
+    core-ui
+    core-bindings))
 
 (dolist (core-module igneous--core-modules)
   (require core-module))
