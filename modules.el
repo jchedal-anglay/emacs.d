@@ -1,4 +1,4 @@
-(load! :ui
+(load! :theme
        (one-dark +variant)
-       :editor
+       :input
        dvorak)
