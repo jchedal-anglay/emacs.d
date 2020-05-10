@@ -3,7 +3,6 @@
 ;; Defines UI elements such as the modeline or the dashboard.
 ;;; Code:
 
-
 (defun igneous--banner-logo-title ()
   (setq dashboard-banner-logo-title
 	(format "%d modules loaded within %d categories."
@@ -21,8 +20,7 @@
   (after-init . igneous--banner-logo-title)
   :custom
   (dashboard-center-content t)
-  (dashboard-items '((recents  . 5)
-                     (projects . 5)))
+  (dashboard-items '((recents  . 5)))
   (dashboard-set-file-icons nil)
   (dashboard-set-footer nil)
   (dashboard-set-heading-icons nil)
