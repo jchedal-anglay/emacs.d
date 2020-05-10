@@ -40,5 +40,11 @@
 ;; Buffer names uniquifying
 (setq uniquify-buffer-name-style 'post-forward-angle-brackets)
 
+;; Startup screens and scratch buffer
+(setq inhibit-startup-screen t)
+(setq inhibit-startup-message t)
+(setq inhibit-startup-echo-area-message t)
+(setq initial-scratch-message nil)
+
 (provide 'core-basics)
 ;;; core-basics.el ends here
