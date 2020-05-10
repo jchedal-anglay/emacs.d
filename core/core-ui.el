@@ -55,5 +55,8 @@
   :hook
   ((comint-mode help-mode) . hide-mode-line-mode))
 
+(when (display-graphic-p)
+  (add-hook 'prog-mode-hook #'hl-line-mode))
+
 (provide 'core-ui)
 ;;; core-ui.el ends here
