@@ -34,8 +34,7 @@
       scroll-preserve-screen-position t)
 
 ;; Disable bells
-(setq audible-bell nil
-      ring-bell-function 'ignore
+(setq ring-bell-function 'ignore
       visible-bell nil)
 
 ;; Buffer names uniquifying
