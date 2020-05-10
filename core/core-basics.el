@@ -46,5 +46,8 @@
 (setq inhibit-startup-echo-area-message t)
 (setq initial-scratch-message nil)
 
+;; End file with \n
+(setq-default require-final-newline t)
+
 (provide 'core-basics)
 ;;; core-basics.el ends here
