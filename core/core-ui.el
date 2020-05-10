@@ -58,5 +58,15 @@
 (when (display-graphic-p)
   (add-hook 'prog-mode-hook #'hl-line-mode))
 
+(use-package display-line-numbers
+  :ensure nil
+  :hook
+  (prog-mode . display-line-numbers-mode)
+  :custom
+  (display-line-numbers-type 'relative)
+  (display-line-numbers-current-absolute t)
+  (display-line-numbers-width 2)
+  (display-line-numbers-widen t))
+
 (provide 'core-ui)
 ;;; core-ui.el ends here
