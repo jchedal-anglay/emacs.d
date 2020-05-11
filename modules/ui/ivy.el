@@ -2,13 +2,13 @@
   :bind
   ([remap switch-to-buffer] . ivy-switch-buffer)
   (:map ivy-minibuffer-map
-        ("<return>" . ivy-alt-done))
+        ("RET" . ivy-alt-done)
+        ("C-RET" . ivy-done))
   :custom
   (ivy-use-virtual-buffers t)
   (ivy-count-format "%d/%d ")
   (ivy-height 20)
   (ivy-display-style 'fancy)
-  (ivy-format-function 'ivy-format-function-line)
   (ivy-wrap t)
   (ivy-action-wrap t)
   (ivy-re-builders-alist
@@ -26,9 +26,7 @@
   (use-package swiper
     :after ivy
     :bind
-    (:map swiper-isearch-map
-          ;; Required, bugged by default
-          ("M-n" . ivy-next-history-element))))
+    ("C-s" . swiper)))
 
 (use-package ivy-rich
   :after (ivy counsel)
