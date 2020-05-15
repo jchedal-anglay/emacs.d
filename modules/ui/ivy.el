@@ -22,11 +22,11 @@
   (counsel-mode t)
   (setq-default ivy-initial-inputs-alist nil))
 
-(with-feature! +swiper
-  (use-package swiper
-    :after ivy
-    :bind
-    ("C-s" . swiper)))
+(use-package swiper
+  :if (feature-p! +swiper)
+  :after ivy
+  :bind
+  ("C-s" . swiper))
 
 (use-package ivy-rich
   :after (ivy counsel)

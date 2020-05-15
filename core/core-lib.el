@@ -24,6 +24,14 @@
   `(when (if (consp ',os) (memq system-type ',os) (eq system-type ',os))
      ,@body))
 
+(defmacro feature-p! (feature)
+  "Return nil if the FEATURE is not activated in the current category and module, t otherwise."
+  `(igneous--feature-activated-p (igneous--current-category) (igneous--current-module) ',feature))
+
+(defmacro module-p! (category module)
+  "Return nil if the MODULE is not activated in the right CATEGORY, t otherwise."
+  `(igneous--module-activated-p ',category ',module))
+
 (defun igneous--features (category module)
   "Return the features given a CATEGORY and MODULE by looking in `igneous--modules'."
   (->> igneous--modules

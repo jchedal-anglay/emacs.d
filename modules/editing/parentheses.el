@@ -5,8 +5,7 @@
 
 (show-paren-mode t)
 
-(with-feature! +rainbow
-  (use-package rainbow-delimiters
-    :hook
-    (prog-mode . rainbow-delimiters-mode)))
-
+(use-package rainbow-delimiters
+  :if (feature-p! +rainbow)
+  :hook
+  (prog-mode . rainbow-delimiters-mode))
