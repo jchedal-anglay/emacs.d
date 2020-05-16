@@ -1,12 +1,12 @@
 (defun igneous--file-exists-p (path)
-  (and (file-exists-p path) path))
+  (and (file-exists-p path) `(,path)))
 
 (use-package projectile
   :demand t
   :bind-keymap
   ("C-c p" . projectile-command-map)
   :custom
-  (projectile-project-search-path (list (igneous--file-exists-p "~/Projects")))
+  (projectile-project-search-path (igneous--file-exists-p "~/Projects"))
   (projectile-indexing-method (if (memq system-type '(ms-dos windows-nt cygwin)) 'native 'alien))
   (projectile-sort-order 'access-time)
   (projectile-enable-caching t)
