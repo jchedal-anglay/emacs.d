@@ -11,7 +11,7 @@
        exec-path-from-shell
        :os
        macos
-       :theme
+       :themes
        (one-dark +variant)
        :tools
        git
