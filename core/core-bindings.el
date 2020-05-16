@@ -3,9 +3,15 @@
 ;; Modifies keybindings of builtin modes and functions.
 ;;; Code:
 
+
 (global-set-key (kbd "C-x C-b") #'ibuffer)
-(define-key 'dired-mode-map (kbd "C-c C-c") #'wdired-change-to-wdired-mode)
-(define-key 'comint-mode-map (kbd "C-l") #'comint-clear-buffer)
+(global-set-key (kbd "M-o") #'other-window)
+
+(with-eval-after-load 'comint
+  (define-key comint-mode-map (kbd "C-l") #'comint-clear-buffer))
+
+(with-eval-after-load 'dired
+  (define-key dired-mode-map (kbd "C-c C-c") #'wdired-change-to-wdired-mode))
 
 (use-package mwim
   :bind
