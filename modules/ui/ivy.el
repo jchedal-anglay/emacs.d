@@ -1,9 +1,10 @@
 (use-package ivy
+  :demand t
   :bind
   ([remap switch-to-buffer] . ivy-switch-buffer)
   (:map ivy-minibuffer-map
-        ("RET" . ivy-alt-done)
-        ("C-RET" . ivy-done))
+	("RET" . ivy-alt-done)
+	("C-RET" . ivy-done))
   :custom
   (ivy-use-virtual-buffers t)
   (ivy-count-format "%d/%d ")
@@ -19,8 +20,7 @@
 (use-package counsel
   :after ivy
   :config
-  (counsel-mode t)
-  (setq-default ivy-initial-inputs-alist nil))
+  (counsel-mode t))
 
 (use-package swiper
   :if (feature-p! +swiper)
