@@ -1,3 +1,5 @@
 (use-package aggressive-indent
-  :hook
-  (prog-mode . aggressive-indent-mode))
+  :config
+  (add-to-list 'aggressive-indent-excluded-modes 'c++-mode)
+  (add-to-list 'aggressive-indent-excluded-modes 'c-mode)
+  (global-aggressive-indent-mode))
