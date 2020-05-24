@@ -1,12 +1,16 @@
 (load! :editor
        aggressive-indent
+       company
        expand-region
+       flycheck
        hungry-delete
        multiple-cursors
        (parentheses +rainbow)
        project
        :input
        dvorak
+       :language
+       (cc +lsp)
        :misc
        exec-path-from-shell
        :os
@@ -15,7 +19,8 @@
        (one-dark +variant)
        :tools
        git
+       (lsp +ui)
        :ui
        discoverability
        icons
-       ivy)
+       (ivy +swiper))
