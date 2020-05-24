@@ -24,3 +24,6 @@
   :config
   (with-eval-after-load 'hl-line
     (set-face-background 'lsp-ui-doc-background (face-background 'hl-line))))
+
+(with-module! :editor company
+  (add-hook 'lsp-mode-hook #'company-mode))
