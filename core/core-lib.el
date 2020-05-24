@@ -18,6 +18,11 @@
   `(when (igneous--feature-activated-p (igneous--current-category) (igneous--current-module) ',feature)
      ,@body))
 
+(defmacro with-module! (category module &rest body)
+  (declare (indent 2))
+  `(when (igneous--module-activated-p ',category ',module)
+     ,@body))
+
 (defmacro with-os! (os &rest body)
   "Execute BODY if current os is OS."
   (declare (indent 1))
