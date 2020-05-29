@@ -14,6 +14,7 @@
        :misc
        discord
        exec-path-from-shell
+       keyfreq
        :os
        macos
        :themes
