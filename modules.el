@@ -12,6 +12,7 @@
        :language
        (cc +lsp)
        :misc
+       discord
        exec-path-from-shell
        :os
        macos
