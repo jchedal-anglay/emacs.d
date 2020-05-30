@@ -11,6 +11,7 @@
        dvorak
        :language
        (cc +lsp)
+       clojure
        (python +lsp)
        :misc
        discord
