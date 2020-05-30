@@ -12,6 +12,7 @@
        :language
        (cc +lsp)
        clojure
+       common-lisp
        (python +lsp)
        :misc
        discord
