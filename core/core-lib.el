@@ -8,6 +8,17 @@
 (use-package dash-functional)
 (use-package f)
 
+(defun verify-dependencies! ()
+  "Iterate through the variable `igneous--ext-dependencies' and outputs warning when dependencies are not installed."
+  (dolist (row igneous--ext-dependencies)
+    (when (not (executable-find (symbol-name (caddr row))))
+      (warn "%s/%s marked %s as a dependency." (car row) (cadr row) (caddr row)))))
+
+(defmacro dependencies! (&rest progs)
+  "Add PROGS to the list of dependencies for the current module."
+  `(dolist (prog ',progs)
+     (igneous--add-dependency prog)))
+
 (defmacro load! (&rest modules)
   "Load the MODULES."
   `(igneous--load-modules ',modules))
@@ -37,8 +48,12 @@
   "Return nil if the MODULE is not activated in the right CATEGORY, t otherwise."
   `(igneous--module-activated-p ',category ',module))
 
+(defun igneous--add-dependency (prog)
+  "Add (:category 'module prog) to the variable `igneous--ext-dependencies'."
+  (add-to-list 'igneous--ext-dependencies (list (igneous--current-category) (igneous--current-module) prog)))
+
 (defun igneous--features (category module)
-  "Return the features given a CATEGORY and MODULE by looking in `igneous--modules'."
+  "Return the features given a CATEGORY and MODULE by looking in the variable `igneous--modules'."
   (->> igneous--modules
        (--filter (and (-> it car (eq category)) (-> it cadr (eq module))))
        cddar))
@@ -48,7 +63,7 @@
   (memq feature (igneous--features category module)))
 
 (defun igneous--modules (category)
-  "Return the modules given a CATEGORY by looking in `igneous--modules'."
+  "Return the modules given a CATEGORY by looking in the variable `igneous--modules'."
   (->> igneous--modules
        (--filter (eq (car it) category))
        (-map #'cadr)))
