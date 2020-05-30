@@ -11,6 +11,7 @@
        dvorak
        :language
        (cc +lsp)
+       (python +lsp)
        :misc
        discord
        exec-path-from-shell
