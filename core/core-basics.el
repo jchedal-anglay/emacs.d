@@ -49,5 +49,9 @@
 ;; End file with \n
 (setq-default require-final-newline t)
 
+;; Tab width & type
+(setq-default tab-width 4)
+(setq-default indent-tabs-mode nil)
+
 (provide 'core-basics)
 ;;; core-basics.el ends here
