@@ -1,6 +1,7 @@
 (load! :editor
        aggressive-indent
        company
+       editorconfig
        expand-region
        flycheck
        hungry-delete
