@@ -18,3 +18,11 @@
   (if (module-p! :tools lsp)
       (add-hook 'python-mode-hook #'lsp)
     (warn "Module language/python requires module tools/lsp for feature +lsp to work.")))
+
+(with-eval-after-load 'lsp-mode
+  (setq lsp-pyls-plugins-autopep8-enabled nil
+        lsp-pyls-plugins-flake8-enabled t
+        lsp-pyls-plugins-mccabe-enabled nil
+        lsp-pyls-plugins-pycodestyle-enabled nil
+        lsp-pyls-plugins-pyflakes-enabled nil
+        lsp-pyls-plugins-yapf-enabled nil))
