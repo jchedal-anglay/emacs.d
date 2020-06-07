@@ -20,3 +20,5 @@
 (use-package gitattributes-mode)
 (use-package gitignore-mode)
 (use-package gitconfig-mode)
+
+(dependencies! git)

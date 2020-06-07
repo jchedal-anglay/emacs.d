@@ -26,3 +26,5 @@
         lsp-pyls-plugins-pycodestyle-enabled nil
         lsp-pyls-plugins-pyflakes-enabled nil
         lsp-pyls-plugins-yapf-enabled nil))
+
+(dependencies! python)

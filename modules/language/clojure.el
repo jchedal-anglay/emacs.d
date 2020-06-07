@@ -5,7 +5,7 @@
 (use-package cider
   :bind
   (:map cider-repl-mode-map
-	("C-l" . cider-repl-clear-buffer))
+        ("C-l" . cider-repl-clear-buffer))
   :custom
   (cider-font-lock-dynamically t)
   (cider-print-fn 'fipp)
@@ -14,3 +14,5 @@
   (cider-repl-tab-command 'indent-for-tab-command)
   (cider-save-file-on-load t)
   (nrepl-hide-special-buffers t))
+
+(dependencies! lein)
