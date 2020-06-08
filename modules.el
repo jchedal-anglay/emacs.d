@@ -14,6 +14,7 @@
        (cc +lsp)
        clojure
        common-lisp
+       emacs-lisp
        (python +lsp)
        :misc
        discord
