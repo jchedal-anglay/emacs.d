@@ -31,17 +31,18 @@
       :duration 'command)
     value)
 
-  (defun sly-eval-with-transcript (form)
-    "Eval FORM in Lisp. Display output, if any."
-    (run-hooks 'sly-transcript-start-hook)
-    (sly-rex () (form)
-      ((:ok value)
-       (setq igneous--sly-eval-result value)
-       (run-hooks 'sly-transcript-stop-hook)
-       (sly-display-eval-result value))
-      ((:abort condition)
-       (run-hooks 'sly-transcript-stop-hook)
-       (sly-message "Evaluation aborted on %s." condition))))
+  (advice-add 'sly-eval-with-transcript :override
+              (lambda (form)
+                "Eval FORM in Lisp. Display output, if any."
+                (run-hooks 'sly-transcript-start-hook)
+                (sly-rex () (form)
+                  ((:ok value)
+                   (setq igneous--sly-eval-result value)
+                   (run-hooks 'sly-transcript-stop-hook)
+                   (sly-display-eval-result value))
+                  ((:abort condition)
+                   (run-hooks 'sly-transcript-stop-hook)
+                   (sly-message "Evaluation aborted on %s." condition)))))
 
   (advice-add 'sly-eval-region :around
               (lambda (f beg end &rest _)
@@ -66,6 +67,5 @@
                        (end-of-defun)
                        (point)))
                   (makunbound 'igneous--sly-eval-result)))))
-
 
 (dependencies! sbcl)
