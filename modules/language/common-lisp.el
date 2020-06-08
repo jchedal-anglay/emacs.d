@@ -7,4 +7,7 @@
   :config
   (sly-setup))
 
+(with-module! :editor company
+  (add-hook 'sly-mode-hook #'company-mode))
+
 (dependencies! sbcl)

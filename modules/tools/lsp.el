@@ -14,8 +14,8 @@
   :after lsp-mode
   :bind
   (:map lsp-mode-map
-	([remap xref-find-references] . lsp-ui-peek-find-references)
-	([remap flycheck-list-errors] . lsp-ui-flycheck-list))
+        ([remap xref-find-references] . lsp-ui-peek-find-references)
+        ([remap flycheck-list-errors] . lsp-ui-flycheck-list))
   :hook
   (lsp-mode . lsp-ui-mode)
   :custom
