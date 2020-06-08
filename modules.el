@@ -27,6 +27,7 @@
        :tools
        git
        (lsp +ui)
+       vterm
        :ui
        discoverability
        icons
