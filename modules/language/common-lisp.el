@@ -49,13 +49,13 @@
                     (endless/eval-overlay-cl
                      (apply f beg end igneous--sly-eval-result)
                      end)
-                  (fmakunbound igneous--sly-eval-result))))
+                  (makunbound 'igneous--sly-eval-result))))
 
   (advice-add 'sly-eval-last-expression :filter-return
               (lambda (_)
                 (prog1
                     (endless/eval-overlay-cl igneous--sly-eval-result (point))
-                  (fmakunbound igneous--sly-eval-result))))
+                  (makunbound 'igneous--sly-eval-result))))
 
   (advice-add 'sly-eval-defun :filter-return
               (lambda (_)
@@ -65,7 +65,7 @@
                      (save-excursion
                        (end-of-defun)
                        (point)))
-                  (fmakunbound igneous--sly-eval-result)))))
+                  (makunbound 'igneous--sly-eval-result)))))
 
 
 (dependencies! sbcl)
