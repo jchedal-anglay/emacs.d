@@ -1,4 +1,5 @@
 (use-package python
+  :defer t
   :ensure nil
   :custom
   (python-indent 4)

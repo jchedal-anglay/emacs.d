@@ -2,7 +2,6 @@
   (and (file-exists-p path) `(,path)))
 
 (use-package projectile
-  :demand t
   :bind-keymap
   ("C-c p" . projectile-command-map)
   :custom
