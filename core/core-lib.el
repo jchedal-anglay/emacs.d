@@ -20,6 +20,9 @@
   `(dolist (prog ',progs)
      (igneous--add-dependency prog)))
 
+(defmacro set-face! (face-type where color)
+  `(set-face-attribute ',(intern (string-join (list "font-lock-" (symbol-name face-type) "-face"))) nil ,where (doom-color ',color)))
+
 (defmacro load! (&rest modules)
   "Load the MODULES."
   `(igneous--load-modules ',modules))
