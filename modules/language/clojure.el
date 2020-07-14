@@ -3,6 +3,8 @@
   (clojure-mode . aggressive-indent-mode))
 
 (use-package cider
+  :hook
+  (cider-repl-mode . hide-mode-line-mode)
   :bind
   (:map cider-repl-mode-map
         ("C-l" . cider-repl-clear-buffer))
