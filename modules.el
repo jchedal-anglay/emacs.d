@@ -15,6 +15,7 @@
        common-lisp
        emacs-lisp
        (python +cython +lsp)
+       latex
        :misc
        discord
        exec-path-from-shell
