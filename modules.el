@@ -14,7 +14,7 @@
        clojure
        common-lisp
        emacs-lisp
-       (python +lsp)
+       (python +cython +lsp)
        :misc
        discord
        exec-path-from-shell

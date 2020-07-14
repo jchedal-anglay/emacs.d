@@ -15,6 +15,14 @@
   :hook
   (python-mode . pyvenv-mode))
 
+(with-feature! +cython
+  (use-package cython-mode)
+  (use-package flycheck-cython
+    :if (module-p! :tools flycheck)
+    :after flycheck
+    :config
+    (add-to-list 'flycheck-checkers 'cython)))
+
 (with-feature! +lsp
   (if (module-p! :tools lsp)
       (add-hook 'python-mode-hook #'lsp)
