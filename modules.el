@@ -26,6 +26,7 @@
        :tools
        git
        (lsp +ui)
+       pdf
        vterm
        :ui
        discoverability
