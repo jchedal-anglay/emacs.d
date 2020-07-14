@@ -4,3 +4,4 @@
 (define-key key-translation-map (kbd "M-x") (kbd "M-t"))
 (define-key key-translation-map (kbd "C-M-t") (kbd "C-M-x"))
 (define-key key-translation-map (kbd "C-M-x") (kbd "C-M-t"))
+(setq default-input-method "french-prefix")
