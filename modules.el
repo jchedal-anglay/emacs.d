@@ -23,7 +23,8 @@
        :os
        macos
        :themes
-       (one-dark +variant)
+       ;; (one-dark +variant)
+       elegance
        :tools
        git
        (lsp +ui)

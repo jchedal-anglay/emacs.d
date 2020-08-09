@@ -33,28 +33,9 @@
 (line-number-mode t)
 (column-number-mode t)
 
-(use-package doom-modeline
-  :demand t
-  :if (display-graphic-p)
-  :custom
-  (doom-modeline-env-enable-elixir nil)
-  (doom-modeline-env-enable-go nil)
-  (doom-modeline-env-enable-perl nil)
-  (doom-modeline-env-enable-python nil)
-  (doom-modeline-env-enable-ruby nil)
-  (doom-modeline-env-enable-rust nil)
-  (doom-modeline-icon nil)
-  (doom-modeline-env-version nil)
-  (doom-modeline-buffer-file-name-style 'file-name)
-  :config
-  (doom-modeline-mode t))
-
 (use-package hide-mode-line
   :hook
   ((comint-mode help-mode) . hide-mode-line-mode))
-
-(when (display-graphic-p)
-  (add-hook 'prog-mode-hook #'hl-line-mode))
 
 (use-package display-line-numbers
   :ensure nil
