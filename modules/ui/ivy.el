@@ -36,3 +36,10 @@
   :config
   (ivy-rich-mode t)
   (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-line))
+
+(use-package ivy-posframe
+  :if (feature-p! +posframe)
+  :custom
+  (ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
+  :config
+  (ivy-posframe-mode))

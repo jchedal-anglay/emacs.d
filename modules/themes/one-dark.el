@@ -37,3 +37,7 @@
                       nil
                       :background (face-background 'default)
                       :height 1.0))
+
+(with-eval-after-load 'ivy-posframe
+  (set-face-attribute 'ivy-posframe-border nil :background (doom-color 'fg))
+  (set-face-attribute 'ivy-posframe nil :background (doom-color 'bg)))
