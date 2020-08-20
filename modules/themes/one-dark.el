@@ -3,6 +3,7 @@
   (load-theme 'doom-one t))
 
 (use-package doom-modeline
+  :if (feature-p! +modeline)
   :demand t
   :if (display-graphic-p)
   :custom
