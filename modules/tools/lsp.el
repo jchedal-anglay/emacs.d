@@ -1,9 +1,9 @@
 (use-package lsp-mode
   :bind
   (:map lsp-mode-map
-	([remap xref-find-definitions] . lsp-find-definition)
-	("C-c e" . lsp-rename)
-	("C-c f" . lsp-format-buffer))
+        ([remap xref-find-definitions] . lsp-find-definition)
+        ("C-c e" . lsp-rename)
+        ("C-c f" . lsp-format-buffer))
   :custom
   (lsp-auto-guess-root t)
   (lsp-enable-snippet nil)
