@@ -6,6 +6,7 @@
 
 (global-set-key (kbd "C-x C-b") #'ibuffer)
 (global-set-key (kbd "M-o") #'other-window)
+(global-set-key (kbd "C-x k") #'kill-this-buffer)
 
 (with-eval-after-load 'comint
   (define-key comint-mode-map (kbd "C-l") #'comint-clear-buffer))

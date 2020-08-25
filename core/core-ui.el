@@ -47,5 +47,8 @@
   (display-line-numbers-width 2)
   (display-line-numbers-widen t))
 
+;; No ugly button for checkboxes
+(setq widget-image-enable nil)
+
 (provide 'core-ui)
 ;;; core-ui.el ends here
