@@ -23,14 +23,13 @@
        :os
        macos
        :themes
-       ;; (one-dark +variant)
-       elegance
+       (one-dark +variant +modeline)
        :tools
        git
-       (lsp +ui)
+       (lsp +ui +debug)
        pdf
        vterm
        :ui
-       discoverability
+       (discoverability)
        icons
-       (ivy +swiper))
+       (ivy +swiper +posframe))
