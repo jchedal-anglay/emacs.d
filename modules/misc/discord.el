@@ -1,5 +1,5 @@
 (use-package elcord
-  :if (executable-find "discord")
+  :if (or (executable-find "discord") (executable-find "discord-canary"))
   :custom
   (elcord-use-major-mode-as-main-icon t)
   :config
