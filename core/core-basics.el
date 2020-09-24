@@ -53,5 +53,8 @@
 (setq-default tab-width 4)
 (setq-default indent-tabs-mode nil)
 
+;; Overwrite region when typing
+(delete-selection-mode 1)
+
 (provide 'core-basics)
 ;;; core-basics.el ends here
