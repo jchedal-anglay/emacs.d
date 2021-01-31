@@ -9,7 +9,7 @@
 (use-package f)
 
 (defun verify-dependencies! ()
-  "Iterate through the variable `igneous--ext-dependencies' and outputs warning when dependencies are not installed."
+  "Iterate through the variable `igneous--ext-dependencies' and output warnings when dependencies are not installed."
   (interactive)
   (dolist (row igneous--ext-dependencies)
     (when (not (executable-find (symbol-name (caddr row))))
