@@ -24,6 +24,7 @@
        macos
        :themes
        (one-dark +variant +modeline)
+       ;; (solarized-light +modeline)
        :tools
        git
        (lsp +ui +debug)
