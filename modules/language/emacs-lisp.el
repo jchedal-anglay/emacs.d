@@ -17,15 +17,5 @@
                 (endless/eval-overlay
                  (apply f beg end r)
                  end)))
-
-  (advice-add 'eval-last-sexp :filter-return
-              (lambda (r)
-                (endless/eval-overlay r (point))))
-
-  (advice-add 'eval-defun :filter-return
-              (lambda (r)
-                (endless/eval-overlay
-                 r
-                 (save-excursion
-                   (end-of-defun)
-                   (point))))))
+  (advice-add 'eval-last-sexp :filter-return (##endless/eval-overlay % (point)))
+  (advice-add 'eval-defun :filter-return (##endless/eval-overlay % (save-recursion (end-of-defun) (point)))))
