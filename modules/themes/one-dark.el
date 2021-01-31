@@ -22,8 +22,8 @@
 (with-feature! +variant
   (set-face! negation-char     :foreground red)
   (set-face! type              :foreground yellow)
-  (set-face! comment-delimiter :foreground grey)
-  (set-face! doc               :foreground grey)
+  (set-face! comment-delimiter :foreground light-grey)
+  (set-face! doc               :foreground light-grey)
   (set-face! function-name     :foreground blue)
   (set-face! constant          :foreground violet)
   (set-face! warning           :foreground orange)
