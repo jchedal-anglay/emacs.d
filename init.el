@@ -11,12 +11,14 @@
 (defvar igneous--file-name-handler-alist file-name-handler-alist)
 (setq file-name-handler-alist nil)
 
-(add-hook 'after-init-hook (lambda ()
-                             (setq gc-cons-threshold (* 32 1000000)
-                                   gc-cons-percentage 0.1)
-                             (dolist (handler igneous--file-name-handler-alist)
-                               (add-to-list 'file-name-handler-alist handler))
-                             (makunbound 'igneous--file-name-handler-alist)))
+(defun igneous--startup ()
+  (setq gc-cons-threshold (* 32 1000000)
+        gc-cons-percentage 0.1)
+  (dolist (handler igneous--file-name-handler-alist)
+    (add-to-list 'file-name-handler-alist handler))
+  (makunbound 'igneous--file-name-handler-alist))
+
+(add-hook 'after-init-hook #'igneous--startup)
 
 (defvar igneous-dir user-emacs-directory)
 (defvar igneous-core-dir (expand-file-name "core" igneous-dir))
