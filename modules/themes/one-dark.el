@@ -20,18 +20,18 @@
   (doom-modeline-mode t))
 
 (with-feature! +variant
-  (set-face! negation-char     :foreground red)
-  (set-face! type              :foreground yellow)
-  (set-face! comment-delimiter :foreground light-grey)
-  (set-face! doc               :foreground light-grey)
-  (set-face! function-name     :foreground blue)
-  (set-face! constant          :foreground violet)
-  (set-face! warning           :foreground orange)
-  (set-face! keyword           :foreground magenta)
-  (set-face! string            :foreground green)
-  (set-face! variable-name     :foreground red)
-  (set-face! preprocessor      :foreground teal)
-  (set-face! builtin           :foreground blue))
+  (set-font-lock! negation-char     :foreground red)
+  (set-font-lock! type              :foreground yellow)
+  (set-font-lock! comment-delimiter :foreground light-grey)
+  (set-font-lock! doc               :foreground light-grey)
+  (set-font-lock! function-name     :foreground blue)
+  (set-font-lock! constant          :foreground violet)
+  (set-font-lock! warning           :foreground orange)
+  (set-font-lock! keyword           :foreground magenta)
+  (set-font-lock! string            :foreground green)
+  (set-font-lock! variable-name     :foreground red)
+  (set-font-lock! preprocessor      :foreground teal)
+  (set-font-lock! builtin           :foreground blue))
 
 (with-eval-after-load 'org
   (set-face-attribute 'org-level-1
