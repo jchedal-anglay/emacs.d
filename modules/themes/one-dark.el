@@ -33,6 +33,10 @@
   (set-font-lock! preprocessor      :foreground teal)
   (set-font-lock! builtin           :foreground blue))
 
+(with-eval-after-load 'lsp-headerline
+  (set-face! lsp-headerline-breadcrumb-symbols :foreground blue)
+  (set-face! lsp-headerline-breadcrumb-path :foreground yellow))
+
 (with-eval-after-load 'org
   (set-face-attribute 'org-level-1
                       nil
