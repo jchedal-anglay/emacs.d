@@ -4,7 +4,8 @@
 ;;; Code:
 
 (defvar igneous--core-modules
-  '(core-packages
+  '(;;core-straight
+    core-packages
     core-custom
     core-lib
     core-basics
