@@ -23,14 +23,15 @@
        :os
        macos
        :themes
-       (one-dark +variant +modeline)
-       ;; (solarized-light +modeline)
+       (one-dark +variant)
+       ;; solarized-light
        :tools
        git
        (lsp +ui +debug)
        pdf
        vterm
        :ui
+       (modeline +doom)
        (discoverability)
        icons
        (ivy +swiper +posframe))

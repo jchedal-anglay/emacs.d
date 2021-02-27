@@ -23,11 +23,13 @@
   `(dolist (prog ',progs)
      (igneous--add-dependency prog)))
 
-(defmacro set-font-lock! (face-type where color)
-  `(set-face-attribute ',(intern (string-join (list "font-lock-" (symbol-name face-type) "-face"))) nil ,where (doom-color ',color)))
+(with-eval-after-load 'doom-themes
+  (defmacro set-font-lock! (face-type where color)
+  `(set-face-attribute ',(intern (string-join (list "font-lock-" (symbol-name face-type) "-face"))) nil ,where (doom-color ',color))))
 
-(defmacro set-face! (face where color)
-  `(set-face-attribute ',(intern (string-join (list (symbol-name face) "-face"))) nil ,where (doom-color ',color)))
+(with-eval-after-load 'doom-themes
+  (defmacro set-face! (face where color)
+  `(set-face-attribute ',(intern (string-join (list (symbol-name face) "-face"))) nil ,where (doom-color ',color))))
 
 (defmacro load! (&rest modules)
   "Load the MODULES."
