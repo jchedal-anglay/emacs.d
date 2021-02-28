@@ -32,6 +32,7 @@
 
 (line-number-mode t)
 (column-number-mode t)
+(global-hl-line-mode t)
 
 (use-package hide-mode-line
   :hook
@@ -49,6 +50,9 @@
 
 ;; No ugly button for checkboxes
 (setq widget-image-enable nil)
+
+;; Border on frames
+(set-frame-parameter nil 'internal-border-width 20)
 
 (provide 'core-ui)
 ;;; core-ui.el ends here
