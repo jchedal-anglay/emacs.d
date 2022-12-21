@@ -5,8 +5,8 @@
   (flycheck-info ((t (:underline (:style line :color "#80FF80")))))
   (flycheck-warning ((t (:underline (:style line :color "#FF9933")))))
   (flycheck-error ((t (:underline (:style line :color "#FF5C33")))))
-  (flycheck-check-syntax-automatically '(mode-enabled save))
   :custom
+  (flycheck-check-syntax-automatically '(mode-enabled save))
   (flycheck-checkers nil)
   :config
   ;; Bad flycheck design, override the default fringe without having to redefine entire checker levels
