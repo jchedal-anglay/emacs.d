@@ -31,20 +31,11 @@
 
 (with-feature! +lsp
   (if (module-p! :tools lsp)
-      (add-hook 'python-mode-hook #'lsp 80)  ;; 80 is the depth, helping making sure it runs after other hook functions
+      (use-package lsp-pyright
+        :init
+        (add-hook 'python-mode-hook #'lsp 80)  ;; 80 is the depth, helping making sure it runs after other hook functions
+        (require 'lsp-pyright))
     (warn "Module language/python requires module tools/lsp for feature +lsp to work.")))
 
-(with-eval-after-load 'lsp-mode
-  (lsp-register-custom-settings
-   '(("pyls.plugins.pyls_mypy.enabled" t t)
-     ("pyls.plugins.pyls_mypy.live_mode" nil t)
-     ("pyls.plugins.pyls_black.enabled" t t)
-     ("pyls.plugins.pyls_isort.enabled" t t)))
-  (setq lsp-pyls-plugins-autopep8-enabled nil
-        lsp-pyls-plugins-flake8-enabled t
-        lsp-pyls-plugins-mccabe-enabled nil
-        lsp-pyls-plugins-pycodestyle-enabled nil
-        lsp-pyls-plugins-pyflakes-enabled nil
-        lsp-pyls-plugins-yapf-enabled nil))
-
+(with-eval-after-load 'lsp-mode)
 (dependencies! python)
