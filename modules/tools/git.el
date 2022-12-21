@@ -17,8 +17,4 @@
   :config
   (transient-bind-q-to-quit))
 
-(use-package gitattributes-mode)
-(use-package gitignore-mode)
-(use-package gitconfig-mode)
-
 (dependencies! git)
