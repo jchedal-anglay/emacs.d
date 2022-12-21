@@ -23,8 +23,8 @@
        :os
        macos
        :themes
-       ;; (one-dark +variant)
-       solarized-light
+       (one-dark +variant)
+       ;; solarized-light
        :tools
        git
        (lsp +ui +debug)
@@ -34,5 +34,6 @@
        (modeline +doom)
        (discoverability)
        icons
-       ligatures
-       (ivy +swiper +posframe))
+       ;; ligatures
+       ;; (ivy +swiper +posframe)
+       vertico)
