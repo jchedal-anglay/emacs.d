@@ -7,9 +7,7 @@
 (use-package dash)
 (use-package dash-functional)
 (use-package f)
-(use-package llama
-  :config
-  (global-llama-mode))
+(use-package llama)
 
 (defun verify-dependencies! ()
   "Iterate through the variable `igneous--ext-dependencies' and output warnings when dependencies are not installed."
