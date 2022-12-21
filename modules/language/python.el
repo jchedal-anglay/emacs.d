@@ -37,5 +37,4 @@
         (require 'lsp-pyright))
     (warn "Module language/python requires module tools/lsp for feature +lsp to work.")))
 
-(with-eval-after-load 'lsp-mode)
 (dependencies! python)
