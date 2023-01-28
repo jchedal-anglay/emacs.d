@@ -1,10 +1,14 @@
+(use-package orderless
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles basic partial-completion)))))
+
 (use-package vertico
   :bind (:map vertico-map (("RET" . vertico-directory-enter)))
   :custom
   (vertico-resize t)
   (vertico-cycle t)
   (vertico-count 20)
-  (completion-styles '(substring basic))
   :init
   (vertico-mode t))
 
