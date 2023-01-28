@@ -20,6 +20,7 @@
        discord
        exec-path-from-shell
        keyfreq
+       notes
        :os
        macos
        :themes
