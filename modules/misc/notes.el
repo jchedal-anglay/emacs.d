@@ -6,9 +6,9 @@
   :bind (("C-c n l" . org-roam-buffer-toggle)
          ("C-c n f" . org-roam-node-find)
          ("C-c n i" . org-roam-node-insert)
-         ("C-c n M-." . org-roam-node-visit)
          :map org-mode-map
-         ("C-M-i"    . completion-at-point)))
+         ("M-?"    . completion-at-point)
+         ("M-." . org-open-at-point)))
 
 (use-package org-roam-ui
   :after org-roam
