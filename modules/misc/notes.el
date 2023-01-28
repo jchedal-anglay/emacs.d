@@ -17,4 +17,19 @@
   (org-roam-ui-sync-theme t)
   (org-roam-ui-follow t)
   (org-roam-ui-update-on-save t)
-  (org-roam-ui-open-on-start t))
+  (org-roam-ui-open-on-start t)
+  :config
+  (add-hook 'org-roam-buffer-postrender-functions
+            (lambda () (org--latex-preview-region (point-min) (point-max))))
+  (org-roam-db-autosync-mode))
+
+(use-package org
+  :defer t
+  :ensure nil
+  :custom
+  (org-src-fontify-natively t)
+  (org-highlight-latex-and-related '(latex script entities)))
+
+(use-package org-fragtog
+  :hook
+  (org-mode . org-fragtog-mode))
