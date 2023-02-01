@@ -24,8 +24,8 @@
        :os
        macos
        :themes
-       (one-dark +variant)
-       ;; solarized-light
+       ;; (one-dark +variant)
+       solarized-light
        :tools
        git
        (lsp +ui +debug)
