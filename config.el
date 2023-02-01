@@ -1,0 +1,5 @@
+(set-face-attribute 'default nil :height 160)
+(setq org-format-latex-options (plist-put org-format-latex-options :scale 1.7))
+(setq org-startup-with-inline-images t)
+(global-visual-line-mode t)
+(global-hl-line-mode t)
